@@ -1,0 +1,13 @@
+build
+node_modules
+bin
+package-lock.json
+deploy.log
+
+# OpenZeppelin
+unknown-*.json
+.session
+
+.openzeppelin
+
+yarn.lock
