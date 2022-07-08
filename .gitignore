@@ -11,3 +11,6 @@ unknown-*.json
 .openzeppelin
 
 yarn.lock
+
+.DS_Store
+*.DS_Store
