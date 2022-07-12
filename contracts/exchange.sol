@@ -10,7 +10,7 @@ contract Member is Department {
 	 */
 	bytes4 public constant ID = 0x98fded77;
 
-	function initMember(address host, string memory info, address operator) external {
+	function initExchange(address host, string memory info, address operator) external {
 		initDepartment(host, info, operator);
 		_registerInterface(ID);
 		// TODO
