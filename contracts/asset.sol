@@ -1,7 +1,6 @@
 
 pragma solidity ^0.8.15;
 
-import "./department.sol";
 import "./erc721.sol";
 
 contract Asset is Department, ERC721 {

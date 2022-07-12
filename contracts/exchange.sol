@@ -3,7 +3,7 @@ pragma solidity ^0.8.15;
 
 import "./department.sol";
 
-contract Member is Department {
+contract Exchange is Department {
 
 	/*
 	 * bytes4(keccak256('initMember(string,string,address,address,address,address,address,address)')) == 0x98fded77
