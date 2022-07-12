@@ -52,44 +52,9 @@ async function deploy(name, Contract, args, opts) {
 }
 
 module.exports = async function(deployer, networks, accounts) {
-	var team = accounts[0];
-
 	// https://docs.openzeppelin.com/upgrades-plugins/1.x/faq#why-cant-i-use-custom-types
-	opts = { deployer, initializer: 'initialize', unsafeAllowCustomTypes: true };
-	// TODO: check storage layout
-	var feePlan = await deploy('FeePlan', FeePlan, [], opts);
-	var ledger = await deploy('Ledger', Ledger, [], opts);
-	var exchange = await deploy('Exchange', Exchange, [feePlan.address, ledger.address, team], opts);
-	var votePool = await deploy('VotePool', VotePool, [exchange.address, ledger.address], opts);
-	var nfts = await deploy('NFTs', NFTs, [], opts);
+	let opts = { deployer, initializer: 'initialize', unsafeAllowCustomTypes: true };
 
-	const FORCE_SET = !!process.env['FORCE_SET'];
+	// TODO ...
 
-	if (await exchange.votePool() != votePool.address) {
-		await exchange.setVotePool(votePool.address);
-	}
-	if (await exchange.feePlan() != feePlan.address) {
-		await exchange.setFeePlan(feePlan.address);
-	}
-	if (await exchange.ledger() != ledger.address) {
-		assert(FORCE_SET, "Not can update ledger");
-		await exchange.setLedger(ledger.address);
-	}
-	if (await votePool.exchange() != exchange.address) {
-		assert(FORCE_SET, "Not can update exchange");
-		await votePool.setExchange(exchange.address);
-	}
-	if (await votePool.ledger() != ledger.address) {
-		assert(FORCE_SET, "Not can update ledger");
-		await votePool.setLedger(ledger.address);
-	}
-	if (!await ledger.hasSubLedger(votePool.address)) {
-		await ledger.addNewSubLedger(votePool.address);
-	}
-
-	console.log("exchange:", exchange.address);
-	console.log("ledger:", ledger.address);
-	console.log("votePool:", votePool.address);
-	console.log("feePlan:", feePlan.address);
-	console.log("nfts:", nfts.address);
 };
