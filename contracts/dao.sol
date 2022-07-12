@@ -30,12 +30,9 @@ contract DAO is Department {
 
 	function initDAO(
 		string memory info,
-		address operator,
-		address root_,
-		address member,
-		address ledger,
-		address asset,
-		address exchange) external {
+		address operator, address root_,
+		address member, address ledger,
+		address asset, address exchange) external {
 		initDepartment(address(this), info, operator);
 
 		ERC165(root_).checkInterface(VotePool.ID, "#DAO#initDAO root type not match");
