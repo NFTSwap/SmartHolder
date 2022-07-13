@@ -6,9 +6,9 @@ import "./erc721.sol";
 contract Asset is ERC721, IERC721Lock {
 
 	/*
-	 * bytes4(keccak256('initAsset(address,string,address)')) == 0x98fded77
+	 * bytes4(keccak256('initAsset(address,string,address)')) == 0xb6f00dcf
 	 */
-	bytes4 public constant ID = 0x98fded77;
+	bytes4 public constant ID = 0xb6f00dcf;
 
 	// Equals to `bytes4(keccak256("onERC721LockReceived(address,address,uint256,bytes)"))`
 	bytes4 private constant _ERC721_LOCK_RECEIVED = 0x7e154325;

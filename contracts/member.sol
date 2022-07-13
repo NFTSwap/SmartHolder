@@ -23,9 +23,9 @@ contract Member is ERC721 {
 	event UpdateInfo(uint256 id);
 
 	/*
-	 * bytes4(keccak256('initMember(string,string,address,address,address,address,address,address)')) == 0x98fded77
+	 * bytes4(keccak256('initMember(address,string,address)')) == 0x23fc76b9
 	 */
-	bytes4 public constant ID = 0x98fded77;
+	bytes4 public constant ID = 0x23fc76b9;
 
 	// member id => member info
 	mapping(uint256 => Info) private _info; // 成员信息

@@ -14,9 +14,9 @@ contract AssetGlobal is Department, ERC721, IERC721Receiver, IERC721LockReceiver
 		Kind kind;
 	}
 	/*
-	 * bytes4(keccak256('initAssetGlobal(address,string,address)')) == 0x98fded77
+	 * bytes4(keccak256('initAssetGlobal(address,string,address)')) == 0x711cc62c
 	 */
-	bytes4 public  constant ID = 0x98fded77;
+	bytes4 public  constant ID = 0x711cc62c;
 	bytes4 private constant _ERC721_RECEIVED = 0x150b7a02;
 	bytes4 private constant _ERC721_LOCK_RECEIVED = 0x7e154325;
 	bytes4 private constant _INTERFACE_ID_ERC721 = 0x80ac58cd;

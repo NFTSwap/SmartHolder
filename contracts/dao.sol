@@ -13,9 +13,9 @@ contract DAO is Department {
 	using EnumerableSet for EnumerableSet.AddressSet;
 
 	/*
-	 * bytes4(keccak256('initDAO(string,string,address,address,address,address,address,address)')) == 0x98fded77
+	 * bytes4(keccak256('initDAO(string,address,address,address,address,address,address)')) == 0xc7b55336
 	 */
-	bytes4 public constant ID = 0x98fded77;
+	bytes4 public constant ID = 0xc7b55336;
 
 	VotePool public root;
 	Member public member;

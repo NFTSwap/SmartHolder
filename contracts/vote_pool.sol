@@ -30,9 +30,9 @@ contract VotePool is ERC165 {
 	}
 
 	/*
-	 * bytes4(keccak256('initVotePool(string,string,address,address,address,address,address,address)')) == 0xf41fe906
+	 * bytes4(keccak256('initVotePool(address,string)')) == 0x0ddf27bf
 	 */
-	bytes4 public constant ID = 0xb3ab15fb;
+	bytes4 public constant ID = 0x0ddf27bf;
 
 	// define events
 	event Created(uint256);

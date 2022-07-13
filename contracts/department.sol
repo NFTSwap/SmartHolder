@@ -10,9 +10,9 @@ contract Department is ERC165 {
 	using Address for address;
 
 	/*
-	 * bytes4(keccak256('initDepartment(address,string,address)')) == 0x5d100a03
+	 * bytes4(keccak256('initDepartment(address,string,address)')) == 0x36c6362d
 	 */
-	bytes4 private constant ID = 0x5d100a03;
+	bytes4 private constant ID = 0x36c6362d;
 
 	address private __impl;
 	DAO internal host;

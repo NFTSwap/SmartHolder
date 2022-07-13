@@ -7,9 +7,9 @@ import "./member.sol";
 contract Ledger is Department {
 
 	/*
-	 * bytes4(keccak256('initLedger(address,string,address)')) == 0x98fded77
+	 * bytes4(keccak256('initLedger(address,string,address)')) == 0xf4c38e51
 	 */
-	bytes4 public constant ID = 0x98fded77;
+	bytes4 public constant ID = 0xf4c38e51;
 
 	event Receive(address indexed from, uint256 balance);
 	event Release(uint256 indexed member, address addr, uint256 balance);
