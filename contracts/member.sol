@@ -37,7 +37,7 @@ contract Member is ERC721 {
 		_registerInterface(ID);
 	}
 
-	function create(address owner, Info memory info) external onlyDAO {
+	function create(address owner, Info memory info) external OnlyDAO {
 		_mint(owner, info.id);
 
 		Info storage info_ = _info[id];
@@ -59,7 +59,7 @@ contract Member is ERC721 {
 		return _votes;
 	}
 
-	function setBaseURI(string memory baseURI) external onlyDAO {
+	function setBaseURI(string memory baseURI) external OnlyDAO {
 		_setBaseURI(baseURI);
 	}
 
@@ -81,6 +81,11 @@ contract Member is ERC721 {
 	function info(uint256 id) view public returns (Info memory) {
 		require(_exists(id), "#Member#info: info query for nonexistent member");
 		return _info[id];
+	}
+
+	function indexAt(uint256 index) view public returns (Info memory) {
+		require(index < _infoList.length, "#Member#indexAt Index out of bounds");
+		return _info[_infoList[index]];
 	}
 
 	function exists(uint256 id) view public returns (bool) {

@@ -22,11 +22,11 @@ contract Department is ERC165 {
 	/**
 		* @dev Throws if called by any account other than the owner.
 		*/
-	modifier onlyDAO() {
+	modifier OnlyDAO() {
 		address sender = msg.sender;
 		if (sender != operator) {
 			if (sender != host.operator) {
-				require(sender == host.root, "#Department#onlyDAO caller does not have permission");
+				require(sender == host.root, "#Department#OnlyDAO caller does not have permission");
 			}
 		}
 		_;
@@ -44,14 +44,14 @@ contract Department is ERC165 {
 		setOperator(operator_);
 	}
 
-	function setOperator(address vote) external onlyDAO {
+	function setOperator(address vote) external OnlyDAO {
 		if (vote != address(0)) {
 			ERC165(vote).checkInterface(VotePool.ID, "#Department#setOperator operator type not match");
 		}
 		operator = VotePool(vote);
 	}
 
-	function upgrade(address impl) external onlyDAO {
+	function upgrade(address impl) external OnlyDAO {
 		__impl = impl;
 	}
 

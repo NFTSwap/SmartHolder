@@ -49,22 +49,22 @@ contract DAO is Department {
 		asset = Asset(asset_);
 	}
 
-	function setLedger(address addr) external onlyDAO {
+	function setLedger(address addr) external OnlyDAO {
 		ERC165(addr).checkInterface(Ledger.ID, "#DAO#setLedger type not match");
 		ledger = Ledger(addr);
 	}
 
-	function setAssetGlobal(address addr) external onlyDAO {
+	function setAssetGlobal(address addr) external OnlyDAO {
 		ERC165(addr).checkInterface(AssetGlobal.ID, "#DAO#setAssetGlobal type not match");
 		assetGlobal = AssetGlobal(addr);
 	}
 
-	function setAsset(address addr) external onlyDAO {
+	function setAsset(address addr) external OnlyDAO {
 		ERC165(addr).checkInterface(Asset.ID, "#DAO#setAsset type not match");
 		asset = Asset(addr);
 	}
 
-	function setDepartments(address addr, bool isDel) external onlyDAO {
+	function setDepartments(address addr, bool isDel) external OnlyDAO {
 		ERC165(addr).checkInterface(Department.ID, "#DAO#setDepartments type not match");
 
 		if (departments.contains(addr)) {
