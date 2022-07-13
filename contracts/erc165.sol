@@ -27,7 +27,7 @@ contract ERC165 is Initializable, IERC165 {
 	}
 
 	function checkInterface(bytes4 interfaceId, string memory message) internal returns (void) {
-		require(IERC165(host).supportsInterface(interfaceId), message);
+		require(supportsInterface(interfaceId), message);
 	}
 
 	/**

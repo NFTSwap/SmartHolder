@@ -19,16 +19,6 @@ contract Department is ERC165 {
 	string  public info;
 	VotePool public operator;
 
-	function initDepartment(address host_, string memory info_, address operator_) internal {
-		initERC165();
-		_registerInterface(ID);
-
-		ERC165(host_).checkInterface(DAO.ID, "#Department#initDepartment dao host type not match");
-		this.host = DAO(host_);
-		this.info = info_;
-		setOperator(operator_);
-	}
-
 	/**
 		* @dev Throws if called by any account other than the owner.
 		*/
@@ -40,6 +30,18 @@ contract Department is ERC165 {
 			}
 		}
 		_;
+	}
+
+	function initDepartment(address host_, string memory info_, address operator_) internal {
+		initERC165();
+		_registerInterface(ID);
+
+		ERC165(host_).checkInterface(DAO.ID, "#Department#initDepartment dao host type not match");
+
+		this.host = DAO(host_);
+		this.info = info_;
+
+		setOperator(operator_);
 	}
 
 	function setOperator(address vote) external onlyDAO {
