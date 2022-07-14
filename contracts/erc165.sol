@@ -27,20 +27,19 @@ contract ERC165 is Initializable, IERC165, IERC1651 {
 		_registerInterface(_INTERFACE_ID_ERC165);
 	}
 
-	function checkInterface(bytes4 interfaceId, string memory message) external override {
+	function checkInterface(bytes4 interfaceId, string memory message) view external override {
 		require(supportsInterface(interfaceId), message);
 	}
 
 	/**
-	 * @dev See {IERC165-supportsInterface}.
-	 *
-	 * Time complexity O(1), guaranteed to always use less than 30 000 gas.
-	 */
-	function supportsInterface(bytes4 interfaceId) view public override returns (bool) {
-		if (isConstructor())
-			return false;
+		* @dev See {IERC165-supportsInterface}.
+		*
+		* Time complexity O(1), guaranteed to always use less than 30 000 gas.
+		*/
+	function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
 		return _supportedInterfaces[interfaceId];
 	}
+
 
 	/**
 	 * @dev Registers the contract as an implementer of the interface defined by

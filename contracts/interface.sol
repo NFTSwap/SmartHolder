@@ -19,13 +19,13 @@ interface IERC721LockReceiver {
 }
 
 interface IERC1651 {
-	function checkInterface(bytes4 interfaceId, string memory message) external;
+	function checkInterface(bytes4 interfaceId, string memory message) view external;
 }
 
 interface IERC721_All is IERC721, IERC721Metadata, IERC721Enumerable {}
 
 interface IDepartment is IERC165, IERC1651 {
-	function operator() external returns (IVotePool);
+	function operator() view external returns (IVotePool);
 	function setOperator(address vote) external;
 	function upgrade(address impl) external;
 }
@@ -74,8 +74,6 @@ interface IMember is IERC721, IERC721Metadata, IERC721Enumerable, IDepartment {
 		uint256[2] __ext;
 	}
 
-	event UpdateInfo(uint256 id);
-
 	function indexAt(uint256 index) view external returns (Info memory);
 	function getInfo(uint256 id) view external returns (Info memory);
 	function exists(uint256 id) view external returns (bool);
@@ -105,12 +103,6 @@ interface IVotePool {
 		bool isExecuted; // 是否已执行完成
 		bytes data; // 调用方法与实参
 	}
-
-	// define events
-	event Created(uint256);
-	event Vote(uint256 indexed id, uint256 member, int256 votes);
-	event Close(uint256 id);
-	event Execute(uint256 indexed id);
 
 	function tryClose(uint256 id) external;
 }

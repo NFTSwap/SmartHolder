@@ -1,5 +1,7 @@
 pragma solidity >=0.6.0 <=0.8.15;
 
+import "./address.sol";
+
 /**
  * @title Initializable
  *
@@ -53,7 +55,7 @@ contract Initializable {
 	}
 
 	/// @dev Returns true if and only if the function is running in the constructor
-	function isConstructor() internal view returns (bool) {
+	function isConstructor() private view returns (bool) {
 		// extcodesize checks the size of the code stored in an address, and
 		// address returns the current address. Since the code is still not
 		// deployed when running a constructor, any checks on its code size will
@@ -64,6 +66,7 @@ contract Initializable {
 		assembly { cs := extcodesize(self) }
 		return cs == 0;
 	}
+
 
 	// Reserved storage space to allow for layout changes in the future.
 	// uint256[50] private ______gap;

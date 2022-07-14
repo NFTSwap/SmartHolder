@@ -12,11 +12,17 @@ contract VotePool is ERC165, IVotePool {
 	using Address for address;
 	using SafeMath for uint256;
 
-	bytes4 public constant DAO_ID = 0xc7b55336;
-	bytes4 public constant VotePool_ID = 0x0ddf27bf;
+	bytes4 internal constant DAO_ID = 0xc7b55336;
+	bytes4 internal constant VotePool_ID = 0x0ddf27bf;
+
+	// define events
+	event Created(uint256);
+	event Vote(uint256 indexed id, uint256 member, int256 votes);
+	event Close(uint256 id);
+	event Execute(uint256 indexed id);
 
 	// define props
-	IDAO internal host;
+	IDAO public host;
 	string public info;
 	uint256 private _current; // 当前执行的提案决议
 	// proposal id => Proposal
@@ -91,7 +97,7 @@ contract VotePool is ERC165, IVotePool {
 		emit Created(proposal.id);
 	}
 
-	function abs(int256 value) view public returns (uint256) {
+	function abs(int256 value) pure internal returns (uint256) {
 		return value < 0 ? uint256(-value): uint256(value);
 	}
 
