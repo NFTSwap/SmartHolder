@@ -2,7 +2,7 @@
 pragma solidity >=0.6.0 <=0.8.15;
 // pragma solidity ^0.6.0;
 
-import "./department.sol";
+import "./Department.sol";
 import "../openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "../openzeppelin/contracts-ethereum-package/contracts/utils/Address.sol";
 import "../openzeppelin/contracts-ethereum-package/contracts/utils/EnumerableSet.sol";

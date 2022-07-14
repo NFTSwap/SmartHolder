@@ -1,7 +1,7 @@
 
 pragma solidity >=0.6.12 <=0.8.15;
 
-import "./erc721.sol";
+import "./ERC721.sol";
 
 contract Asset is ERC721, IAsset {
 

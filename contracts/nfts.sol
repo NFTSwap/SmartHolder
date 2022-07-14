@@ -1,8 +1,8 @@
 
 pragma solidity >=0.6.0 <=0.8.15;
 
-import "./erc721.sol";
-import "./erc165.sol";
+import "./ERC721.sol";
+import "./ERC165.sol";
 
 contract NFTs is ERC165, ERC721_Base {
 

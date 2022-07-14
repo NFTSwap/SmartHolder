@@ -1,7 +1,7 @@
 
 pragma solidity >=0.6.0 <=0.8.15;
 
-import "./department.sol";
+import "./Department.sol";
 import "../openzeppelin/contracts-ethereum-package/contracts/utils/EnumerableSet.sol";
 
 contract DAO is Department, IDAO {

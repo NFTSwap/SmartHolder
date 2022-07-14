@@ -3,7 +3,7 @@ pragma solidity >=0.6.0 <=0.8.15;
 
 pragma experimental ABIEncoderV2;
 
-import "./erc721.sol";
+import "./ERC721.sol";
 
 contract Member is ERC721, IMember {
 

@@ -3,8 +3,8 @@ pragma solidity >=0.6.0 <=0.8.15;
 
 pragma experimental ABIEncoderV2;
 
-import "./department.sol";
-import "./erc721.sol";
+import "./Department.sol";
+import "./ERC721.sol";
 
 contract AssetGlobal is ERC721, IAssetGlobal {
 

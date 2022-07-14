@@ -1,10 +1,10 @@
 
 pragma solidity >=0.6.0 <=0.8.15;
 
-import "./interface.sol";
-import "./vote_pool.sol";
-import "./erc165.sol";
-import "./address.sol";
+import "./Interface.sol";
+import "./VotePool.sol";
+import "./ERC165.sol";
+import "./Address.sol";
 
 contract Department is ERC165, IDepartment {
 	using Address for address;

@@ -3,8 +3,8 @@ pragma solidity >=0.6.0 <=0.8.15;
 
 pragma experimental ABIEncoderV2;
 
-import "./interface.sol";
-import "./erc165.sol";
+import "./Interface.sol";
+import "./ERC165.sol";
 import "../openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "../openzeppelin/contracts-ethereum-package/contracts/utils/Address.sol";
 

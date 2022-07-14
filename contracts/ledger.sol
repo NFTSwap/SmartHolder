@@ -3,8 +3,8 @@ pragma solidity >=0.6.0 <=0.8.15;
 
 pragma experimental ABIEncoderV2;
 
-import "./interface.sol";
-import "./department.sol";
+import "./Interface.sol";
+import "./Department.sol";
 
 
 contract Ledger is Department, ILedger {

@@ -1,8 +1,8 @@
 pragma solidity >=0.6.0 <=0.8.15;
 
 import "../openzeppelin/contracts-ethereum-package/contracts/introspection/IERC165.sol";
-import "./init.sol";
-import "./interface.sol";
+import "./Initializable.sol";
+import "./Interface.sol";
 
 /**
  * @dev Implementation of the {IERC165} interface.
