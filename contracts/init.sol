@@ -1,4 +1,4 @@
-pragma solidity >=0.4.24 <0.7.0;
+pragma solidity >=0.6.0 <=0.8.15;
 
 /**
  * @title Initializable
@@ -43,7 +43,7 @@ contract Initializable {
 		}
 	}
 
-	function _msgSender() internal view virtual returns (address payable) {
+	function _msgSender() internal view virtual returns (address) {
 		return msg.sender;
 	}
 
@@ -53,7 +53,7 @@ contract Initializable {
 	}
 
 	/// @dev Returns true if and only if the function is running in the constructor
-	function isConstructor() private view returns (bool) {
+	function isConstructor() internal view returns (bool) {
 		// extcodesize checks the size of the code stored in an address, and
 		// address returns the current address. Since the code is still not
 		// deployed when running a constructor, any checks on its code size will

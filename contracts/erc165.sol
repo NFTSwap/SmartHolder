@@ -1,7 +1,8 @@
-pragma solidity ^0.6.0;
+pragma solidity >=0.6.0 <=0.8.15;
 
 import "../openzeppelin/contracts-ethereum-package/contracts/introspection/IERC165.sol";
 import "./init.sol";
+import "./interface.sol";
 
 /**
  * @dev Implementation of the {IERC165} interface.
@@ -9,7 +10,7 @@ import "./init.sol";
  * Contracts may inherit from this and call {_registerInterface} to declare
  * their support of an interface.
  */
-contract ERC165 is Initializable, IERC165 {
+contract ERC165 is Initializable, IERC165, IERC1651 {
 	/*
 	 * bytes4(keccak256('supportsInterface(bytes4)')) == 0x01ffc9a7
 	 */
@@ -26,7 +27,7 @@ contract ERC165 is Initializable, IERC165 {
 		_registerInterface(_INTERFACE_ID_ERC165);
 	}
 
-	function checkInterface(bytes4 interfaceId, string memory message) internal returns (void) {
+	function checkInterface(bytes4 interfaceId, string memory message) external override {
 		require(supportsInterface(interfaceId), message);
 	}
 
@@ -35,7 +36,7 @@ contract ERC165 is Initializable, IERC165 {
 	 *
 	 * Time complexity O(1), guaranteed to always use less than 30 000 gas.
 	 */
-	function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
+	function supportsInterface(bytes4 interfaceId) view public override returns (bool) {
 		if (isConstructor())
 			return false;
 		return _supportedInterfaces[interfaceId];

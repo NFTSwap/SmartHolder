@@ -1,12 +1,14 @@
 
-pragma solidity ^0.8.15;
+pragma solidity >=0.6.0 <=0.8.15;
 
 import "./erc721.sol";
+import "./erc165.sol";
 
-contract NFTs is ERC721 {
+contract NFTs is ERC165, ERC721_Base {
 
 	function initNFTs() external {
-			initERC721("NFTs", "NFTs");
+		initERC165();
+		initERC721_Base("NFTs", "NFTs");
 	}
 
 	function mint(uint256 tokenId) public {
@@ -36,12 +38,24 @@ contract NFTs is ERC721 {
 		_setBaseURI(baseURI_);
 	}
 
-	function exists(uint256 tokenId) public returns (bool) {
+	function exists(uint256 tokenId) view public returns (bool) {
 		return _exists(tokenId);
 	}
 
-	function isApprovedOrOwner(address spender, uint256 tokenId) public returns (bool) {
-		return _isApprovedOrOwner(spender, tokenId);
+	function isApprovedOrOwner(address spender, uint256 tokenId) view public returns (bool) {
+		return _isCanTransfer(spender, tokenId);
+	}
+
+	function _msgSender721() internal view virtual override returns (address) {
+		return super._msgSender();
+	}
+
+	function _msgData721() internal view virtual override returns (bytes memory) {
+		return super._msgData();
+	}
+
+	function _registerInterface721(bytes4 interfaceId) internal virtual override {
+		super._registerInterface(interfaceId);
 	}
 
 }

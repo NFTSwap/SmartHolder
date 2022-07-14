@@ -1,80 +1,72 @@
 
-pragma solidity ^0.8.15;
+pragma solidity >=0.6.0 <=0.8.15;
 
 import "./department.sol";
-import "./vote_pool.sol";
-import "./member.sol";
-import "./ledger.sol";
-import "./asset_global.sol";
-import "./asset.sol";
 import "../openzeppelin/contracts-ethereum-package/contracts/utils/EnumerableSet.sol";
 
-contract DAO is Department {
+contract DAO is Department, IDAO {
 	using EnumerableSet for EnumerableSet.AddressSet;
 
-	/*
-	 * bytes4(keccak256('initDAO(string,address,address,address,address,address,address)')) == 0xc7b55336
-	 */
-	bytes4 public constant ID = 0xc7b55336;
-
-	VotePool public root;
-	Member public member;
-	Ledger public ledger;
-	AssetGlobal public assetGlobal;
-	Asset public asset;
+	IVotePool private _root;
+	IMember private _member;
+	ILedger private _ledger;
+	IAssetGlobal private _assetGlobal;
+	IAsset private _asset;
 	address private __exchange;
-	AddressSet private departments;
+	EnumerableSet.AddressSet private _departments;
 	uint256[50] private __gap;
 
-	constructor() external {
-		_registerInterface(ID);
+	function root() view external override returns (IVotePool) { return _root; }
+	function member() view external override returns (IMember) { return _member; }
+	function ledger() view external override returns (ILedger) { return _ledger; }
+	function assetGlobal() view external override returns (IAssetGlobal) { return _assetGlobal; }
+	function asset() view external override returns (IAsset) { return _asset; }
+
+	constructor() public {
+		_registerInterface(DAO_ID);
 	}
 
 	function initDAO(
 		string memory info,
-		address operator, address root_,
-		address member_, address ledger_, address assetGlobal_, address asset_) external {
+		address operator, address root,
+		address member, address ledger, address assetGlobal, address asset) external {
 		initDepartment(address(this), info, operator);
 
-		ERC165(root_).checkInterface(VotePool.ID, "#DAO#initDAO root type not match");
-		ERC165(member_).checkInterface(Member.ID, "#DAO#initDAO member type not match");
-		ERC165(ledger_).checkInterface(Ledger.ID, "#DAO#initDAO ledger type not match");
-		ERC165(assetGlobal_).checkInterface(AssetGlobal.ID, "#DAO#initDAO assetGlobal type not match");
-		ERC165(asset_).checkInterface(Asset.ID, "#DAO#initDAO asset type not match");
+		ERC165(root).checkInterface(VotePool_ID, "#DAO#initDAO root type not match");
+		ERC165(member).checkInterface(Member_ID, "#DAO#initDAO member type not match");
+		ERC165(ledger).checkInterface(Ledger_ID, "#DAO#initDAO ledger type not match");
+		ERC165(assetGlobal).checkInterface(AssetGlobal_ID, "#DAO#initDAO assetGlobal type not match");
+		ERC165(asset).checkInterface(Asset_ID, "#DAO#initDAO asset type not match");
 
-		root = VotePool(root_);
-		member = VotePool(member_);
-		ledger = Ledger(ledger_);
-		assetGlobal = AssetGlobal(assetGlobal_);
-		asset = Asset(asset_);
+		_root = IVotePool(root);
+		_member = IMember(member);
+		_ledger = ILedger(ledger);
+		_assetGlobal = IAssetGlobal(assetGlobal);
+		_asset = IAsset(asset);
 	}
 
 	function setLedger(address addr) external OnlyDAO {
-		ERC165(addr).checkInterface(Ledger.ID, "#DAO#setLedger type not match");
-		ledger = Ledger(addr);
+		ERC165(addr).checkInterface(Ledger_ID, "#DAO#setLedger type not match");
+		_ledger = ILedger(addr);
 	}
 
 	function setAssetGlobal(address addr) external OnlyDAO {
-		ERC165(addr).checkInterface(AssetGlobal.ID, "#DAO#setAssetGlobal type not match");
-		assetGlobal = AssetGlobal(addr);
+		ERC165(addr).checkInterface(AssetGlobal_ID, "#DAO#setAssetGlobal type not match");
+		_assetGlobal = IAssetGlobal(addr);
 	}
 
 	function setAsset(address addr) external OnlyDAO {
-		ERC165(addr).checkInterface(Asset.ID, "#DAO#setAsset type not match");
-		asset = Asset(addr);
+		ERC165(addr).checkInterface(Asset_ID, "#DAO#setAsset type not match");
+		_asset = IAsset(addr);
 	}
 
 	function setDepartments(address addr, bool isDel) external OnlyDAO {
-		ERC165(addr).checkInterface(Department.ID, "#DAO#setDepartments type not match");
+		ERC165(addr).checkInterface(Department_ID, "#DAO#setDepartments type not match");
 
-		if (departments.contains(addr)) {
-			if (isDel) {
-				departments.remove(addr);
-			}
+		if (_departments.contains(addr)) {
+			if (isDel) _departments.remove(addr);
 		} else {
-			if (!isDel) {
-				departments.add(addr);
-			}
+			if (!isDel) _departments.add(addr);
 		}
 	}
 
