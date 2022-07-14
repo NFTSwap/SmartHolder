@@ -72,15 +72,18 @@ module.exports = {
 		// production: true    // Treats this network as if it was a public net. (default: false)
 		// }
 		development: {
-			host: "127.0.0.1",
-			port: "7777",
-			gas: 6721975
+			host: "117.50.36.53",
+			port: "38545",
+			gas: 6721975,
+			network_id: 64,
+			from: '0x90f15922028b0fa3c5ea37b6351e5cd4fb8f9957',
 		},
 		rinkeby: {
 			network_id: 4,
 			provider: new HDWalletProvider({
 				privateKeys: ['f81fb73a528c504cb5c02daeb03fb2f3c9d2eec79c859c91574da69f58c250f4'],
-				providerOrUrl: "https://rinkeby.infura.io/v3/dde6a07efab74ec2998d48ff4a77ec03",
+				providerOrUrl: "https://rinkeby.infura.io/v3/5fad8ac4c3c946f489e0a5fec628d40e",
+				// providerOrUrl: 'http://152.32.172.175:8545',
 			}),
 			production: true,
 		},

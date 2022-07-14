@@ -6,10 +6,10 @@
 	"scripts": {
 		"compile": "rm -rf build && truffle compile",
 		"console": "truffle console",
-		"deploy": "truffle deploy --network rinkeby",
+		"deploy": "truffle deploy --network development",
 		"rinkeby": "truffle deploy --network rinkeby",
 		"matic": "truffle deploy --network matic",
-		"test": "truffle compile && truffle test --network development --compile-none",
+		"test": "npm run compile && truffle test --network rinkeby --compile-none",
 		"coverage": "truffle run coverage --network development",
 		"prepare-docs": "scripts/prepare-docs.sh",
 		"prettier:solidity": "prettier --write 'contracts/**/*.sol'",
