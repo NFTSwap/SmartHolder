@@ -6,7 +6,7 @@ pragma experimental ABIEncoderV2;
 import "./Department.sol";
 import "./ERC721.sol";
 
-contract AssetGlobal is ERC721, IAssetGlobal {
+contract AssetGlobal is IAssetGlobal, ERC721 {
 
 	bytes4 private constant _ERC721_RECEIVED = 0x150b7a02;
 	bytes4 private constant _ERC721_LOCK_RECEIVED = 0x7e154325;
@@ -15,8 +15,8 @@ contract AssetGlobal is ERC721, IAssetGlobal {
 
 	mapping(uint256 => AssetID) private _assetsMeta;
 
-	function initAssetGlobal(address host, string memory info, address operator) external {
-		initERC721(host, info, operator);
+	function initAssetGlobal(address host, string memory describe, address operator) external {
+		initERC721(host, describe, operator);
 		_registerInterface(AssetGlobal_ID);
 		_registerInterface(_ERC721_RECEIVED);
 		_registerInterface(_ERC721_LOCK_RECEIVED);

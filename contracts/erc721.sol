@@ -545,11 +545,11 @@ abstract contract ERC721_Base is IERC721_All {
 	// uint256[41] private __gap;
 }
 
-contract ERC721 is ERC721_Base, Department {
+contract ERC721 is Department, ERC721_Base {
 
-	function initERC721(address host, string memory info, address operator) internal initializer {
-		initDepartment(host, info, operator);
-		initERC721_Base(info, info);
+	function initERC721(address host, string memory describe, address operator) internal initializer {
+		initDepartment(host, describe, operator);
+		initERC721_Base(describe, describe);
 	}
 
 	function _msgSender721() internal view virtual override returns (address) {

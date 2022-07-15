@@ -5,24 +5,24 @@ pragma experimental ABIEncoderV2;
 
 import "./ERC721.sol";
 
-contract Member is ERC721, IMember {
+contract Member is IMember, ERC721 {
 
 	event UpdateInfo(uint256 id);
 
 	// member id => member info
-	mapping(uint256 => Info) private _info; // 成员信息
+	mapping(uint256 => Info) private _infoMap; // 成员信息
 	uint256[] private _infoList; // 成员列表
 	uint256 private _votes; // 投票权总数
 
-	function initMember(address host, string memory info, address operator) external initializer {
-		initERC721(host, info, operator);
+	function initMember(address host, string memory describe, address operator) external initializer {
+		initERC721(host, describe, operator);
 		_registerInterface(Member_ID);
 	}
 
 	function create(address owner, Info memory info) external OnlyDAO {
 		_mint(owner, info.id);
 
-		Info storage info_ = _info[info.id];
+		Info storage info_ = _infoMap[info.id];
 		info_.id = info.id;
 		info_.name = info.name;
 		info_.info = info.info;
@@ -52,7 +52,7 @@ contract Member is ERC721, IMember {
 
 	function setInfo(uint256 id, Info memory info) external {
 		require(ownerOf(id) == _msgSender(), "#Member#setInfo: owner no match");
-		Info storage info_ = _info[id];
+		Info storage info_ = _infoMap[id];
 		info_.name = info.name;
 		info_.info = info.info;
 		info_.avatar = info.avatar;
@@ -62,12 +62,12 @@ contract Member is ERC721, IMember {
 
 	function getInfo(uint256 id) view external override returns (Info memory) {
 		require(_exists(id), "#Member#info: info query for nonexistent member");
-		return _info[id];
+		return _infoMap[id];
 	}
 
 	function indexAt(uint256 index) view public override returns (Info memory) {
 		require(index < _infoList.length, "#Member#indexAt Index out of bounds");
-		return _info[_infoList[index]];
+		return _infoMap[_infoList[index]];
 	}
 
 	function exists(uint256 id) view public override returns (bool) {

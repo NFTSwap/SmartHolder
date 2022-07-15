@@ -8,7 +8,7 @@ import "./ERC165.sol";
 import "../openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "../openzeppelin/contracts-ethereum-package/contracts/utils/Address.sol";
 
-contract VotePool is ERC165, IVotePool {
+contract VotePool is IVotePool, ERC165 {
 	using Address for address;
 	using SafeMath for uint256;
 
@@ -22,22 +22,30 @@ contract VotePool is ERC165, IVotePool {
 	event Execute(uint256 indexed id);
 
 	// define props
-	IDAO public host;
-	string public info;
+	IDAO private _host;
+	string private _describe;
 	uint256 private _current; // 当前执行的提案决议
 	// proposal id => Proposal
-	mapping(uint256 => Proposal) private _proposals; // 提案决议列表
+	mapping(uint256 => Proposal) private _proposalMap; // 提案决议列表
 	uint256[] private _proposalList; // 提案列表索引
 	// proposal id => map( member id => votes )
 	mapping(uint256 => mapping(uint256 => int256)) private _votes; // 成员投票记录
 
-	function initVotePool(address host_, string memory info_) external {
+	function initVotePool(address host, string memory describe) external {
 		initERC165();
 		_registerInterface(VotePool_ID);
 
-		IDAO(host_).checkInterface(DAO_ID, "#Department#initVotePool dao host type not match");
-		host = IDAO(host_);
-		info = info_;
+		IDAO(host).checkInterface(DAO_ID, "#Department#initVotePool dao host type not match");
+		_host = IDAO(host);
+		_describe = describe;
+	}
+
+	function host() view external returns (IDAO) {
+		return _host;
+	}
+
+	function describe() view external returns (string memory) {
+		return _describe;
 	}
 
 	function current() view public returns (uint256) {
@@ -46,16 +54,16 @@ contract VotePool is ERC165, IVotePool {
 
 	function getProposal(uint256 id) view public returns (Proposal memory) {
 		require(exists(id), "#VotePool#proposal proposal not exists");
-		return _proposals[id];
+		return _proposalMap[id];
 	}
 
 	function proposal(uint256 id) private returns (Proposal storage) {
 		require(exists(id), "#VotePool#proposal proposal not exists");
-		return _proposals[id];
+		return _proposalMap[id];
 	}
 
 	function exists(uint256 id) view public returns (bool) {
-		return _proposals[id].idx < _proposalList.length;
+		return _proposalMap[id].idx < _proposalList.length;
 	}
 
 	function create(Proposal memory proposal) external {
@@ -64,9 +72,9 @@ contract VotePool is ERC165, IVotePool {
 
 		require(proposal.voteRate > 5000, "#VotePool#create proposal vote rate not less than 50%");
 		require(proposal.passRate > 5000, "#VotePool#create proposal vote rate not less than 50%");
-		require(host.member().tokenOfOwnerByIndex(msg.sender, 0) != 0, "#VotePool#create No call permission");
+		require(_host.member().tokenOfOwnerByIndex(msg.sender, 0) != 0, "#VotePool#create No call permission");
 
-		Proposal storage obj = _proposals[proposal.id];
+		Proposal storage obj = _proposalMap[proposal.id];
 
 		if (proposal.loop != 0) {
 			require(proposal.loopTime >= 1 minutes, "#VotePool#create Loop time must be greater than 1 minute");
@@ -103,11 +111,11 @@ contract VotePool is ERC165, IVotePool {
 
 	function vote(uint256 id, uint256 member, int256 votes) external {
 		Proposal storage obj = proposal(id);
-		IMember.Info memory info = host.member().getInfo(member);
+		IMember.Info memory info = _host.member().getInfo(member);
 
 		require(votes == 0, "#VotePool#vote parameter error, votes==0");
 		require(!obj.isClose, "#VotePool#vote Voting has been closed");
-		require(host.member().ownerOf(member) == msg.sender, "#VotePool#vote No call permission");
+		require(_host.member().ownerOf(member) == msg.sender, "#VotePool#vote No call permission");
 		require(_votes[id][member] == 0, "#VotePool#vote Cannot vote repeatedly");
 		require(abs(votes) <= info.votes, "#VotePool#vote Voting limit");
 
@@ -132,7 +140,7 @@ contract VotePool is ERC165, IVotePool {
 
 		require(!obj.isClose, "#VotePool#tryClose Voting has been closed");
 
-		uint256 votes = host.member().votes();
+		uint256 votes = _host.member().votes();
 
 		// is expiry
 		if (obj.expiry != 0 && obj.expiry < block.timestamp) {

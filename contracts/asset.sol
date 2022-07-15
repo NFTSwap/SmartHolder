@@ -3,7 +3,7 @@ pragma solidity >=0.6.12 <=0.8.15;
 
 import "./ERC721.sol";
 
-contract Asset is ERC721, IAsset {
+contract Asset is IAsset, ERC721 {
 
 	// Equals to `bytes4(keccak256("onERC721LockReceived(address,address,uint256,bytes)"))`
 	bytes4 private constant _ERC721_LOCK_RECEIVED = 0x7e154325;
@@ -18,8 +18,8 @@ contract Asset is ERC721, IAsset {
 	// Mapping from token ID to lock address
 	mapping (uint256 => address) private _tokenLocks;
 
-	function initAsset(address host, string memory info, address operator) external {
-		initERC721(host, "DAO Asset", operator);
+	function initAsset(address host, string memory describe, address operator) external {
+		initERC721(host, describe, operator);
 		_registerInterface(Asset_ID);
 		_registerInterface(_INTERFACE_ID_ERC721_LOCK);
 	}

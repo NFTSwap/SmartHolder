@@ -30,7 +30,7 @@ interface IDepartment is IERC165, IERC1651 {
 	function upgrade(address impl) external;
 }
 
-interface IAssetGlobal is IERC721_All, IERC721Receiver, IERC721LockReceiver, IDepartment {
+interface IAssetGlobal is IDepartment, IERC721_All, IERC721Receiver, IERC721LockReceiver {
 	enum Kind {
 		Lock,
 		Owner
@@ -45,7 +45,7 @@ interface IAssetGlobal is IERC721_All, IERC721Receiver, IERC721LockReceiver, IDe
 	function unlock(address metaToken, uint256 metaTokenId) external;
 }
 
-interface IAsset is IERC721_All, IERC721Lock, IDepartment {
+interface IAsset is IDepartment, IERC721_All, IERC721Lock {
 	event Lock(uint256 indexed tokenId, address owner, address to);
 }
 
@@ -58,7 +58,7 @@ interface ILedger is IDepartment {
 	function withdraw(uint256 amount, address target) external payable;
 }
 
-interface IMember is IERC721, IERC721Metadata, IERC721Enumerable, IDepartment {
+interface IMember is IDepartment, IERC721, IERC721Metadata, IERC721Enumerable {
 
 	enum Role {
 		DEFAULT

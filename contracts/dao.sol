@@ -4,7 +4,7 @@ pragma solidity >=0.6.0 <=0.8.15;
 import "./Department.sol";
 import "../openzeppelin/contracts-ethereum-package/contracts/utils/EnumerableSet.sol";
 
-contract DAO is Department, IDAO {
+contract DAO is IDAO, Department {
 	using EnumerableSet for EnumerableSet.AddressSet;
 
 	IVotePool private _root;
@@ -27,10 +27,10 @@ contract DAO is Department, IDAO {
 	}
 
 	function initDAO(
-		string memory info,
+		string memory describe,
 		address operator, address root,
 		address member, address ledger, address assetGlobal, address asset) external {
-		initDepartment(address(this), info, operator);
+		initDepartment(address(this), describe, operator);
 
 		ERC165(root).checkInterface(VotePool_ID, "#DAO#initDAO root type not match");
 		ERC165(member).checkInterface(Member_ID, "#DAO#initDAO member type not match");

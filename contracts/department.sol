@@ -1,12 +1,13 @@
 
 pragma solidity >=0.6.0 <=0.8.15;
 
+import "./Upgrade.sol";
 import "./Interface.sol";
 import "./VotePool.sol";
 import "./ERC165.sol";
 import "./AddressExp.sol";
 
-contract Department is ERC165, IDepartment {
+contract Department is IDepartment, Upgrade, ERC165 {
 	using Address for address;
 	using AddressExp for address;
 
@@ -39,11 +40,9 @@ contract Department is ERC165, IDepartment {
 		*/
 	bytes4 internal constant VotePool_ID = 0x0ddf27bf;
 
-
-	address private __impl;
-	IDAO public host;
-	string  public info;
-	IVotePool private _operator;
+	IVotePool internal _operator; // address
+	IDAO internal _host; // address
+	string internal _describe;
 
 	/**
 		* @dev Throws if called by any account other than the owner.
@@ -51,27 +50,35 @@ contract Department is ERC165, IDepartment {
 	modifier OnlyDAO() {
 		address sender = msg.sender;
 		if (sender != address(_operator)) {
-			if (sender != address(host.operator())) {
-				require(sender == address(host.root()), "#Department#OnlyDAO caller does not have permission");
+			if (sender != address(_host.operator())) {
+				require(sender == address(_host.root()), "#Upgrade#OnlyDAO caller does not have permission");
 			}
 		}
 		_;
 	}
 
-	function initDepartment(address host_, string memory info_, address operator_) internal {
+	function initDepartment(address host, string memory describe, address operator) internal {
 		initERC165();
 		_registerInterface(Department_ID);
 
-		ERC165(host_).checkInterface(DAO_ID, "#Department#initDepartment dao host type not match");
+		ERC165(host).checkInterface(DAO_ID, "#Department#initDepartment dao host type not match");
 
-		host = IDAO(host_);
-		info = info_;
+		_host = IDAO(host);
+		_describe = describe;
 
-		setOperator_internal(operator_);
+		setOperator_internal(operator);
+	}
+
+	function host() view external returns (IDAO) {
+		return _host;
 	}
 
 	function operator() view external override returns (IVotePool) {
 		return _operator;
+	}
+
+	function describe() view external returns (string memory) {
+		return _describe;
 	}
 
 	function setOperator_internal(address vote) internal {
@@ -88,7 +95,6 @@ contract Department is ERC165, IDepartment {
 	}
 
 	function upgrade(address impl) external override OnlyDAO {
-		__impl = impl;
+		_impl = impl;
 	}
-
 }

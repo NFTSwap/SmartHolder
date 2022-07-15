@@ -6,11 +6,10 @@ pragma experimental ABIEncoderV2;
 import "./Interface.sol";
 import "./Department.sol";
 
+contract Ledger is ILedger, Department {
 
-contract Ledger is Department, ILedger {
-
-	function initLedger(address host, string memory info, address operator) external {
-		initDepartment(host, info, operator);
+	function initLedger(address host, string memory describe, address operator) external {
+		initDepartment(host, describe, operator);
 		_registerInterface(Ledger_ID);
 	}
 
@@ -30,18 +29,18 @@ contract Ledger is Department, ILedger {
 		uint256 curamount = address(this).balance;
 		require(curamount >= amount, "#Ledger#release insufficient balance");
 
-		uint256 votes = host.member().votes();
+		uint256 votes = _host.member().votes();
 		uint256 unit = amount / votes;
 
 		require(unit != 0 , "#Ledger#release insufficient balance release");
 
-		uint256 total = host.member().total();
+		uint256 total = _host.member().total();
 
 		IMember.Info memory info;
 
 		for (uint256 i = 0; i < total; i++) {
-			info = host.member().indexAt(i);
-			address owner = host.member().ownerOf(info.id);
+			info = _host.member().indexAt(i);
+			address owner = _host.member().ownerOf(info.id);
 			uint256 balance = info.votes * unit;
 			owner.sendValue(balance);
 			emit Release(info.id, owner, balance);
