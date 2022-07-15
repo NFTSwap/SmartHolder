@@ -7,7 +7,7 @@ import "./VotePool.sol";
 import "./ERC165.sol";
 import "./AddressExp.sol";
 
-contract Department is IDepartment, Upgrade, ERC165 {
+contract Department is Upgrade, IDepartment, ERC165 {
 	using Address for address;
 	using AddressExp for address;
 
@@ -67,6 +67,10 @@ contract Department is IDepartment, Upgrade, ERC165 {
 		_describe = describe;
 
 		setOperator_internal(operator);
+	}
+
+	function impl() view external returns (address) {
+		return _impl;
 	}
 
 	function host() view external returns (IDAO) {

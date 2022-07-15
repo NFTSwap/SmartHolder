@@ -169,13 +169,13 @@ contract VotePool is IVotePool, ERC165 {
 		if (obj.loop != 0) {
 			require(obj.executeTime + obj.loopTime < block.timestamp, "#VotePool#execute Execution interval is too short");
 			if (obj.loop > 0) {
-				exec(obj);
+				execCall(obj);
 				obj.loop--;
 			} else { // permanent loop
-				exec(obj);
+				execCall(obj);
 			}
 		} else { // execute once
-			exec(obj);
+			execCall(obj);
 			obj.isExecuted = true;
 		}
 
@@ -184,10 +184,17 @@ contract VotePool is IVotePool, ERC165 {
 		emit Execute(id);
 	}
 
-	function exec(Proposal storage obj) internal {
+	function execCall(Proposal storage obj) internal {
 		_current = obj.id;
-		obj.target.call{ value: msg.value }(obj.data);
+		(bool suc, bytes memory _data) = obj.target.call{ value: msg.value }(obj.data);
 		_current = 0;
+		assembly {
+			let len := mload(_data)
+			let data := add(_data, 0x20)
+			switch suc
+			case 0 { revert(data, len) }
+			default { return(data, len) }
+		}
 	}
 
 	function total() view public returns (uint256) {
