@@ -20,7 +20,6 @@ async function deploy(name, Contract, opts, args = [], isUpgrade = true) {
 }
 
 module.exports = async function(deployer, networks, accounts) {
-	debugger
 
 	var opts = { deployer, initializer: 'initialize', unsafeAllowCustomTypes: true };
 	var operator = '0x0000000000000000000000000000000000000000';
@@ -31,7 +30,7 @@ module.exports = async function(deployer, networks, accounts) {
 	var assetGlobal = await deploy('AssetGlobal', AssetGlobal, opts);
 	var ledger = await deploy('Ledger', Ledger, opts);
 	var member = await deploy('Member', Member, opts);
-	var votePool = await deploy('VotePool', VotePool, opts, []);
+	var votePool = await deploy('VotePool', VotePool, opts, [], false);
 
 	await asset.initAsset(dao.address, 'Asset', operator);
 	await assetGlobal.initAssetGlobal(dao.address, 'AssetGlobal', operator);
@@ -39,8 +38,6 @@ module.exports = async function(deployer, networks, accounts) {
 	await member.initMember(dao.address, 'Member', operator);
 	await votePool.initVotePool(dao.address, 'VotePool', [], false);
 	await dao.initDAO('Test', from, votePool.address, member.address, ledger.address, assetGlobal.address, asset.address);
-
-	debugger
 
 	console.log("DAO:", dao.address);
 	console.log("AssetGlobal:", assetGlobal.address);
