@@ -22,14 +22,17 @@ contract DAO is IDAO, Department {
 	function assetGlobal() view external override returns (IAssetGlobal) { return _assetGlobal; }
 	function asset() view external override returns (IAsset) { return _asset; }
 
-	constructor() public {
+	function initInterfaceID() external {
+		require(!supportsInterface(DAO_ID), "Can only be called once");
 		_registerInterface(DAO_ID);
 	}
 
 	function initDAO(
 		string memory describe,
 		address operator, address root,
-		address member, address ledger, address assetGlobal, address asset) external {
+		address member, address ledger,
+		address assetGlobal, address asset
+	) external {
 		initDepartment(address(this), describe, operator);
 
 		ERC165(root).checkInterface(VotePool_ID, "#DAO#initDAO root type not match");
@@ -43,21 +46,26 @@ contract DAO is IDAO, Department {
 		_ledger = ILedger(ledger);
 		_assetGlobal = IAssetGlobal(assetGlobal);
 		_asset = IAsset(asset);
+
+		emit Change("Init");
 	}
 
 	function setLedger(address addr) external OnlyDAO {
 		ERC165(addr).checkInterface(Ledger_ID, "#DAO#setLedger type not match");
 		_ledger = ILedger(addr);
+		emit Change("Ledger");
 	}
 
 	function setAssetGlobal(address addr) external OnlyDAO {
 		ERC165(addr).checkInterface(AssetGlobal_ID, "#DAO#setAssetGlobal type not match");
 		_assetGlobal = IAssetGlobal(addr);
+		emit Change("AssetGlobal");
 	}
 
 	function setAsset(address addr) external OnlyDAO {
 		ERC165(addr).checkInterface(Asset_ID, "#DAO#setAsset type not match");
 		_asset = IAsset(addr);
+		emit Change("Asset");
 	}
 
 	function setDepartments(address addr, bool isDel) external OnlyDAO {
@@ -68,6 +76,7 @@ contract DAO is IDAO, Department {
 		} else {
 			if (!isDel) _departments.add(addr);
 		}
+		emit Change("Department");
 	}
 
 }

@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"build": "truffle compile && onlyBuild=true truffle deploy --network development && truffle compile",
+		"build": "truffle compile --all && onlyBuild=true truffle deploy --network development && truffle compile",
 		"console": "truffle console",
 		"deploy": "truffle deploy --network development",
 		"rinkeby": "truffle deploy --network rinkeby",

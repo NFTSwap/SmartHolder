@@ -95,14 +95,6 @@ module.exports = {
 				providerOrUrl: "https://rpc-mainnet.maticvigil.com/v1/ef8f16191b474bb494f33283a81a38487e4dc245",
 			}),
 			production: true,
-		},
-		bsn: {
-			network_id: 5555,
-			provider: new HDWalletProvider({
-				privateKeys: ['f81fb73a528c504cb5c02daeb03fb2f3c9d2eec79c859c91574da69f58c250f4'],
-				providerOrUrl: "https://opbningxia.bsngate.com:18602/api/216f07d5657d45babb3c1ce8abc3c9eb/rpc",
-			}),
-			production: true,
 		}
 	},
 

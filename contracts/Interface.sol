@@ -108,6 +108,7 @@ interface IVotePool {
 }
 
 interface IDAO is IDepartment {
+	event Change(string tag);
 	function root() view external returns (IVotePool);
 	function member() view external returns (IMember);
 	function ledger() view external returns (ILedger);
