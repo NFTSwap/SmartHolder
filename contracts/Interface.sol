@@ -54,8 +54,8 @@ interface ILedger is IDepartment {
 	event Receive(address indexed from, uint256 balance);
 	event ReleaseLog(address indexed operator, uint256 balance, string log);
 	event Deposit(address indexed from, uint256 balance, string name, string describe);
-	event Release(uint256 indexed member, address indexed to, uint256 balance);
 	event Withdraw(address indexed target, uint256 balance, string describe);
+	event Release(uint256 indexed member, address indexed to, uint256 balance);
 
 	function withdraw(uint256 amount, address target) external payable;
 }
@@ -88,7 +88,8 @@ interface IVotePool {
 	struct Proposal {
 		uint256 id;
 		string name;
-		string info;
+		string describe;
+		address origin; // 发起人
 		address target; // 目标合约
 		uint256 lifespan; // 投票生命周期
 		uint256 expiry; // 过期时间

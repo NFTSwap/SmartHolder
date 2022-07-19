@@ -82,8 +82,9 @@ contract VotePool is IVotePool, ERC165 {
 
 		obj.id = proposal.id;
 		obj.name = proposal.name;
-		obj.info = proposal.info;
+		obj.describe = proposal.describe;
 		obj.target = proposal.target;
+		obj.origin = msg.sender;
 		// obj.signature = proposal.signature;
 		obj.data = proposal.data;
 		obj.lifespan = proposal.lifespan;
