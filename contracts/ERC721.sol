@@ -288,7 +288,7 @@ abstract contract ERC721_Base is IERC721_All {
 		*/
 	function transferFrom(address from, address to, uint256 tokenId) public virtual override {
 		//solhint-disable-next-line max-line-length
-		require(_isCanTransfer(_msgSender721(), tokenId), "ERC721: transfer caller is not owner nor approved");
+		require(_havePermission(_msgSender721(), tokenId), "ERC721: transfer caller is not owner nor approved");
 		_transfer(from, to, tokenId, "");
 	}
 
@@ -320,7 +320,7 @@ abstract contract ERC721_Base is IERC721_All {
 		* @param _data bytes data to send along with a safe transfer check
 		*/
 	function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory _data) public virtual override {
-		require(_isCanTransfer(_msgSender721(), tokenId), "ERC721: transfer caller is not owner nor approved");
+		require(_havePermission(_msgSender721(), tokenId), "ERC721: transfer caller is not owner nor approved");
 		_safeTransfer(from, to, tokenId, _data);
 	}
 
@@ -357,7 +357,7 @@ abstract contract ERC721_Base is IERC721_All {
 		* @return bool whether the msg.sender is approved for the given token ID,
 		* is an operator of the owner, or is the owner of the token
 		*/
-	function _isCanTransfer(address spender, uint256 tokenId) internal view virtual returns (bool) {
+	function _havePermission(address spender, uint256 tokenId) internal view virtual returns (bool) {
 		require(_exists(tokenId), "ERC721: operator query for nonexistent token");
 		address owner = ownerOf(tokenId);
 		return (spender == owner || getApproved(tokenId) == spender || isApprovedForAll(owner, spender));

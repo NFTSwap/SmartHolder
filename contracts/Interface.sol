@@ -52,8 +52,10 @@ interface IAsset is IDepartment, IERC721_All, IERC721Lock {
 interface ILedger is IDepartment {
 
 	event Receive(address indexed from, uint256 balance);
-	event Release(uint256 indexed member, address addr, uint256 balance);
-	event Withdraw(address indexed target, uint256 balance);
+	event ReleaseLog(address indexed operator, uint256 balance, string log);
+	event Deposit(address indexed from, uint256 balance, string name, string describe);
+	event Release(uint256 indexed member, address indexed to, uint256 balance);
+	event Withdraw(address indexed target, uint256 balance, string describe);
 
 	function withdraw(uint256 amount, address target) external payable;
 }
@@ -66,7 +68,7 @@ interface IMember is IDepartment, IERC721, IERC721Metadata, IERC721Enumerable {
 	struct Info {
 		uint256 id;
 		string name;
-		string info;
+		string describe;
 		string avatar;
 		Role role;
 		uint32 votes; // 投票权

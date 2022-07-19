@@ -24,8 +24,22 @@ contract Asset is IAsset, ERC721 {
 		_registerInterface(_INTERFACE_ID_ERC721_LOCK);
 	}
 
+	function safeMint(address to, uint256 tokenId, string memory _tokenURI, address lock, bytes memory _data) public {
+		_safeMint(to, tokenId, _data);
+		_setTokenURI(tokenId, _tokenURI);
+
+		if (lock != address(0)) {
+			_lock(lock, tokenId, _data);
+		}
+	}
+
 	function _burn(uint256 tokenId) internal virtual override {
 		// NOOP
+	}
+
+	function setTokenURI(uint256 tokenId, string memory _tokenURI) public {
+		require(_havePermission(_msgSender(), tokenId), "#NFTs#setTokenURI: owner no match");
+		_setTokenURI(tokenId, _tokenURI);
 	}
 
 	function lock(address to, uint256 tokenId, bytes calldata data) public virtual override {
@@ -40,16 +54,22 @@ contract Asset is IAsset, ERC721 {
 		if (to == address(0)) {
 			require(locked == _msgSender(), "ERC721: unlock no permission");
 			delete _tokenLocks[tokenId];
+			emit Lock(tokenId, owner, to);
 		} else {
 			require(owner == _msgSender() || isApprovedForAll(owner, _msgSender()), "ERC721: lock caller is not owner nor locked for all");
-			_tokenLocks[tokenId] = to;
-			require(_checkOnERC721LockReceived(owner, to, tokenId, data), "ERC721: transfer to non ERC721LockReceiver implementer");
+			_lock(to, tokenId, data);
 		}
-		emit Lock(tokenId, ownerOf(tokenId), to);
 	}
 
-	function _isCanTransfer(address spender, uint256 tokenId) internal view virtual override returns (bool) {
-		require(_exists(tokenId), "#ERC721#_isCanTransfer ERC721: operator query for nonexistent token");
+	function _lock(address to, uint256 tokenId, bytes calldata data) internal {
+		_tokenLocks[tokenId] = to;
+		address owner = ownerOf(tokenId);
+		require(_checkOnERC721LockReceived(owner, to, tokenId, data), "ERC721: transfer to non ERC721LockReceiver implementer");
+		emit Lock(tokenId, owner, to);
+	}
+
+	function _havePermission(address spender, uint256 tokenId) internal view virtual override returns (bool) {
+		require(_exists(tokenId), "#ERC721#_havePermission ERC721: operator query for nonexistent token");
 		if (_tokenLocks[tokenId] != address(0)) {
 			return _tokenLocks[tokenId] == spender;
 		} else {

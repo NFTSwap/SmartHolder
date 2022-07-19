@@ -25,7 +25,7 @@ contract Member is IMember, ERC721 {
 		Info storage info_ = _infoMap[info.id];
 		info_.id = info.id;
 		info_.name = info.name;
-		info_.info = info.info;
+		info_.describe = info.describe;
 		info_.avatar = info.avatar;
 		info_.role = info.role;
 		info_.votes = info.votes == 0 ? 1: info.votes;
@@ -54,7 +54,7 @@ contract Member is IMember, ERC721 {
 		require(ownerOf(id) == _msgSender(), "#Member#setInfo: owner no match");
 		Info storage info_ = _infoMap[id];
 		info_.name = info.name;
-		info_.info = info.info;
+		info_.describe = info.describe;
 		info_.avatar = info.avatar;
 		// info_.extended = info.extended;
 		emit UpdateInfo(id);

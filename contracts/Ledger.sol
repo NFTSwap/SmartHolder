@@ -23,7 +23,7 @@ contract Ledger is ILedger, Department {
 		return address(this).balance;
 	}
 
-	function release(uint256 amount) external payable OnlyDAO {
+	function release(uint256 amount, string memory describe) external payable OnlyDAO {
 		receiveBalance();
 
 		uint256 curamount = address(this).balance;
@@ -46,14 +46,20 @@ contract Ledger is ILedger, Department {
 			emit Release(info.id, owner, balance);
 		}
 
-		emit Withdraw(address(0), amount);
+		emit ReleaseLog(msg.sender, amount, describe);
 	}
 
-	function withdraw(uint256 amount, address target) external payable override OnlyDAO {
+	function deposit(string memory name, string memory describe) public {
+		if (msg.value != 0) {
+			emit Deposit(msg.sender, msg.value, name, describe);
+		}
+	}
+
+	function withdraw(uint256 amount, address target, string memory describe) external payable override OnlyDAO {
 		require(target != address(0), "#Ledger#withdraw receive assress not address(0)");
 		receiveBalance();
 		target.sendValue(amount);
-		emit Withdraw(target, amount);
+		emit Withdraw(target, amount, describe);
 	}
 
 	receive() external payable {
