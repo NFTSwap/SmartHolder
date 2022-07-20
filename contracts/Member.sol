@@ -7,7 +7,7 @@ import "./ERC721.sol";
 
 contract Member is IMember, ERC721 {
 
-	event UpdateInfo(uint256 id);
+	// event UpdateInfo(uint256 id);
 
 	// member id => member info
 	mapping(uint256 => Info) private _infoMap; // 成员信息

@@ -15,12 +15,6 @@ contract VotePool is IVotePool, ERC165 {
 	bytes4 internal constant DAO_ID = 0xc7b55336;
 	bytes4 internal constant VotePool_ID = 0x0ddf27bf;
 
-	// define events
-	event Created(uint256);
-	event Vote(uint256 indexed id, uint256 member, int256 votes);
-	event Close(uint256 id);
-	event Execute(uint256 indexed id);
-
 	// define props
 	IDAO private _host;
 	string private _describe;
