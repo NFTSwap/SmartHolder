@@ -86,10 +86,12 @@ module.exports = async function(deployer) {
 	const AssetGlobal = artifacts.require("AssetGlobal.sol");
 	const Ledger = artifacts.require("Ledger.sol");
 	const Member = artifacts.require("Member.sol");
+	const VotePool = artifacts.require("VotePool.sol");
 
 	await genProxy('DAO', DAO, opts);
 	await genProxy('Asset', Asset, opts);
 	await genProxy('AssetGlobal', AssetGlobal, opts);
 	await genProxy('Ledger', Ledger, opts);
 	await genProxy('Member', Member, opts);
+	await genProxy('VotePool', VotePool, opts);
 }

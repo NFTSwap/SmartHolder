@@ -18,13 +18,13 @@ contract Asset is IAsset, ERC721 {
 	// Mapping from token ID to lock address
 	mapping (uint256 => address) private _tokenLocks;
 
-	function initAsset(address host, string memory describe, address operator) external {
-		initERC721(host, describe, operator);
+	function initAsset(address host, string memory description, address operator) external {
+		initERC721(host, description, operator);
 		_registerInterface(Asset_ID);
 		_registerInterface(_INTERFACE_ID_ERC721_LOCK);
 	}
 
-	function safeMint(address to, uint256 tokenId, string memory _tokenURI, address lock, bytes memory _data) public {
+	function safeMint(address to, uint256 tokenId, string memory _tokenURI, address lock, bytes calldata _data) public {
 		_safeMint(to, tokenId, _data);
 		_setTokenURI(tokenId, _tokenURI);
 

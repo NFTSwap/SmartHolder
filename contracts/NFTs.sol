@@ -43,7 +43,7 @@ contract NFTs is ERC165, ERC721_Base {
 	}
 
 	function isApprovedOrOwner(address spender, uint256 tokenId) view public returns (bool) {
-		return _isCanTransfer(spender, tokenId);
+		return _havePermission(spender, tokenId);
 	}
 
 	function _msgSender721() internal view virtual override returns (address) {

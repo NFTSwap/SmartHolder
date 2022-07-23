@@ -547,9 +547,9 @@ abstract contract ERC721_Base is IERC721_All {
 
 contract ERC721 is Department, ERC721_Base {
 
-	function initERC721(address host, string memory describe, address operator) internal initializer {
-		initDepartment(host, describe, operator);
-		initERC721_Base(describe, describe);
+	function initERC721(address host, string memory description, address operator) internal initializer {
+		initDepartment(host, description, operator);
+		initERC721_Base(description, description);
 	}
 
 	function _msgSender721() internal view virtual override returns (address) {

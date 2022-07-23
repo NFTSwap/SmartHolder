@@ -5,10 +5,11 @@ pragma experimental ABIEncoderV2;
 
 import "./Interface.sol";
 import "./ERC165.sol";
+import "./Upgrade.sol";
 import "../openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "../openzeppelin/contracts-ethereum-package/contracts/utils/Address.sol";
 
-contract VotePool is IVotePool, ERC165 {
+contract VotePool is Upgrade, IVotePool, ERC165 {
 	using Address for address;
 	using SafeMath for uint256;
 
@@ -17,7 +18,7 @@ contract VotePool is IVotePool, ERC165 {
 
 	// define props
 	IDAO private _host;
-	string private _describe;
+	string private _description;
 	uint256 private _current; // 当前执行的提案决议
 	// proposal id => Proposal
 	mapping(uint256 => Proposal) private _proposalMap; // 提案决议列表
@@ -25,21 +26,21 @@ contract VotePool is IVotePool, ERC165 {
 	// proposal id => map( member id => votes )
 	mapping(uint256 => mapping(uint256 => int256)) private _votes; // 成员投票记录
 
-	function initVotePool(address host, string memory describe) external {
+	function initVotePool(address host, string memory description) external {
 		initERC165();
 		_registerInterface(VotePool_ID);
 
 		IDAO(host).checkInterface(DAO_ID, "#Department#initVotePool dao host type not match");
 		_host = IDAO(host);
-		_describe = describe;
+		_description = description;
 	}
 
 	function host() view external returns (IDAO) {
 		return _host;
 	}
 
-	function describe() view external returns (string memory) {
-		return _describe;
+	function description() view external returns (string memory) {
+		return _description;
 	}
 
 	function current() view public returns (uint256) {
@@ -76,7 +77,7 @@ contract VotePool is IVotePool, ERC165 {
 
 		obj.id = proposal.id;
 		obj.name = proposal.name;
-		obj.describe = proposal.describe;
+		obj.description = proposal.description;
 		obj.target = proposal.target;
 		obj.origin = msg.sender;
 		// obj.signature = proposal.signature;

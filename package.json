@@ -6,9 +6,9 @@
 	"scripts": {
 		"build": "truffle compile --all && onlyBuild=true truffle deploy --network development && truffle compile",
 		"console": "truffle console",
-		"deploy": "truffle deploy --network development",
-		"rinkeby": "truffle deploy --network rinkeby",
-		"matic": "truffle deploy --network matic",
+		"deploy": "onlyImpl=true truffle deploy --network development",
+		"rinkeby": "onlyImpl=true truffle deploy --network rinkeby",
+		"matic": "onlyImpl=true truffle deploy --network matic",
 		"test": "truffle test --network rinkeby --compile-none",
 		"coverage": "truffle run coverage --network development",
 		"prepare-docs": "scripts/prepare-docs.sh",

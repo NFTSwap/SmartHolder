@@ -42,7 +42,7 @@ contract Department is Upgrade, IDepartment, ERC165 {
 
 	IVotePool internal _operator; // address
 	IDAO internal _host; // address
-	string internal _describe;
+	string internal _description;
 
 	/**
 		* @dev Throws if called by any account other than the owner.
@@ -57,14 +57,14 @@ contract Department is Upgrade, IDepartment, ERC165 {
 		_;
 	}
 
-	function initDepartment(address host, string memory describe, address operator) internal {
+	function initDepartment(address host, string memory description, address operator) internal {
 		initERC165();
 		_registerInterface(Department_ID);
 
 		ERC165(host).checkInterface(DAO_ID, "#Department#initDepartment dao host type not match");
 
 		_host = IDAO(host);
-		_describe = describe;
+		_description = description;
 
 		setOperator_internal(operator);
 	}
@@ -81,8 +81,8 @@ contract Department is Upgrade, IDepartment, ERC165 {
 		return _operator;
 	}
 
-	function describe() view external returns (string memory) {
-		return _describe;
+	function description() view external returns (string memory) {
+		return _description;
 	}
 
 	function setOperator_internal(address vote) internal {

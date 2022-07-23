@@ -8,8 +8,8 @@ import "./Department.sol";
 
 contract Ledger is ILedger, Department {
 
-	function initLedger(address host, string memory describe, address operator) external {
-		initDepartment(host, describe, operator);
+	function initLedger(address host, string memory description, address operator) external {
+		initDepartment(host, description, operator);
 		_registerInterface(Ledger_ID);
 	}
 
@@ -23,7 +23,7 @@ contract Ledger is ILedger, Department {
 		return address(this).balance;
 	}
 
-	function release(uint256 amount, string memory describe) external payable OnlyDAO {
+	function release(uint256 amount, string memory description) external payable OnlyDAO {
 		receiveBalance();
 
 		uint256 curamount = address(this).balance;
@@ -46,20 +46,20 @@ contract Ledger is ILedger, Department {
 			emit Release(info.id, owner, balance);
 		}
 
-		emit ReleaseLog(msg.sender, amount, describe);
+		emit ReleaseLog(msg.sender, amount, description);
 	}
 
-	function deposit(string memory name, string memory describe) public {
+	function deposit(string memory name, string memory description) public payable {
 		if (msg.value != 0) {
-			emit Deposit(msg.sender, msg.value, name, describe);
+			emit Deposit(msg.sender, msg.value, name, description);
 		}
 	}
 
-	function withdraw(uint256 amount, address target, string memory describe) external payable override OnlyDAO {
+	function withdraw(uint256 amount, address target, string memory description) external payable override OnlyDAO {
 		require(target != address(0), "#Ledger#withdraw receive assress not address(0)");
 		receiveBalance();
 		target.sendValue(amount);
-		emit Withdraw(target, amount, describe);
+		emit Withdraw(target, amount, description);
 	}
 
 	receive() external payable {

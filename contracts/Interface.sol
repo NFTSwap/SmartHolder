@@ -53,11 +53,11 @@ interface ILedger is IDepartment {
 
 	event Receive(address indexed from, uint256 balance);
 	event ReleaseLog(address indexed operator, uint256 balance, string log);
-	event Deposit(address indexed from, uint256 balance, string name, string describe);
-	event Withdraw(address indexed target, uint256 balance, string describe);
+	event Deposit(address indexed from, uint256 balance, string name, string description);
+	event Withdraw(address indexed target, uint256 balance, string description);
 	event Release(uint256 indexed member, address indexed to, uint256 balance);
 
-	function withdraw(uint256 amount, address target) external payable;
+	function withdraw(uint256 amount, address target, string memory description) external payable;
 }
 
 interface IMember is IDepartment, IERC721, IERC721Metadata, IERC721Enumerable {
@@ -68,7 +68,7 @@ interface IMember is IDepartment, IERC721, IERC721Metadata, IERC721Enumerable {
 	struct Info {
 		uint256 id;
 		string name;
-		string describe;
+		string description;
 		string avatar;
 		Role role;
 		uint32 votes; // 投票权
@@ -90,7 +90,7 @@ interface IVotePool {
 	struct Proposal {
 		uint256 id;
 		string name;
-		string describe;
+		string description;
 		address origin; // 发起人
 		address target; // 目标合约
 		uint256 lifespan; // 投票生命周期
