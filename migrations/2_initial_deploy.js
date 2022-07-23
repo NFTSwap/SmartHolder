@@ -22,7 +22,7 @@ async function deploy(name, Contract, opts, args = [], isUpgrade = true) {debugg
 
 async function onlyImpl(opts) {
 	var dao = await deploy('DAO', DAO, opts, [], false);
-	var asset = await deploy('Asset', Asset, opts);
+	var asset = await deploy('Asset', Asset, opts, [], false);
 	var assetGlobal = await deploy('AssetGlobal', AssetGlobal, opts, [], false);
 	var ledger = await deploy('Ledger', Ledger, opts, [], false);
 	var member = await deploy('Member', Member, opts, [], false);
