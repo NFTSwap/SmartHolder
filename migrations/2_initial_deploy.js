@@ -66,7 +66,7 @@ module.exports = async function(deployer, networks, accounts) {
 	await ledger.initLedger(dao.address, 'Ledger', operator);
 	await member.initMember(dao.address, 'Member', operator);
 	await votePool.initVotePool(dao.address, 'VotePool');
-	await dao.initDAO('Test', from, votePool.address, member.address, ledger.address, assetGlobal.address, asset.address);
+	await dao.initDAO('Test', '', '', from, votePool.address, member.address, ledger.address, assetGlobal.address, asset.address);
 
 	console.log("DAO:", dao.address, "IMPL:", dao.impl.address);
 	console.log("AssetGlobal:", assetGlobal.address, "IMPL:", assetGlobal.impl.address);
