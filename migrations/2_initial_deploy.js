@@ -6,7 +6,7 @@ const Ledger = artifacts.require("Ledger.sol");
 const Member = artifacts.require("Member.sol");
 const VotePool = artifacts.require("VotePool.sol");
 
-async function deploy(name, Contract, opts, args = [], isUpgrade = true) {
+async function deploy(name, Contract, opts, args = [], isUpgrade = true) {debugger
 	await opts.deployer.deploy(Contract, ...args);
 	var impl = await Contract.deployed();
 	if (isUpgrade) {
@@ -20,14 +20,13 @@ async function deploy(name, Contract, opts, args = [], isUpgrade = true) {
 	}
 }
 
-async function onlyImpl(deployer, opts) {
-	// var opts = { deployer, initializer: 'initialize', unsafeAllowCustomTypes: true };
-	var dao = await deploy('DAO', DAO, opts, false);
+async function onlyImpl(opts) {
+	var dao = await deploy('DAO', DAO, opts, [], false);
 	var asset = await deploy('Asset', Asset, opts);
-	var assetGlobal = await deploy('AssetGlobal', AssetGlobal, opts, false);
-	var ledger = await deploy('Ledger', Ledger, opts, false);
-	var member = await deploy('Member', Member, opts, false);
-	var votePool = await deploy('VotePool', VotePool, opts, false);
+	var assetGlobal = await deploy('AssetGlobal', AssetGlobal, opts, [], false);
+	var ledger = await deploy('Ledger', Ledger, opts, [], false);
+	var member = await deploy('Member', Member, opts, [], false);
+	var votePool = await deploy('VotePool', VotePool, opts, [], false);
 
 	console.log("DAO:", dao.address);
 	console.log("AssetGlobal:", assetGlobal.address);
@@ -44,7 +43,7 @@ module.exports = async function(deployer, networks, accounts) {
 	var from = deployer.options.from;
 
 	if (process.env.onlyImpl == 'true') {
-		return await onlyImpl(deployer, opts);
+		return await onlyImpl(opts);
 	}
 
 	var dao = await deploy('DAO', DAO, opts);
