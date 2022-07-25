@@ -17,7 +17,7 @@ contract VotePool is IVotePool, ERC165 {
 
 	// define props
 	IDAO private _host;
-	string private _describe;
+	string private _description;
 	uint256 private _current; // 当前执行的提案决议
 	// proposal id => Proposal
 	mapping(uint256 => Proposal) private _proposalMap; // 提案决议列表
@@ -25,21 +25,21 @@ contract VotePool is IVotePool, ERC165 {
 	// proposal id => map( member id => votes )
 	mapping(uint256 => mapping(uint256 => int256)) private _votes; // 成员投票记录
 
-	function initVotePool(address host, string memory describe) external {
+	function initVotePool(address host, string memory description) external {
 		initERC165();
 		_registerInterface(VotePool_ID);
 
 		IDAO(host).checkInterface(DAO_ID, "#Department#initVotePool dao host type not match");
 		_host = IDAO(host);
-		_describe = describe;
+		_description = description;
 	}
 
 	function host() view external returns (IDAO) {
 		return _host;
 	}
 
-	function describe() view external returns (string memory) {
-		return _describe;
+	function description() view external returns (string memory) {
+		return _description;
 	}
 
 	function current() view public returns (uint256) {
@@ -70,13 +70,13 @@ contract VotePool is IVotePool, ERC165 {
 
 		Proposal storage obj = _proposalMap[proposal.id];
 
-		if (proposal.loop != 0) {
+		if (proposal.loopCount != 0) {
 			require(proposal.loopTime >= 1 minutes, "#VotePool#create Loop time must be greater than 1 minute");
 		}
 
 		obj.id = proposal.id;
 		obj.name = proposal.name;
-		obj.describe = proposal.describe;
+		obj.description = proposal.description;
 		obj.target = proposal.target;
 		obj.origin = msg.sender;
 		// obj.signature = proposal.signature;
@@ -85,7 +85,7 @@ contract VotePool is IVotePool, ERC165 {
 		obj.expiry = block.timestamp + (proposal.lifespan * 1 minutes);
 		obj.voteRate = proposal.voteRate > 10000 ? 10000: proposal.voteRate;
 		obj.passRate = proposal.passRate > 10000 ? 10000: proposal.passRate;
-		obj.loop = proposal.loop;
+		obj.loopCount = proposal.loopCount;
 		obj.loopTime = proposal.loopTime;
 		obj.voteTotal = 0;
 		obj.agreeTotal = 0;
@@ -161,11 +161,11 @@ contract VotePool is IVotePool, ERC165 {
 		require(obj.isAgree, "#VotePool#execute Proposal was not passed");
 		require(!obj.isExecuted, "#VotePool#execute Resolution has been implemented");
 
-		if (obj.loop != 0) {
+		if (obj.loopCount != 0) {
 			require(obj.executeTime + obj.loopTime < block.timestamp, "#VotePool#execute Execution interval is too short");
-			if (obj.loop > 0) {
+			if (obj.loopCount > 0) {
 				execCall(obj);
-				obj.loop--;
+				obj.loopCount--;
 			} else { // permanent loop
 				execCall(obj);
 			}

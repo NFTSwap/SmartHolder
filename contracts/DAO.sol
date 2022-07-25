@@ -7,6 +7,9 @@ import "../openzeppelin/contracts-ethereum-package/contracts/utils/EnumerableSet
 contract DAO is IDAO, Department {
 	using EnumerableSet for EnumerableSet.AddressSet;
 
+	string private _name;
+	string private _mission;
+
 	IVotePool private _root;
 	IMember private _member;
 	ILedger private _ledger;
@@ -16,6 +19,8 @@ contract DAO is IDAO, Department {
 	EnumerableSet.AddressSet private _departments;
 	uint256[50] private __gap;
 
+	function name() view external override returns (string memory) { return _name; }
+	function mission() view external override returns (string memory) { return _mission; }
 	function root() view external override returns (IVotePool) { return _root; }
 	function member() view external override returns (IMember) { return _member; }
 	function ledger() view external override returns (ILedger) { return _ledger; }
@@ -28,12 +33,14 @@ contract DAO is IDAO, Department {
 	}
 
 	function initDAO(
-		string memory describe,
+		string memory name,
+		string memory mission,
+		string memory description,
 		address operator, address root,
 		address member, address ledger,
 		address assetGlobal, address asset
 	) external {
-		initDepartment(address(this), describe, operator);
+		initDepartment(address(this), description, operator);
 
 		ERC165(root).checkInterface(VotePool_ID, "#DAO#initDAO root type not match");
 		ERC165(member).checkInterface(Member_ID, "#DAO#initDAO member type not match");
@@ -41,6 +48,8 @@ contract DAO is IDAO, Department {
 		ERC165(assetGlobal).checkInterface(AssetGlobal_ID, "#DAO#initDAO assetGlobal type not match");
 		ERC165(asset).checkInterface(Asset_ID, "#DAO#initDAO asset type not match");
 
+		_name = name;
+		_mission = mission;
 		_root = IVotePool(root);
 		_member = IMember(member);
 		_ledger = ILedger(ledger);
@@ -48,6 +57,12 @@ contract DAO is IDAO, Department {
 		_asset = IAsset(asset);
 
 		emit Change("Init");
+	}
+
+	function setMissionAndDescribe(string memory mission, string memory description) {
+		_mission = mission;
+		_description = description;
+		emit Change("MissionAndDescribe");
 	}
 
 	function setLedger(address addr) external OnlyDAO {

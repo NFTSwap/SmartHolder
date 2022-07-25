@@ -15,8 +15,8 @@ contract AssetGlobal is IAssetGlobal, ERC721 {
 
 	mapping(uint256 => AssetID) private _assetsMeta;
 
-	function initAssetGlobal(address host, string memory describe, address operator) external {
-		initERC721(host, describe, operator);
+	function initAssetGlobal(address host, string memory description, address operator) external {
+		initERC721(host, description, operator);
 		_registerInterface(AssetGlobal_ID);
 		_registerInterface(_ERC721_RECEIVED);
 		_registerInterface(_ERC721_LOCK_RECEIVED);

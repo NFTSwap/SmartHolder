@@ -14,8 +14,8 @@ contract Member is IMember, ERC721 {
 	uint256[] private _infoList; // 成员列表
 	uint256 private _votes; // 投票权总数
 
-	function initMember(address host, string memory describe, address operator) external initializer {
-		initERC721(host, describe, operator);
+	function initMember(address host, string memory description, address operator) external initializer {
+		initERC721(host, description, operator);
 		_registerInterface(Member_ID);
 	}
 
@@ -25,7 +25,7 @@ contract Member is IMember, ERC721 {
 		Info storage info_ = _infoMap[info.id];
 		info_.id = info.id;
 		info_.name = info.name;
-		info_.describe = info.describe;
+		info_.description = info.description;
 		info_.avatar = info.avatar;
 		info_.role = info.role;
 		info_.votes = info.votes == 0 ? 1: info.votes;
@@ -54,7 +54,7 @@ contract Member is IMember, ERC721 {
 		require(ownerOf(id) == _msgSender(), "#Member#setInfo: owner no match");
 		Info storage info_ = _infoMap[id];
 		info_.name = info.name;
-		info_.describe = info.describe;
+		info_.description = info.description;
 		info_.avatar = info.avatar;
 		// info_.extended = info.extended;
 		emit UpdateInfo(id);
