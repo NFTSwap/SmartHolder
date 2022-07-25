@@ -58,17 +58,10 @@ contract DAO is IDAO, Department {
 		emit Change("Init");
 	}
 
-<<<<<<< HEAD
-	function setMissionAndDescribe(string memory mission, string memory description) {
-		_mission = mission;
-		_description = description;
-		emit Change("MissionAndDescribe");
-=======
 	function setMissionAndDesc(string memory mission, string memory description) external OnlyDAO {
 		_description = description;
 		_mission = mission;
 		emit Change("MissionAndDesc");
->>>>>>> 60a0abe10cfcc1f02fe2a38e97a3b206e35a4048
 	}
 
 	function setLedger(address addr) external OnlyDAO {
