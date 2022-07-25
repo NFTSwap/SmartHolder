@@ -57,7 +57,7 @@ interface ILedger is IDepartment {
 	event Withdraw(address indexed target, uint256 balance, string description);
 	event Release(uint256 indexed member, address indexed to, uint256 balance);
 
-	function withdraw(uint256 amount, address target) external payable;
+	function withdraw(uint256 amount, address target, string memory description) external payable;
 }
 
 interface IMember is IDepartment, IERC721, IERC721Metadata, IERC721Enumerable {

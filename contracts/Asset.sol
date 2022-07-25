@@ -24,7 +24,7 @@ contract Asset is IAsset, ERC721 {
 		_registerInterface(_INTERFACE_ID_ERC721_LOCK);
 	}
 
-	function safeMint(address to, uint256 tokenId, string memory _tokenURI, address lock, bytes memory _data) public {
+	function safeMint(address to, uint256 tokenId, string memory _tokenURI, address lock, bytes calldata _data) public {
 		_safeMint(to, tokenId, _data);
 		_setTokenURI(tokenId, _tokenURI);
 

@@ -5,10 +5,11 @@ pragma experimental ABIEncoderV2;
 
 import "./Interface.sol";
 import "./ERC165.sol";
+import "./Upgrade.sol";
 import "../openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "../openzeppelin/contracts-ethereum-package/contracts/utils/Address.sol";
 
-contract VotePool is IVotePool, ERC165 {
+contract VotePool is Upgrade, IVotePool, ERC165 {
 	using Address for address;
 	using SafeMath for uint256;
 

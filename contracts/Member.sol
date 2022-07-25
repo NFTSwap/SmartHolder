@@ -75,7 +75,7 @@ contract Member is IMember, ERC721 {
 	}
 
 	function isApprovedOrOwner(address spender, uint256 id) view public returns (bool) {
-		return _isCanTransfer(spender, id);
+		return _havePermission(spender, id);
 	}
 
 	function total() view public override returns (uint256) {

@@ -7,9 +7,8 @@ import "../openzeppelin/contracts-ethereum-package/contracts/utils/EnumerableSet
 contract DAO is IDAO, Department {
 	using EnumerableSet for EnumerableSet.AddressSet;
 
-	string private _name;
-	string private _mission;
-
+	string internal _name;
+	string internal _mission;
 	IVotePool private _root;
 	IMember private _member;
 	ILedger private _ledger;
@@ -19,8 +18,8 @@ contract DAO is IDAO, Department {
 	EnumerableSet.AddressSet private _departments;
 	uint256[50] private __gap;
 
-	function name() view external override returns (string memory) { return _name; }
-	function mission() view external override returns (string memory) { return _mission; }
+	function name() view external returns (string memory) { return _name; }
+	function mission() view external returns (string memory) { return _mission; }
 	function root() view external override returns (IVotePool) { return _root; }
 	function member() view external override returns (IMember) { return _member; }
 	function ledger() view external override returns (ILedger) { return _ledger; }
@@ -59,10 +58,17 @@ contract DAO is IDAO, Department {
 		emit Change("Init");
 	}
 
+<<<<<<< HEAD
 	function setMissionAndDescribe(string memory mission, string memory description) {
 		_mission = mission;
 		_description = description;
 		emit Change("MissionAndDescribe");
+=======
+	function setMissionAndDesc(string memory mission, string memory description) external OnlyDAO {
+		_description = description;
+		_mission = mission;
+		emit Change("MissionAndDesc");
+>>>>>>> 60a0abe10cfcc1f02fe2a38e97a3b206e35a4048
 	}
 
 	function setLedger(address addr) external OnlyDAO {

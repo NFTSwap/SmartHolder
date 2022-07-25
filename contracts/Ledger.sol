@@ -49,7 +49,7 @@ contract Ledger is ILedger, Department {
 		emit ReleaseLog(msg.sender, amount, description);
 	}
 
-	function deposit(string memory name, string memory description) public {
+	function deposit(string memory name, string memory description) public payable {
 		if (msg.value != 0) {
 			emit Deposit(msg.sender, msg.value, name, description);
 		}
