@@ -37,6 +37,15 @@ contract Member is IMember, ERC721 {
 		_infoList.push(info.id);
 	}
 
+	function create2(address owner, uint256 id, uint32 votes, string memory name, string memory description, string memory avatar) external OnlyDAO {
+		Info memory info;
+		info.id = id;
+		info.name = name;
+		info.votes = votes;
+		info.avatar = avatar;
+		info.description = description;
+	}
+
 	function votes() view external override returns (uint256) {
 		return _votes;
 	}

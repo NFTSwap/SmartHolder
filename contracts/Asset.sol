@@ -81,7 +81,7 @@ contract Asset is IAsset, ERC721 {
 	function _checkOnERC721LockReceived(address from, address to, uint256 tokenId, bytes memory _data) private returns (bool) {
 		if (!to.isContract()) return true;
 		bytes memory data = abi.encodeWithSelector(
-			IERC721Receiver(to).onERC721Received.selector, _msgSender(), from, tokenId, _data
+			IERC721LockReceiver(to).onERC721LockReceived.selector, _msgSender(), from, tokenId, _data
 		);
 		return checkCall(to, data, "ERC721: lock to non ERC721LockReceiver implementer") == _ERC721_LOCK_RECEIVED;
 	}

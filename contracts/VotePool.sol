@@ -58,10 +58,10 @@ contract VotePool is Upgrade, IVotePool, ERC165 {
 	}
 
 	function exists(uint256 id) view public returns (bool) {
-		return _proposalMap[id].idx < _proposalList.length;
+		return _proposalMap[id].id != 0;
 	}
 
-	function create(Proposal memory proposal) external {
+	function create(Proposal memory proposal) public {
 
 		require(!exists(proposal.id), "#VotePool#create proposal already exists");
 
@@ -101,6 +101,32 @@ contract VotePool is Upgrade, IVotePool, ERC165 {
 		emit Created(proposal.id);
 	}
 
+	function create2(
+		uint256 id,
+		address target,
+		uint256 lifespan,
+		uint256 voteRate,
+		uint256 passRate,
+		int256 loopCount,
+		uint256 loopTime,
+		string memory name,
+		string memory description,
+		bytes memory data
+	) external {
+		Proposal memory proposal;
+		proposal.id = id;
+		proposal.target = target;
+		proposal.lifespan = lifespan;
+		proposal.voteRate = voteRate;
+		proposal.passRate = passRate;
+		proposal.loopCount = loopCount;
+		proposal.loopTime = loopTime;
+		proposal.name = name;
+		proposal.description = description;
+		proposal.data = data;
+		create(proposal);
+	}
+
 	function abs(int256 value) pure internal returns (uint256) {
 		return value < 0 ? uint256(-value): uint256(value);
 	}
@@ -109,7 +135,7 @@ contract VotePool is Upgrade, IVotePool, ERC165 {
 		Proposal storage obj = proposal(id);
 		IMember.Info memory info = _host.member().getInfo(member);
 
-		require(votes == 0, "#VotePool#vote parameter error, votes==0");
+		require(votes != 0, "#VotePool#vote parameter error, votes==0");
 		require(!obj.isClose, "#VotePool#vote Voting has been closed");
 		require(_host.member().ownerOf(member) == msg.sender, "#VotePool#vote No call permission");
 		require(_votes[id][member] == 0, "#VotePool#vote Cannot vote repeatedly");
@@ -142,11 +168,18 @@ contract VotePool is Upgrade, IVotePool, ERC165 {
 		if (obj.expiry != 0 && obj.expiry < block.timestamp) {
 			obj.isClose = true; //
 		} else {
+			// obj.voteTotal / votes * 10000
 			if (obj.voteTotal * 10000 / votes > obj.voteRate) { // test voteTotal
-				if (obj.agreeTotal * 10000 / votes > obj.agreeTotal) { // test agreeTotal
+				if (obj.agreeTotal * 10000 / votes > obj.passRate) { // test agreeTotal
 					// complete
 					obj.isClose = true;
 					obj.isAgree = true;
+				}
+			}
+
+			if (!obj.isClose) {
+				if ((obj.voteTotal - obj.agreeTotal) * 10000 / votes > (10000 - obj.passRate)) { // Refuse to pass
+					obj.isClose = true;
 				}
 			}
 		}
@@ -184,12 +217,15 @@ contract VotePool is Upgrade, IVotePool, ERC165 {
 		_current = obj.id;
 		(bool suc, bytes memory _data) = obj.target.call{ value: msg.value }(obj.data);
 		_current = 0;
+
 		assembly {
 			let len := mload(_data)
 			let data := add(_data, 0x20)
 			switch suc
 			case 0 { revert(data, len) }
-			default { return(data, len) }
+			default { 
+				// return(data, len) 
+			}
 		}
 	}
 

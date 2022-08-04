@@ -1,6 +1,5 @@
 
-const constants = require("@openzeppelin/test-helpers/src/constants");
-const { web3, BN } = require("@openzeppelin/test-helpers/src/setup");
+const fs = require('fs');
 
 const DAO = artifacts.require("DAO.sol");
 const Asset = artifacts.require("Asset.sol");
@@ -14,12 +13,13 @@ require("@openzeppelin/test-helpers");
 
 class App {
 	async deployed(account) {
-		this.DAO = await DAO.deployed();
-		this.Asset = await Asset.deployed();
-		this.AssetGlobal = await AssetGlobal.deployed();
-		this.Ledger = await Ledger.deployed();
-		this.Member = await Member.deployed();
-		this.VotePool = await VotePool.deployed();
+		var json = JSON.parse(fs.readFileSync(`${__dirname}/../build/_impls.json`, 'utf-8'));
+		this.dao = await DAO.at(json.dao);//deployed();
+		this.asset = await Asset.at(json.asset);//deployed();
+		this.assetGlobal = await AssetGlobal.at(json.assetGlobal);//deployed();
+		this.ledger = await Ledger.at(json.ledger);//deployed();
+		this.member = await Member.at(json.member);//deployed();
+		this.votePool = await VotePool.at(json.votePool);//deployed();
 	}
 }
 

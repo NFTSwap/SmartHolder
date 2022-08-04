@@ -82,6 +82,12 @@ contract DAO is IDAO, Department {
 		emit Change("Asset");
 	}
 
+	function setMember(address addr) external OnlyDAO {
+		ERC165(addr).checkInterface(Member_ID, "#DAO#setAsset type not match");
+		_member = IMember(addr);
+		emit Change("Member");
+	}
+
 	function setDepartments(address addr, bool isDel) external OnlyDAO {
 		ERC165(addr).checkInterface(Department_ID, "#DAO#setDepartments type not match");
 

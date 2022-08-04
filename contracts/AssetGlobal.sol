@@ -100,7 +100,7 @@ contract AssetGlobal is IAssetGlobal, ERC721 {
 
 	function unlock(address metaToken, uint256 metaTokenId) external override {
 		uint256 id = convertTokenID(metaToken, metaTokenId);
-		AssetID storage asset = _assetsMeta[metaTokenId];
+		AssetID storage asset = _assetsMeta[id];
 		require(asset.token != address(0), "#AssetGlobal#unlock unlock of asset non exists");
 		IERC721Lock(asset.token).lock(address(0), asset.tokenId, "");
 		delete _assetsMeta[id];

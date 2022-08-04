@@ -5,8 +5,10 @@ const AssetGlobal = artifacts.require("AssetGlobal.sol");
 const Ledger = artifacts.require("Ledger.sol");
 const Member = artifacts.require("Member.sol");
 const VotePool = artifacts.require("VotePool.sol");
+const fs = require('fs');
 
-async function deploy(name, Contract, opts, args = [], isUpgrade = true) {debugger
+async function deploy(name, Contract, opts, args = [], isUpgrade = true) {
+	console.log('Deploy', name);
 	await opts.deployer.deploy(Contract, ...args);
 	var impl = await Contract.deployed();
 	if (isUpgrade) {
@@ -21,6 +23,9 @@ async function deploy(name, Contract, opts, args = [], isUpgrade = true) {debugg
 }
 
 async function onlyImpl(opts) {
+	var operator = '0x0000000000000000000000000000000000000000';
+	var from = opts.deployer.options.from;
+
 	var dao = await deploy('DAO', DAO, opts, [], false);
 	var asset = await deploy('Asset', Asset, opts, [], false);
 	var assetGlobal = await deploy('AssetGlobal', AssetGlobal, opts, [], false);
@@ -34,6 +39,40 @@ async function onlyImpl(opts) {
 	console.log("Ledger:", ledger.address);
 	console.log("Member:", member.address);
 	console.log("VotePool:", votePool.address);
+
+	if (!await dao.supportsInterface('0xc7b55336')) {
+		await dao.initInterfaceID(); console.log('initInterfaceID ok');
+	}
+	if (await asset.host() != dao.address) {
+		await asset.initAsset(dao.address, 'Asset', operator); console.log('initAsset ok');
+	}
+	if (await assetGlobal.host() != dao.address) {
+		await assetGlobal.initAssetGlobal(dao.address, 'AssetGlobal', operator); console.log('initAssetGlobal ok');
+	}
+	if (await ledger.host() != dao.address) {
+		await ledger.initLedger(dao.address, 'Ledger', operator); console.log('initLedger ok');
+	}
+	if (await member.host() != dao.address) {
+		await member.initMember(dao.address, 'Member', operator); console.log('initMember ok');
+	}
+	if (await votePool.host() != dao.address) {
+		await votePool.initVotePool(dao.address, 'VotePool'); console.log('initVotePool ok');
+	}
+	if (await dao.asset() != asset.address) {
+		await dao.initDAO('Test', '', '', from, votePool.address, member.address, ledger.address, assetGlobal.address, asset.address);
+		console.log('initDAO ok');
+	}
+
+	fs.writeFileSync(`${__dirname}/../build/_impls.json`, JSON.stringify({
+		dao: dao.address,
+		assetGlobal: assetGlobal.address,
+		asset: asset.address,
+		ledger: ledger.address,
+		member: member.address,
+		votePool: votePool.address,
+	}));
+
+	return {dao,assetGlobal,asset,ledger,member,votePool};
 }
 
 module.exports = async function(deployer, networks, accounts) {
@@ -46,19 +85,16 @@ module.exports = async function(deployer, networks, accounts) {
 		return await onlyImpl(opts);
 	}
 
+	if (process.env.onlyTest) {
+		return;
+	}
+
 	var dao = await deploy('DAO', DAO, opts);
 	var asset = await deploy('Asset', Asset, opts);
 	var assetGlobal = await deploy('AssetGlobal', AssetGlobal, opts);
 	var ledger = await deploy('Ledger', Ledger, opts);
 	var member = await deploy('Member', Member, opts);
 	var votePool = await deploy('VotePool', VotePool, opts);
-
-	// var dao = await DAO.at('0x1F978cd7B8eD52c30C743213B8C79Bbe1deD2Ed6');
-	// var asset = await Asset.at('0x9b24edF5917b484AAEA96b7b4b108FC0d92D5bc4');
-	// var assetGlobal = await AssetGlobal.at('0x174592711b02dFc27030074Eb48a568D0B421183');
-	// var ledger = await Ledger.at('0xdf3057268dA671Bad70d260da3D7110aBf901354');
-	// var member = await Member.at('0x50523F67f863eB6C5882bb0ea8C807f37c143369');
-	// var votePool = await VotePool.at('0x22700b353C4316c4de2B980Df0Bef0A1827E348B');
 
 	await dao.initInterfaceID();
 	await asset.initAsset(dao.address, 'Asset', operator);
