@@ -22,9 +22,12 @@ async function deploy(name, Contract, opts, args = [], isUpgrade = true) {
 	}
 }
 
-async function onlyImpl(opts) {
-	var operator = '0x0000000000000000000000000000000000000000';
-	var from = opts.deployer.options.from;
+module.exports = async function(deployer, networks, accounts) {
+	if (process.env.noDeploy == 'true' && fs.existsSync(`${__dirname}/../build/deploy.json`)) return;
+
+	var opts = { deployer, initializer: 'initialize', unsafeAllowCustomTypes: true };
+	var from = deployer.options.from;
+	var operator = from; // '0x0000000000000000000000000000000000000000';
 
 	var dao = await deploy('DAO', DAO, opts, [], false);
 	var asset = await deploy('Asset', Asset, opts, [], false);
@@ -33,12 +36,21 @@ async function onlyImpl(opts) {
 	var member = await deploy('Member', Member, opts, [], false);
 	var votePool = await deploy('VotePool', VotePool, opts, [], false);
 
-	console.log("DAO:", dao.address);
-	console.log("AssetGlobal:", assetGlobal.address);
-	console.log("Asset:", asset.address);
-	console.log("Ledger:", ledger.address);
-	console.log("Member:", member.address);
-	console.log("VotePool:", votePool.address);
+	// var dao = await DAO.at('0x3b4710ca147372927BC54A45710a3FeD6c188F37');
+	// var asset = await Asset.at('0x67E36B30226b9a780cCc4F4621dD3E30f41A6384');
+	// var assetGlobal = await AssetGlobal.at('0x07c8802d4aa31b8905dDfdE86D3ecA92b4c724eB');
+	// var ledger = await Ledger.at('0xd4ab6cC47DafbD1aDaA8f9186a1fe37989255539');
+	// var member = await Member.at('0xCc7b1Ee5BdF9EB7199a5d4B1BB6D4F0FeCEF3E59');
+	// var votePool = await VotePool.at('0xB83BB3fE46520c04796090370aB3AC2e5Aa1fF42');
+
+	console.log("DAO:", dao.address, "IMPL:", dao.address);
+	console.log("AssetGlobal:", assetGlobal.address, "IMPL:", assetGlobal.address);
+	console.log("Asset:", asset.address, "IMPL:", asset.address);
+	console.log("Ledger:", ledger.address, "IMPL:", ledger.address);
+	console.log("Member:", member.address, "IMPL:", member.address);
+	console.log("VotePool:", votePool.address, "IMPL:", votePool.address);
+
+	if (process.env.noInit == 'true') return;
 
 	if (!await dao.supportsInterface('0xc7b55336')) {
 		await dao.initInterfaceID(); console.log('initInterfaceID ok');
@@ -63,51 +75,12 @@ async function onlyImpl(opts) {
 		console.log('initDAO ok');
 	}
 
-	fs.writeFileSync(`${__dirname}/../build/_impls.json`, JSON.stringify({
+	fs.writeFileSync(`${__dirname}/../build/deploy.json`, JSON.stringify({
 		dao: dao.address,
 		assetGlobal: assetGlobal.address,
 		asset: asset.address,
 		ledger: ledger.address,
 		member: member.address,
 		votePool: votePool.address,
-	}));
-
-	return {dao,assetGlobal,asset,ledger,member,votePool};
-}
-
-module.exports = async function(deployer, networks, accounts) {
-
-	var opts = { deployer, initializer: 'initialize', unsafeAllowCustomTypes: true };
-	var operator = '0x0000000000000000000000000000000000000000';
-	var from = deployer.options.from;
-
-	if (process.env.onlyImpl == 'true') {
-		return await onlyImpl(opts);
-	}
-
-	if (process.env.onlyTest) {
-		return;
-	}
-
-	var dao = await deploy('DAO', DAO, opts);
-	var asset = await deploy('Asset', Asset, opts);
-	var assetGlobal = await deploy('AssetGlobal', AssetGlobal, opts);
-	var ledger = await deploy('Ledger', Ledger, opts);
-	var member = await deploy('Member', Member, opts);
-	var votePool = await deploy('VotePool', VotePool, opts);
-
-	await dao.initInterfaceID();
-	await asset.initAsset(dao.address, 'Asset', operator);
-	await assetGlobal.initAssetGlobal(dao.address, 'AssetGlobal', operator);
-	await ledger.initLedger(dao.address, 'Ledger', operator);
-	await member.initMember(dao.address, 'Member', operator);
-	await votePool.initVotePool(dao.address, 'VotePool');
-	await dao.initDAO('Test', '', '', from, votePool.address, member.address, ledger.address, assetGlobal.address, asset.address);
-
-	console.log("DAO:", dao.address, "IMPL:", dao.impl.address);
-	console.log("AssetGlobal:", assetGlobal.address, "IMPL:", assetGlobal.impl.address);
-	console.log("Asset:", asset.address, "IMPL:", asset.impl.address);
-	console.log("Ledger:", ledger.address, "IMPL:", ledger.impl.address);
-	console.log("Member:", member.address, "IMPL:", member.impl.address);
-	console.log("VotePool:", votePool.address, "IMPL:", votePool.impl.address);
+	}, null, 2));
 };

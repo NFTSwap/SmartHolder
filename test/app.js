@@ -13,7 +13,7 @@ require("@openzeppelin/test-helpers");
 
 class App {
 	async deployed(account) {
-		var json = JSON.parse(fs.readFileSync(`${__dirname}/../build/_impls.json`, 'utf-8'));
+		var json = JSON.parse(fs.readFileSync(`${__dirname}/../build/deploy.json`, 'utf-8'));
 		this.dao = await DAO.at(json.dao);//deployed();
 		this.asset = await Asset.at(json.asset);//deployed();
 		this.assetGlobal = await AssetGlobal.at(json.assetGlobal);//deployed();
