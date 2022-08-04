@@ -58,12 +58,12 @@ contract('SmartHolder All', (accounts) => {
 		it("safeTransferFrom to account 1", async () => {
 			var id = await app.assetGlobal.convertTokenID(app.asset.address, tokenId);
 			await app.assetGlobal.methods['safeTransferFrom(address,address,uint256)'](users[0], users[1], id, {from: users[0]});
-			assert(await app.asset.ownerOf(tokenId)==users[1], 'await app.asset.ownerOf(tokenId)==users[1]');
+			assert((await app.asset.ownerOf(tokenId)).toLowerCase()==users[1], 'await app.asset.ownerOf(tokenId)==users[1]');
 		});
 		it("safeTransferFrom to account 0", async () => {
 			var id = await app.assetGlobal.convertTokenID(app.asset.address, tokenId);
 			await app.assetGlobal.methods['safeTransferFrom(address,address,uint256)'](users[1], users[0], id, {from: users[1]});
-			assert(await app.asset.ownerOf(tokenId)==users[0], 'await app.asset.ownerOf(tokenId)==users[1]');
+			assert((await app.asset.ownerOf(tokenId)).toLowerCase()==users[0], 'await app.asset.ownerOf(tokenId)==users[1]');
 		});
 		it("unlock", async () => {
 			await app.assetGlobal.unlock(app.asset.address, tokenId);
