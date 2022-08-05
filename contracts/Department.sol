@@ -51,7 +51,7 @@ contract Department is Upgrade, IDepartment, ERC165 {
 		address sender = msg.sender;
 		if (sender != address(_operator)) {
 			if (sender != address(_host.operator())) {
-				require(sender == address(_host.root()), "#Upgrade#OnlyDAO caller does not have permission");
+				require(sender == address(_host.root()), "#Department#OnlyDAO caller does not have permission");
 			}
 		}
 		_;
