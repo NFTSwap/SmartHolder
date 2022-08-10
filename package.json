@@ -9,7 +9,7 @@
 		"deploy": "noInit=true truffle deploy --network development",
 		"rinkeby": "noInit=true truffle deploy --network rinkeby",
 		"matic": "noInit=true truffle deploy --network matic",
-		"test": "noDeploy=true truffle test --network development --compile-none",
+		"test": "useCache=true truffle test --network development --compile-none",
 		"coverage": "truffle run coverage --network development",
 		"prepare-docs": "scripts/prepare-docs.sh",
 		"prettier:solidity": "prettier --write 'contracts/**/*.sol'",

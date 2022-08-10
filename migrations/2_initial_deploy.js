@@ -23,7 +23,7 @@ async function deploy(name, Contract, opts, args = [], isUpgrade = true) {
 }
 
 module.exports = async function(deployer, networks, accounts) {
-	if (process.env.noDeploy == 'true' && fs.existsSync(`${__dirname}/../build/deploy.json`)) return;
+	if (process.env.useCache == 'true' && fs.existsSync(`${__dirname}/../build/deploy.json`)) return;
 
 	var opts = { deployer, initializer: 'initialize', unsafeAllowCustomTypes: true };
 	var from = deployer.options.from;
