@@ -6,7 +6,7 @@
 	"scripts": {
 		"build": "truffle compile --all && onlyBuild=true truffle deploy --network development && truffle compile",
 		"console": "truffle console",
-		"deploy": "noInit=true truffle deploy --network development",
+		"deploy": "truffle deploy --network development",
 		"rinkeby": "noInit=true truffle deploy --network rinkeby",
 		"matic": "noInit=true truffle deploy --network matic",
 		"test": "useCache=true truffle test --network development --compile-none",
