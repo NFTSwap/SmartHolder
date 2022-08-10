@@ -10,7 +10,12 @@ const fs = require('fs');
 async function deploy(name, Contract, opts, args = [], isUpgrade = true) {
 	console.log('Deploy', name);
 	await opts.deployer.deploy(Contract, ...args);
-	var impl = await Contract.deployed();
+	try {
+		var impl = await Contract.deployed();
+	} catch(err) {
+		console.warn(err);
+		var impl = await Contract.deployed();
+	}
 	if (isUpgrade) {
 		var ContextContract = artifacts.require(`ContextProxy${name}`);
 		var ctx = await opts.deployer.deploy(ContextContract, impl.address);
