@@ -48,12 +48,12 @@ module.exports = async function(deployer, networks, accounts) {
 	// var member = await Member.at('0xCc7b1Ee5BdF9EB7199a5d4B1BB6D4F0FeCEF3E59');
 	// var votePool = await VotePool.at('0xB83BB3fE46520c04796090370aB3AC2e5Aa1fF42');
 
-	console.log("DAO:", dao.address, "IMPL:", dao.address);
-	console.log("AssetGlobal:", assetGlobal.address, "IMPL:", assetGlobal.address);
-	console.log("Asset:", asset.address, "IMPL:", asset.address);
-	console.log("Ledger:", ledger.address, "IMPL:", ledger.address);
-	console.log("Member:", member.address, "IMPL:", member.address);
-	console.log("VotePool:", votePool.address, "IMPL:", votePool.address);
+	console.log("DAO:", dao.address);
+	console.log("AssetGlobal:", assetGlobal.address);
+	console.log("Asset:", asset.address);
+	console.log("Ledger:", ledger.address);
+	console.log("Member:", member.address);
+	console.log("VotePool:", votePool.address);
 
 	if (process.env.noInit == 'true') return;
 
