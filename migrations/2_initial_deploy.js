@@ -64,7 +64,8 @@ module.exports = async function(deployer, networks, accounts) {
 		await asset.initAsset(dao.address, 'Asset', operator); console.log('initAsset ok');
 	}
 	if (await assetGlobal.host() != dao.address) {
-		await assetGlobal.initAssetGlobal(dao.address, 'AssetGlobal', operator); console.log('initAssetGlobal ok');
+		let uri = `https://smart-dao-rel.stars-mine.com/service-api/utils/getOpenseaContractJSON?host=${dao.address}&chain=4`;
+		await assetGlobal.initAssetGlobal(dao.address, 'AssetGlobal', operator, uri); console.log('initAssetGlobal ok');
 	}
 	if (await ledger.host() != dao.address) {
 		await ledger.initLedger(dao.address, 'Ledger', operator); console.log('initLedger ok');
