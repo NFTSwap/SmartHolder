@@ -13,13 +13,16 @@ contract AssetGlobal is IAssetGlobal, ERC721 {
 	bytes4 private constant _INTERFACE_ID_ERC721 = 0x80ac58cd;
 	bytes4 private constant _INTERFACE_ID_ERC721_LOCK = 0x473eac90;
 
+	string private _contractURI;// = "https://smart-dao.stars-mine.com/service-api/utils/getOpenseaContractJSON?";
+
 	mapping(uint256 => AssetID) private _assetsMeta;
 
-	function initAssetGlobal(address host, string memory description, address operator) external {
+	function initAssetGlobal(address host, string memory description, address operator, string memory contractURI) external {
 		initERC721(host, description, operator);
 		_registerInterface(AssetGlobal_ID);
 		_registerInterface(_ERC721_RECEIVED);
 		_registerInterface(_ERC721_LOCK_RECEIVED);
+		_contractURI = contractURI;
 	}
 
 	// @dev convert addr to standard ERC721 NFT,will be revered if add is invalid.
@@ -116,4 +119,22 @@ contract AssetGlobal is IAssetGlobal, ERC721 {
 		delete _assetsMeta[tokenId];
 		_burn(tokenId);
 	}
+
+	function contractURI() public view returns (string memory) {
+		/*{
+			"name": "OpenSea Creatures",
+			"description": "OpenSea Creatures are adorable aquatic beings primarily for demonstrating what can be done using the OpenSea platform. Adopt one today to try out all the OpenSea buying, selling, and bidding feature set.",
+			"image": "external-link-url/image.png",
+			"external_link": "external-link-url",
+			"seller_fee_basis_points": 100, # Indicates a 1% seller fee.
+			"fee_recipient": "0xA97F337c39cccE66adfeCB2BF99C1DdC54C2D721" # Where seller fees will be paid to.
+		}*/
+
+		return _contractURI;
+	}
+
+	function setContractURI(string memory uri) public {
+		_contractURI = uri;
+	}
+
 }
