@@ -60,22 +60,34 @@ module.exports = async function(deployer, networks, accounts) {
 	if (!await dao.supportsInterface('0xc7b55336')) {
 		await dao.initInterfaceID(); console.log('initInterfaceID ok');
 	}
+	
 	if (await asset.host() != dao.address) {
 		await asset.initAsset(dao.address, 'Asset', operator); console.log('initAsset ok');
 	}
+
 	if (await assetGlobal.host() != dao.address) {
 		let uri = `https://smart-dao-rel.stars-mine.com/service-api/utils/getOpenseaContractJSON?host=${dao.address}&chain=4`;
 		await assetGlobal.initAssetGlobal(dao.address, 'AssetGlobal', operator, uri); console.log('initAssetGlobal ok');
 	}
+
 	if (await ledger.host() != dao.address) {
 		await ledger.initLedger(dao.address, 'Ledger', operator); console.log('initLedger ok');
 	}
+
 	if (await member.host() != dao.address) {
-		await member.initMember(dao.address, 'Member', operator, []); console.log('initMember ok');
+		let testMem = {
+			owner: operator,
+			info: {
+				id: 1, name: 'testMem-1', description: '', avatar: '', role: 0, votes: 1, idx: 0, __ext: [0,0],
+			},
+		};
+		await member.initMember(dao.address, 'Member', operator, [testMem]); console.log('initMember ok');
 	}
+
 	if (await votePool.host() != dao.address) {
 		await votePool.initVotePool(dao.address, 'VotePool'); console.log('initVotePool ok');
 	}
+
 	if (await dao.asset() != asset.address) {
 		await dao.initDAO('Test', '', '', from, votePool.address, member.address, ledger.address, assetGlobal.address, asset.address);
 		console.log('initDAO ok');
