@@ -14,12 +14,21 @@ contract Member is IMember, ERC721 {
 	uint256[] private _infoList; // 成员列表
 	uint256 private _votes; // 投票权总数
 
-	function initMember(address host, string memory description, address operator) external initializer {
-		initERC721(host, description, operator);
-		_registerInterface(Member_ID);
+	struct InitMemberArgs {
+		address owner;
+		Info info;
 	}
 
-	function create(address owner, Info memory info) external OnlyDAO {
+	function initMember(address host, string memory description, address operator, InitMemberArgs[] memory members) external initializer {
+		initERC721(host, description, operator);
+		_registerInterface(Member_ID);
+
+		for (uint256 i = 0; i < members.length; i++) {
+			create0(members[i].owner, members[i].info);
+		}
+	}
+
+	function create0(address owner, Info memory info) private {
 		_mint(owner, info.id);
 
 		Info storage info_ = _infoMap[info.id];
@@ -37,13 +46,39 @@ contract Member is IMember, ERC721 {
 		_infoList.push(info.id);
 	}
 
-	function create2(address owner, uint256 id, uint32 votes, string memory name, string memory description, string memory avatar) external OnlyDAO {
+	function remove(uint256 id) public {
+		require(isApprovedOrOwner(msg.sender, id) || isPermissionDAO(), "#Member#remove No permission");
+		_burn(id);
+
+		Info storage info = _infoMap[id];
+		uint256 idx = info.idx;
+
+		if (_infoList.length > 1) {
+			uint256 lastId = _infoList[_infoList.length - 1];
+			_infoMap[lastId].idx = idx;
+			_infoList[idx] = lastId;
+		}
+		_votes -= info.votes;
+		delete _infoMap[id];
+		_infoList.pop();
+	}
+
+	function create(address owner, Info memory info) external OnlyDAO {
+		create0(owner, info);
+	}
+
+	function create2(
+		address owner, uint256 id, uint32 votes,
+		string memory name, string memory description, string memory avatar
+	) external OnlyDAO 
+	{
 		Info memory info;
 		info.id = id;
 		info.name = name;
 		info.votes = votes;
 		info.avatar = avatar;
 		info.description = description;
+		create0(owner, info);
 	}
 
 	function votes() view external override returns (uint256) {

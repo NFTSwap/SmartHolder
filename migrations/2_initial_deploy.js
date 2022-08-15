@@ -71,7 +71,7 @@ module.exports = async function(deployer, networks, accounts) {
 		await ledger.initLedger(dao.address, 'Ledger', operator); console.log('initLedger ok');
 	}
 	if (await member.host() != dao.address) {
-		await member.initMember(dao.address, 'Member', operator); console.log('initMember ok');
+		await member.initMember(dao.address, 'Member', operator, []); console.log('initMember ok');
 	}
 	if (await votePool.host() != dao.address) {
 		await votePool.initVotePool(dao.address, 'VotePool'); console.log('initVotePool ok');

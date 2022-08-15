@@ -48,13 +48,18 @@ contract Department is Upgrade, IDepartment, ERC165 {
 		* @dev Throws if called by any account other than the owner.
 		*/
 	modifier OnlyDAO() {
-		address sender = msg.sender;
+		require(isPermissionDAO(), "#Department#OnlyDAO caller does not have permission");
+		_;
+	}
+
+	function isPermissionDAO() view internal returns (bool) {
+				address sender = msg.sender;
 		if (sender != address(_operator)) {
 			if (sender != address(_host.operator())) {
-				require(sender == address(_host.root()), "#Department#OnlyDAO caller does not have permission");
+				return sender == address(_host.root());
 			}
 		}
-		_;
+		return true;
 	}
 
 	function initDepartment(address host, string memory description, address operator) internal {

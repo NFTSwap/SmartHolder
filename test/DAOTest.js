@@ -89,6 +89,11 @@ contract('SmartHolder All', (accounts) => {
 				assert((await app.member.ownerOf(mid3)).toLowerCase() == users[2], 'app.member.ownerOf()');
 			}
 		});
+
+		it('remove 0', async () => {
+			await app.member.remove(mid3, {from: users[2]});
+			assert(! await app.member.exists(mid3), 'app.member.exists()');
+		});
 	});
 
 	context("Ledger", () => {
