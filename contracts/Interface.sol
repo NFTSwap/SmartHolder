@@ -88,21 +88,21 @@ interface IMember is IDepartment, IERC721, IERC721Metadata, IERC721Enumerable {
 interface IVotePool {
 
 	struct Proposal {
-		uint256 id;
-		string name;
-		string description;
-		address origin; // 发起人
-		address target; // 目标合约
-		uint256 lifespan; // 投票生命周期
+		uint256 id; // 随机256位长度id
+		string name; // 名称
+		string description; // 描述
+		address origin; // 发起人 address
+		address target; // 目标合约,决议执行合约地址
+		uint256 lifespan; // 投票生命周期单位（分钟）
 		uint256 expiry; // 过期时间
-		uint256 voteRate; // 投票率不小于全体票数50%
-		uint256 passRate; // 通过率不小于全体票数50%
-		int256  loopCount; // 执行循环次数
-		uint256 loopTime; // 执行循环间隔时间
+		uint256 voteRate; // 投票率不小于全体票数50% 1/10000
+		uint256 passRate; // 通过率不小于全体票数50% 1/10000
+		int256  loopCount; // 执行循环次数, -1表示永久定期执行决议
+		uint256 loopTime; // 执行循环间隔时间,不等于0时必须大于1分钟,0只执行一次
 		uint256 voteTotal; // 投票总数
 		uint256 agreeTotal; // 通过总数
 		uint256 executeTime; // 上次执行的时间
-		uint256 idx;
+		uint256 idx; // 
 		bool isAgree; // 是否通过采用
 		bool isClose; // 投票是否截止
 		bool isExecuted; // 是否已执行完成
