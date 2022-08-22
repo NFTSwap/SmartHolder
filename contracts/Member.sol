@@ -114,7 +114,7 @@ contract Member is IMember, ERC721 {
 		return _infoMap[_infoList[index]];
 	}
 
-	function exists(uint256 id) view public override returns (bool) {
+	function isExists(uint256 id) view public override returns (bool) {
 		return _exists(id);
 	}
 

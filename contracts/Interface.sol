@@ -80,7 +80,7 @@ interface IMember is IDepartment, IERC721, IERC721Metadata, IERC721Enumerable {
 
 	function indexAt(uint256 index) view external returns (Info memory);
 	function getInfo(uint256 id) view external returns (Info memory);
-	function exists(uint256 id) view external returns (bool);
+	function isExists(uint256 id) view external returns (bool);
 	function votes() view external returns (uint256);
 	function total() view external returns (uint256);
 }
