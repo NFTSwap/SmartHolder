@@ -564,4 +564,8 @@ contract ERC721 is Department, ERC721_Base {
 		super._registerInterface(interfaceId);
 	}
 
+	function exists(uint256 id) view public returns (bool) {
+		return _exists(id);
+	}
+
 }
