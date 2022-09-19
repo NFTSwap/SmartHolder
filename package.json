@@ -9,6 +9,7 @@
 		"deploy": "truffle deploy --network development",
 		"rinkeby": "truffle deploy --network rinkeby",
 		"matic": "truffle deploy --network matic",
+		"goerli": "truffle deploy --network goerli",
 		"test": "useCache=true truffle test --network development --compile-none",
 		"coverage": "truffle run coverage --network development",
 		"prepare-docs": "scripts/prepare-docs.sh",
