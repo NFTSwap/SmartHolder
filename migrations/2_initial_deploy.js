@@ -93,7 +93,7 @@ module.exports = async function(deployer, networks, accounts) {
 		console.log('initDAO ok');
 	}
 
-	fs.writeFileSync(`${__dirname}/../build/deploy.json`, JSON.stringify({
+	fs.writeFileSync(`${__dirname}/../build/${networks}_deploy.json`, JSON.stringify({
 		dao: dao.address,
 		assetGlobal: assetGlobal.address,
 		asset: asset.address,
