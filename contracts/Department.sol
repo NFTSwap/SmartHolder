@@ -16,13 +16,13 @@ contract Department is Upgrade, IDepartment, ERC165 {
 		*/
 	bytes4 internal constant Department_ID = 0x36c6362d;
 	/*
-		* bytes4(keccak256('initAssetGlobal(address,string,address)')) == 0x711cc62c
+		* bytes4(keccak256('initAssetShell(address,string,address,string)')) == 0x711cc62c
 		*/
-	bytes4 internal constant AssetGlobal_ID = 0x711cc62c;
+	bytes4 internal constant AssetShell_ID = 0x43234e95;
 	/*
-		* bytes4(keccak256('initAsset(address,string,address)')) == 0xb6f00dcf
+		* bytes4(keccak256('initAsset(address,string,address,string)')) == 0xb6f00dcf
 		*/
-	bytes4 internal constant Asset_ID = 0xb6f00dcf;
+	bytes4 internal constant Asset_ID = 0x68ca456f;
 	/*
 		* bytes4(keccak256('initDAO(string,address,address,address,address,address,address)')) == 0xc7b55336
 		*/

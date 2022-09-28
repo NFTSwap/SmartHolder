@@ -4,11 +4,11 @@ pragma solidity >=0.6.0 <=0.8.15;
 import "./ERC721.sol";
 import "./ERC165.sol";
 
-contract NFTs is ERC165, ERC721_Base {
+contract NFTs is ERC165, ERC721_IMPL {
 
 	function initNFTs() external {
 		initERC165();
-		initERC721_Base("NFTs", "NFTs");
+		initERC721_IMPL("NFTs", "NFTs");
 	}
 
 	function mint(uint256 tokenId) public {
@@ -16,9 +16,8 @@ contract NFTs is ERC165, ERC721_Base {
 	}
 
 	function safeMintURI(address to, uint256 tokenId, string memory _tokenURI, bytes memory _data) public {
-		_mint(msg.sender, tokenId);
+		_safeMint(to, tokenId, _data);
 		_setTokenURI(tokenId, _tokenURI);
-		safeTransferFrom(msg.sender, to, tokenId, _data);
 	}
 
 	function safeMint(address to, uint256 tokenId, bytes memory _data) public {
@@ -46,16 +45,20 @@ contract NFTs is ERC165, ERC721_Base {
 		return _havePermission(spender, tokenId);
 	}
 
-	function _msgSender721() internal view virtual override returns (address) {
-		return super._msgSender();
+	function _msgSender() internal view virtual override(Initializable,ERC721_IMPL) returns (address) {
+		return Initializable._msgSender();
 	}
 
-	function _msgData721() internal view virtual override returns (bytes memory) {
-		return super._msgData();
+	function _msgData() internal view virtual override(Initializable,ERC721_IMPL) returns (bytes memory) {
+		return Initializable._msgData();
 	}
 
-	function _registerInterface721(bytes4 interfaceId) internal virtual override {
-		super._registerInterface(interfaceId);
+	function _registerInterface(bytes4 interfaceId) internal virtual override(ERC165,ERC721_IMPL) {
+		ERC165._registerInterface(interfaceId);
+	}
+
+	receive() external payable {
+		require(msg.value != 0);
 	}
 
 }

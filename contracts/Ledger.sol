@@ -65,7 +65,6 @@ contract Ledger is ILedger, Department {
 	receive() external payable {
 		receiveBalance();
 	}
-
 	fallback() external payable {
 		receiveBalance();
 	}

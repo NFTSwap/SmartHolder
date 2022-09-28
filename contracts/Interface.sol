@@ -9,20 +9,11 @@ import "../openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC72
 import "../openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721Enumerable.sol";
 import "../openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721Receiver.sol";
 
-interface IERC721Lock {
-	event Lock(address indexed owner, address indexed locked, uint256 indexed tokenId);
-	function lock(address to, uint256 tokenId, bytes calldata data) external;
-}
-
-interface IERC721LockReceiver {
-	function onERC721LockReceived(address operator, address from, uint256 tokenId, bytes calldata data) external returns (bytes4);
-}
-
 interface IERC1651 {
 	function checkInterface(bytes4 interfaceId, string memory message) view external;
 }
 
-interface IERC721_All is IERC721, IERC721Metadata, IERC721Enumerable {}
+interface IERC721_PLUS is IERC721, IERC721Metadata, IERC721Enumerable {}
 
 interface IDepartment is IERC165, IERC1651 {
 	function operator() view external returns (IVotePool);
@@ -30,38 +21,28 @@ interface IDepartment is IERC165, IERC1651 {
 	function upgrade(address impl) external;
 }
 
-interface IAssetGlobal is IDepartment, IERC721_All, IERC721Receiver, IERC721LockReceiver {
-	enum Kind {
-		Lock,
-		Owner
-	}
+interface IAssetShell is IDepartment, IERC721_PLUS, IERC721Receiver {
 	struct AssetID {
 		address token;
 		uint256 tokenId;
-		Kind kind;
 	}
 	function withdraw(uint256 tokenId) external;
 	function assetMeta(uint256 tokenId) view external returns (AssetID memory);
-	function unlock(address metaToken, uint256 metaTokenId) external;
 }
 
-interface IAsset is IDepartment, IERC721_All, IERC721Lock {
-	event Lock(uint256 indexed tokenId, address owner, address to);
+interface IAsset is IDepartment, IERC721_PLUS {
 }
 
 interface ILedger is IDepartment {
-
 	event Receive(address indexed from, uint256 balance);
 	event ReleaseLog(address indexed operator, uint256 balance, string log);
 	event Deposit(address indexed from, uint256 balance, string name, string description);
 	event Withdraw(address indexed target, uint256 balance, string description);
 	event Release(uint256 indexed member, address indexed to, uint256 balance);
-
 	function withdraw(uint256 amount, address target, string memory description) external payable;
 }
 
-interface IMember is IDepartment, IERC721, IERC721Metadata, IERC721Enumerable {
-
+interface IMember is IDepartment, IERC721_PLUS {
 	enum Role {
 		DEFAULT
 	}
@@ -75,7 +56,6 @@ interface IMember is IDepartment, IERC721, IERC721Metadata, IERC721Enumerable {
 		uint256 idx;
 		uint256[2] __ext;
 	}
-
 	event UpdateInfo(uint256 id);
 
 	function indexAt(uint256 index) view external returns (Info memory);
@@ -86,7 +66,6 @@ interface IMember is IDepartment, IERC721, IERC721Metadata, IERC721Enumerable {
 }
 
 interface IVotePool {
-
 	struct Proposal {
 		uint256 id; // 随机256位长度id
 		string name; // 名称
@@ -101,13 +80,12 @@ interface IVotePool {
 		uint256 voteTotal; // 投票总数
 		uint256 agreeTotal; // 通过总数
 		uint256 executeTime; // 上次执行的时间
-		uint256 idx; // 
+		uint256 idx; //
 		bool isAgree; // 是否通过采用
 		bool isClose; // 投票是否截止
 		bool isExecuted; // 是否已执行完成
 		bytes data; // 调用方法与实参
 	}
-
 	// define events
 	event Created(uint256 id);
 	event Vote(uint256 indexed id, uint256 member, int256 votes);
@@ -122,6 +100,7 @@ interface IDAO is IDepartment {
 	function root() view external returns (IVotePool);
 	function member() view external returns (IMember);
 	function ledger() view external returns (ILedger);
-	function assetGlobal() view external returns (IAssetGlobal);
+	function assetShell() view external returns (IAssetShell);
+	function assetGlobal() view external returns (IAssetShell);
 	function asset() view external returns (IAsset);
 }

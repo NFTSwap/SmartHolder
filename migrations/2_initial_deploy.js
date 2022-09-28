@@ -1,7 +1,7 @@
 
 const DAO = artifacts.require("DAO.sol");
 const Asset = artifacts.require("Asset.sol");
-const AssetGlobal = artifacts.require("AssetGlobal.sol");
+const AssetShell = artifacts.require("AssetShell.sol");
 const Ledger = artifacts.require("Ledger.sol");
 const Member = artifacts.require("Member.sol");
 const VotePool = artifacts.require("VotePool.sol");
@@ -36,20 +36,20 @@ module.exports = async function(deployer, networks, accounts) {
 
 	var dao = await deploy('DAO', DAO, opts, [], false);
 	var asset = await deploy('Asset', Asset, opts, [], false);
-	var assetGlobal = await deploy('AssetGlobal', AssetGlobal, opts, [], false);
+	var assetShell = await deploy('AssetShell', AssetShell, opts, [], false);
 	var ledger = await deploy('Ledger', Ledger, opts, [], false);
 	var member = await deploy('Member', Member, opts, [], false);
 	var votePool = await deploy('VotePool', VotePool, opts, [], false);
 
 	// var dao = await DAO.at('0x3b4710ca147372927BC54A45710a3FeD6c188F37');
 	// var asset = await Asset.at('0x67E36B30226b9a780cCc4F4621dD3E30f41A6384');
-	// var assetGlobal = await AssetGlobal.at('0x07c8802d4aa31b8905dDfdE86D3ecA92b4c724eB');
+	// var assetShell = await AssetShell.at('0x07c8802d4aa31b8905dDfdE86D3ecA92b4c724eB');
 	// var ledger = await Ledger.at('0xd4ab6cC47DafbD1aDaA8f9186a1fe37989255539');
 	// var member = await Member.at('0xCc7b1Ee5BdF9EB7199a5d4B1BB6D4F0FeCEF3E59');
 	// var votePool = await VotePool.at('0xB83BB3fE46520c04796090370aB3AC2e5Aa1fF42');
 
 	console.log("DAO:", dao.address);
-	console.log("AssetGlobal:", assetGlobal.address);
+	console.log("assetShell:", assetShell.address);
 	console.log("Asset:", asset.address);
 	console.log("Ledger:", ledger.address);
 	console.log("Member:", member.address);
@@ -62,12 +62,15 @@ module.exports = async function(deployer, networks, accounts) {
 	}
 	
 	if (await asset.host() != dao.address) {
-		await asset.initAsset(dao.address, 'Asset', operator); console.log('initAsset ok');
+		let uri = `https://smart-dao-rel.stars-mine.com/service-api/utils/getOpenseaContractJSON?host=${dao.address}&chain=4`;
+		await asset.initAsset(dao.address, 'Asset', operator, uri);
+		console.log('initAsset ok');
 	}
 
-	if (await assetGlobal.host() != dao.address) {
-		let uri = `https://smart-dao-rel.stars-mine.com/service-api/utils/getOpenseaContractJSON?host=${dao.address}&chain=4`;
-		await assetGlobal.initAssetGlobal(dao.address, 'AssetGlobal', operator, uri); console.log('initAssetGlobal ok');
+	if (await assetShell.host() != dao.address) {
+		let uri = `https://smart-dao-rel.stars-mine.com/service-api/utils/getOpenseaContractJSON?host=${dao.address}&chain=4&first=1`;
+		await assetShell.initAssetShell(dao.address, 'AssetShell', operator, uri);
+		console.log('initAssetShell ok');
 	}
 
 	if (await ledger.host() != dao.address) {
@@ -81,21 +84,24 @@ module.exports = async function(deployer, networks, accounts) {
 				id: 1, name: 'testMem-1', description: '', avatar: '', role: 0, votes: 1, idx: 0, __ext: [0,0],
 			},
 		};
-		await member.initMember(dao.address, 'Member', operator, [testMem]); console.log('initMember ok');
+		await member.initMember(dao.address, 'Member', operator, [testMem]);
+		console.log('initMember ok');
 	}
 
 	if (await votePool.host() != dao.address) {
-		await votePool.initVotePool(dao.address, 'VotePool'); console.log('initVotePool ok');
+		await votePool.initVotePool(dao.address, 5000, 'VotePool');
+		console.log('initVotePool ok');
 	}
 
 	if (await dao.asset() != asset.address) {
-		await dao.initDAO('Test', '', '', from, votePool.address, member.address, ledger.address, assetGlobal.address, asset.address);
+		await dao.initDAO('Test', '', '', from, votePool.address, 
+			member.address, ledger.address, assetShell.address, asset.address);
 		console.log('initDAO ok');
 	}
 
 	fs.writeFileSync(`${__dirname}/../build/${networks}_deploy.json`, JSON.stringify({
 		dao: dao.address,
-		assetGlobal: assetGlobal.address,
+		assetShell: assetShell.address,
 		asset: asset.address,
 		ledger: ledger.address,
 		member: member.address,

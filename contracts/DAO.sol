@@ -12,7 +12,7 @@ contract DAO is IDAO, Department {
 	IVotePool private _root;
 	IMember private _member;
 	ILedger private _ledger;
-	IAssetGlobal private _assetGlobal;
+	IAssetShell private _assetShell;
 	IAsset private _asset;
 	address private __exchange;
 	EnumerableSet.AddressSet private _departments;
@@ -23,7 +23,8 @@ contract DAO is IDAO, Department {
 	function root() view external override returns (IVotePool) { return _root; }
 	function member() view external override returns (IMember) { return _member; }
 	function ledger() view external override returns (ILedger) { return _ledger; }
-	function assetGlobal() view external override returns (IAssetGlobal) { return _assetGlobal; }
+	function assetShell() view external override returns (IAssetShell) { return _assetShell; }
+	function assetGlobal() view external override returns (IAssetShell) { return _assetShell; }
 	function asset() view external override returns (IAsset) { return _asset; }
 
 	function initInterfaceID() external {
@@ -37,14 +38,14 @@ contract DAO is IDAO, Department {
 		string memory description,
 		address operator, address root,
 		address member, address ledger,
-		address assetGlobal, address asset
+		address assetShell, address asset
 	) external {
 		initDepartment(address(this), description, operator);
 
 		ERC165(root).checkInterface(VotePool_ID, "#DAO#initDAO root type not match");
 		ERC165(member).checkInterface(Member_ID, "#DAO#initDAO member type not match");
 		ERC165(ledger).checkInterface(Ledger_ID, "#DAO#initDAO ledger type not match");
-		ERC165(assetGlobal).checkInterface(AssetGlobal_ID, "#DAO#initDAO assetGlobal type not match");
+		ERC165(assetShell).checkInterface(AssetShell_ID, "#DAO#initDAO assetShell type not match");
 		ERC165(asset).checkInterface(Asset_ID, "#DAO#initDAO asset type not match");
 
 		_name = name;
@@ -52,7 +53,7 @@ contract DAO is IDAO, Department {
 		_root = IVotePool(root);
 		_member = IMember(member);
 		_ledger = ILedger(ledger);
-		_assetGlobal = IAssetGlobal(assetGlobal);
+		_assetShell = IAssetShell(assetShell);
 		_asset = IAsset(asset);
 
 		emit Change("Init");
@@ -70,10 +71,10 @@ contract DAO is IDAO, Department {
 		emit Change("Ledger");
 	}
 
-	function setAssetGlobal(address addr) external OnlyDAO {
-		ERC165(addr).checkInterface(AssetGlobal_ID, "#DAO#setAssetGlobal type not match");
-		_assetGlobal = IAssetGlobal(addr);
-		emit Change("AssetGlobal");
+	function setAssetShell(address addr) external OnlyDAO {
+		ERC165(addr).checkInterface(AssetShell_ID, "#DAO#setAssetShell type not match");
+		_assetShell = IAssetShell(addr);
+		emit Change("AssetShell");
 	}
 
 	function setAsset(address addr) external OnlyDAO {

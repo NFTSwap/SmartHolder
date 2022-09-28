@@ -123,7 +123,7 @@ contract('SmartHolder All', (accounts) => {
 		var id = '0x' + cryptoTx.genPrivateKey().toString('hex');
 		it('create2', async()=>{
 			var data = web3.eth.abi.encodeFunctionCall(app.dao.abi.find(e=>e.name=='setOperator'), [app.votePool.address]);
-			await app.votePool.create2(id, app.dao.address, 1000, 5001, 5001, 0, 0, 'dao.setOperator', '', data);
+			await app.votePool.create2(id, app.dao.address, 1000, 5001, 0, 0, 'dao.setOperator', '', data);
 		});
 		it('vote 1', async()=>{
 				await app.votePool.vote(id, mid1, 1, {from: users[0]});

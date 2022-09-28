@@ -39,7 +39,7 @@ contract VotePool is Upgrade, IVotePool, ERC165 {
 		setLifespan(_lifespan);
 	}
 
-	function setLifespan(uint256 _lifespan) public OnlyDAO {
+	function setLifespan(uint256 _lifespan) private {
 		require(_lifespan >= 7 days, "#VotePool#setLifespan proposal lifespan not less than 7 days");
 		lifespan = _lifespan;
 	}
@@ -72,7 +72,7 @@ contract VotePool is Upgrade, IVotePool, ERC165 {
 
 	function create(Proposal memory proposal) public {
 		require(!exists(proposal.id), "#VotePool#create proposal already exists");
-		if (proposal.lifespan)
+		if (proposal.lifespan != 0)
 			require(proposal.lifespan >= lifespan, "#VotePool#create proposal lifespan not less than 7 days");
 		require(proposal.passRate > 5_000, "#VotePool#create proposal vote pass rate not less than 50%");
 		require(_host.member().tokenOfOwnerByIndex(msg.sender, 0) != 0, "#VotePool#create No call permission");
@@ -89,7 +89,7 @@ contract VotePool is Upgrade, IVotePool, ERC165 {
 		obj.origin = msg.sender;
 		obj.data = proposal.data;
 		obj.lifespan = proposal.lifespan;
-		obj.expiry = proposal.lifespan ? block.timestamp + proposal.lifespan: 0;
+		obj.expiry = proposal.lifespan == 0 ? 0: block.timestamp + proposal.lifespan;
 		obj.passRate = proposal.passRate > 10_000 ? 10_000: proposal.passRate;
 		obj.loopCount = proposal.loopCount;
 		obj.loopTime = proposal.loopTime;
