@@ -26,13 +26,22 @@ contract VotePool is Upgrade, IVotePool, ERC165 {
 	// proposal id => map( member id => votes )
 	mapping(uint256 => mapping(uint256 => int256)) private _votes; // 成员投票记录
 
-	function initVotePool(address host, string memory description) external {
+	// @public
+	uint256 public lifespan; // 提案生命周期限制
+
+	function initVotePool(address host, uint256 _lifespan, string memory description) external {
 		initERC165();
 		_registerInterface(VotePool_ID);
 
 		IDAO(host).checkInterface(DAO_ID, "#Department#initVotePool dao host type not match");
 		_host = IDAO(host);
 		_description = description;
+		setLifespan(_lifespan);
+	}
+
+	function setLifespan(uint256 _lifespan) public OnlyDAO {
+		require(_lifespan >= 7 days, "#VotePool#setLifespan proposal lifespan not less than 7 days");
+		lifespan = _lifespan;
 	}
 
 	function host() view external returns (IDAO) {
@@ -62,30 +71,26 @@ contract VotePool is Upgrade, IVotePool, ERC165 {
 	}
 
 	function create(Proposal memory proposal) public {
-
 		require(!exists(proposal.id), "#VotePool#create proposal already exists");
-
-		require(proposal.voteRate > 5000, "#VotePool#create proposal vote rate not less than 50%");
-		require(proposal.passRate > 5000, "#VotePool#create proposal vote rate not less than 50%");
+		if (proposal.lifespan)
+			require(proposal.lifespan >= lifespan, "#VotePool#create proposal lifespan not less than 7 days");
+		require(proposal.passRate > 5_000, "#VotePool#create proposal vote pass rate not less than 50%");
 		require(_host.member().tokenOfOwnerByIndex(msg.sender, 0) != 0, "#VotePool#create No call permission");
-
-		Proposal storage obj = _proposalMap[proposal.id];
 
 		if (proposal.loopCount != 0) {
 			require(proposal.loopTime >= 1 minutes, "#VotePool#create Loop time must be greater than 1 minute");
 		}
+		Proposal storage obj = _proposalMap[proposal.id];
 
 		obj.id = proposal.id;
 		obj.name = proposal.name;
 		obj.description = proposal.description;
 		obj.target = proposal.target;
 		obj.origin = msg.sender;
-		// obj.signature = proposal.signature;
 		obj.data = proposal.data;
 		obj.lifespan = proposal.lifespan;
-		obj.expiry = block.timestamp + (proposal.lifespan * 1 minutes);
-		obj.voteRate = proposal.voteRate > 10000 ? 10000: proposal.voteRate;
-		obj.passRate = proposal.passRate > 10000 ? 10000: proposal.passRate;
+		obj.expiry = proposal.lifespan ? block.timestamp + proposal.lifespan: 0;
+		obj.passRate = proposal.passRate > 10_000 ? 10_000: proposal.passRate;
 		obj.loopCount = proposal.loopCount;
 		obj.loopTime = proposal.loopTime;
 		obj.voteTotal = 0;
@@ -105,7 +110,6 @@ contract VotePool is Upgrade, IVotePool, ERC165 {
 		uint256 id,
 		address target,
 		uint256 lifespan,
-		uint256 voteRate,
 		uint256 passRate,
 		int256 loopCount,
 		uint256 loopTime,
@@ -117,7 +121,6 @@ contract VotePool is Upgrade, IVotePool, ERC165 {
 		proposal.id = id;
 		proposal.target = target;
 		proposal.lifespan = lifespan;
-		proposal.voteRate = voteRate;
 		proposal.passRate = passRate;
 		proposal.loopCount = loopCount;
 		proposal.loopTime = loopTime;
@@ -159,33 +162,30 @@ contract VotePool is Upgrade, IVotePool, ERC165 {
 	*/
 	function tryClose(uint256 id) public override {
 		Proposal storage obj = proposal(id);
-
 		require(!obj.isClose, "#VotePool#tryClose Voting has been closed");
 
-		uint256 votes = _host.member().votes();
+		uint256 votes  = _host.member().votes();
+		uint256 passRate = obj.passRate;
 
-		// is expiry
-		if (obj.expiry != 0 && obj.expiry < block.timestamp) {
-			obj.isClose = true; //
+		if ((obj.expiry != 0 && obj.expiry <= block.timestamp)) { // block time expiry
+			// Include only participating members
+			obj.isClose = true;
+			obj.isAgree = (obj.agreeTotal * 10_000 / obj.voteTotal) > passRate;
 		} else {
-			// obj.voteTotal / votes * 10000
-			if (obj.voteTotal * 10000 / votes > obj.voteRate) { // test voteTotal
-				if (obj.agreeTotal * 10000 / votes > obj.passRate) { // test agreeTotal
-					// complete
-					obj.isClose = true;
-					obj.isAgree = true;
-				}
-			}
-
-			if (!obj.isClose) {
-				if ((obj.voteTotal - obj.agreeTotal) * 10000 / votes > (10000 - obj.passRate)) { // Refuse to pass
-					obj.isClose = true;
-				}
+			if ((obj.agreeTotal * 10_000 / votes) > passRate) { // test passRate
+				obj.isClose = true;
+				obj.isAgree = true; // complete
+			} else if (((obj.voteTotal - obj.agreeTotal) * 10_000 / votes) > 10_000 - passRate) { // test rejectRate
+				obj.isClose = true;
+				obj.isAgree = false; // complete
 			}
 		}
 
 		if (obj.isClose) {
 			emit Close(id);
+			if (obj.isAgree) {
+				execute(id);
+			}
 		}
 	}
 

@@ -94,8 +94,7 @@ interface IVotePool {
 		address origin; // 发起人 address
 		address target; // 目标合约,决议执行合约地址
 		uint256 lifespan; // 投票生命周期单位（分钟）
-		uint256 expiry; // 过期时间
-		uint256 voteRate; // 投票率不小于全体票数50% 1/10000
+		uint256 expiry; // 过期时间,为0时永不过期
 		uint256 passRate; // 通过率不小于全体票数50% 1/10000
 		int256  loopCount; // 执行循环次数, -1表示永久定期执行决议
 		uint256 loopTime; // 执行循环间隔时间,不等于0时必须大于1分钟,0只执行一次

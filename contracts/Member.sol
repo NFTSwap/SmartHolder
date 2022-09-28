@@ -19,7 +19,10 @@ contract Member is IMember, ERC721 {
 		Info info;
 	}
 
-	function initMember(address host, string memory description, address operator, InitMemberArgs[] memory members) external initializer {
+	function initMember(
+		address host, string memory description, 
+		address operator, InitMemberArgs[] memory members) external initializer 
+	{
 		initERC721(host, description, operator);
 		_registerInterface(Member_ID);
 
