@@ -23,6 +23,8 @@ contract AssetShell is IAssetShell, ERC721 {
 	}*/
 	string public contractURI;// = "https://smart-dao.stars-mine.com/service-api/utils/getOpenseaContractJSON?";
 
+	TokenTransfer public lastTransfer;
+
 	function initAssetShell(address host, string memory description, address operator, string memory _contractURI) external {
 		initERC721(host, description, operator);
 		_registerInterface(AssetShell_ID);
@@ -81,7 +83,7 @@ contract AssetShell is IAssetShell, ERC721 {
 		return asset;
 	}
 
-	function withdraw(uint256 tokenId) external override {
+	function withdraw(uint256 tokenId) external override OnlyDAO {
 		AssetID storage asset = _assetsMeta[tokenId];
 		require(asset.token != address(0), "#AssetShell#withdraw withdraw of asset non exists");
 		address owner = ownerOf(tokenId);
@@ -90,8 +92,19 @@ contract AssetShell is IAssetShell, ERC721 {
 		_burn(tokenId);
 	}
 
+	function _beforeTokenTransfer(address from, address to, uint256 tokenId, bytes memory _data) internal virtual override {
+		require(lastTransfer.tokenId == 0, "#AssetShell#_beforeTokenTransfer lastTransfer.tokenId == 0");
+		if (from == address(0) || to == address(0)) return;
+		lastTransfer.from = from;
+		lastTransfer.to = to;
+		lastTransfer.blockNumber = block.number;
+		lastTransfer.tokenId = tokenId;
+	}
+
 	receive() external payable {
-		require(msg.value != 0);
+		require(lastTransfer.tokenId != 0, "#AssetShell#receive lastTransfer.tokenId != 0");
+		require(msg.value != 0, "#AssetShell#receive msg.value != 0"); // check price
+		lastTransfer.tokenId = 0;
 	}
 
 }

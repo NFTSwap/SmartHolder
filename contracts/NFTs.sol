@@ -57,8 +57,4 @@ contract NFTs is ERC165, ERC721_IMPL {
 		ERC165._registerInterface(interfaceId);
 	}
 
-	receive() external payable {
-		require(msg.value != 0);
-	}
-
 }

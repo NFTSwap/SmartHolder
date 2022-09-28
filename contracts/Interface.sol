@@ -22,6 +22,12 @@ interface IDepartment is IERC165, IERC1651 {
 }
 
 interface IAssetShell is IDepartment, IERC721_PLUS, IERC721Receiver {
+	struct TokenTransfer {
+		address from;
+		address to;
+		uint256 tokenId;
+		uint256 blockNumber;
+	}
 	struct AssetID {
 		address token;
 		uint256 tokenId;
