@@ -22,15 +22,14 @@ interface IDepartment is IERC165, IERC1651 {
 }
 
 interface IAssetShell is IDepartment, IERC721_PLUS, IERC721Receiver {
-	struct TokenTransfer {
-		address from;
-		address to;
-		uint256 tokenId;
-		uint256 blockNumber;
-	}
 	struct AssetID {
 		address token;
 		uint256 tokenId;
+	}
+	enum SaleType {
+		kDefault,
+		kOpenseaFirst,
+		kOpenseaSecond
 	}
 	function withdraw(uint256 tokenId) external;
 	function assetMeta(uint256 tokenId) view external returns (AssetID memory);
@@ -45,7 +44,11 @@ interface ILedger is IDepartment {
 	event Deposit(address indexed from, uint256 balance, string name, string description);
 	event Withdraw(address indexed target, uint256 balance, string description);
 	event Release(uint256 indexed member, address indexed to, uint256 balance);
+	event AssetIncome(address indexed token, uint256 indexed tokenId, 
+		address indexed source, uint256 balance, address to, IAssetShell.SaleType saleType
+	);
 	function withdraw(uint256 amount, address target, string memory description) external payable;
+	function assetIncome(address to, address token, uint256 tokenId, address source, IAssetShell.SaleType saleType) external payable;
 }
 
 interface IMember is IDepartment, IERC721_PLUS {
@@ -106,7 +109,7 @@ interface IDAO is IDepartment {
 	function root() view external returns (IVotePool);
 	function member() view external returns (IMember);
 	function ledger() view external returns (ILedger);
-	function assetShell() view external returns (IAssetShell);
-	function assetGlobal() view external returns (IAssetShell);
+	function openseaFirst() view external returns (IAssetShell);
+	function openseaSecond() view external returns (IAssetShell);
 	function asset() view external returns (IAsset);
 }

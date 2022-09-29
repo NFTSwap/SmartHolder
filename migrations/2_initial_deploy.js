@@ -49,27 +49,25 @@ module.exports = async function(deployer, networks, accounts) {
 	// var votePool = await VotePool.at('0xB83BB3fE46520c04796090370aB3AC2e5Aa1fF42');
 
 	console.log("DAO:", dao.address);
-	console.log("assetShell:", assetShell.address);
 	console.log("Asset:", asset.address);
+	console.log("AssetShell:", assetShell.address);
 	console.log("Ledger:", ledger.address);
 	console.log("Member:", member.address);
 	console.log("VotePool:", votePool.address);
 
 	if (process.env.noInit == 'true') return;
 
-	if (!await dao.supportsInterface('0xc7b55336')) {
-		await dao.initInterfaceID(); console.log('initInterfaceID ok');
-	}
-	
 	if (await asset.host() != dao.address) {
-		let uri = `https://smart-dao-rel.stars-mine.com/service-api/utils/getOpenseaContractJSON?host=${dao.address}&chain=4`;
-		await asset.initAsset(dao.address, 'Asset', operator, uri);
+		await asset.initAsset(dao.address, 'Asset', operator,
+			`https://smart-dao-rel.stars-mine.com/service-api/utils/\
+	getOpenseaContractJSON?host=${dao.address}&chain=5&address=${ledger.address}`);
 		console.log('initAsset ok');
 	}
 
 	if (await assetShell.host() != dao.address) {
-		let uri = `https://smart-dao-rel.stars-mine.com/service-api/utils/getOpenseaContractJSON?host=${dao.address}&chain=4&first=1`;
-		await assetShell.initAssetShell(dao.address, 'AssetShell', operator, uri);
+		await assetShell.initAssetShell(dao.address, 'AssetShell', operator,
+			`https://smart-dao-rel.stars-mine.com/service-api/utils/\
+getOpenseaContractJSON?host=${dao.address}&chain=5&address=${assetShell.address}`, 2);
 		console.log('initAssetShell ok');
 	}
 
@@ -89,19 +87,24 @@ module.exports = async function(deployer, networks, accounts) {
 	}
 
 	if (await votePool.host() != dao.address) {
-		await votePool.initVotePool(dao.address, 5000, 'VotePool');
+		await votePool.initVotePool(dao.address, 'VotePool', 7 * 24 * 3600/*7 days*/);
 		console.log('initVotePool ok');
 	}
 
 	if (await dao.asset() != asset.address) {
 		await dao.initDAO('Test', '', '', from, votePool.address, 
-			member.address, ledger.address, assetShell.address, asset.address);
+			member.address, ledger.address, AssetShell.address, AssetShell.address, asset.address);
 		console.log('initDAO ok');
+	}
+
+	if (!await dao.supportsInterface('0xc7b55336')) {
+		await dao.initInterfaceID();
+		console.log('initInterfaceID ok');
 	}
 
 	fs.writeFileSync(`${__dirname}/../build/${networks}_deploy.json`, JSON.stringify({
 		dao: dao.address,
-		assetShell: assetShell.address,
+		AssetShell: AssetShell.address,
 		asset: asset.address,
 		ledger: ledger.address,
 		member: member.address,

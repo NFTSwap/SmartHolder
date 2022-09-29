@@ -83,7 +83,7 @@ module.exports = {
 			provider: new HDWalletProvider({
 				//privateKeys: ['f81fb73a528c504cb5c02daeb03fb2f3c9d2eec79c859c91574da69f58c250f4'], // com
 				privateKeys: ['df9d24d6ad45d384525f5e894fb4331696885e236b1508da108f220305231ddf'], // home
-				providerOrUrl: "https://rinkeby.infura.io/v3/5fad8ac4c3c946f489e0a5fec628d40e",
+				providerOrUrl: "https://rinkeby.infura.io/v3/96af19f43a3d4e7cac531d93c431f5cf",
 				// providerOrUrl: 'http://152.32.172.175:8545',
 			}),
 			production: true,

@@ -50,9 +50,19 @@ contract Ledger is ILedger, Department {
 	}
 
 	function deposit(string memory name, string memory description) public payable {
-		if (msg.value != 0) {
-			emit Deposit(msg.sender, msg.value, name, description);
-		}
+		if (msg.value == 0) return;
+		emit Deposit(msg.sender, msg.value, name, description);
+	}
+
+	function assetIncome(
+		address to,
+		address token, 
+		uint256 tokenId, 
+		address source,
+		IAssetShell.SaleType saleType
+	) public payable override {
+		require(msg.value != 0, "#Ledger#assetIncome profit cannot be zero");
+		emit AssetIncome(token, tokenId, source, msg.value, to, saleType);
 	}
 
 	function withdraw(uint256 amount, address target, string memory description) external payable override OnlyDAO {

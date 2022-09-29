@@ -65,8 +65,7 @@ contract Department is Upgrade, IDepartment, ERC165 {
 	function initDepartment(address host, string memory description, address operator) internal {
 		initERC165();
 		_registerInterface(Department_ID);
-
-		ERC165(host).checkInterface(DAO_ID, "#Department#initDepartment dao host type not match");
+		//ERC165(host).checkInterface(DAO_ID, "#Department#initDepartment dao host type not match");
 
 		_host = IDAO(host);
 		_description = description;

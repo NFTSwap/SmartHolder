@@ -29,11 +29,11 @@ contract VotePool is Upgrade, IVotePool, ERC165 {
 	// @public
 	uint256 public lifespan; // 提案生命周期限制
 
-	function initVotePool(address host, uint256 _lifespan, string memory description) external {
+	function initVotePool(address host, string memory description, uint256 _lifespan) external {
 		initERC165();
 		_registerInterface(VotePool_ID);
+		//IDAO(host).checkInterface(DAO_ID, "#Department#initVotePool dao host type not match");
 
-		IDAO(host).checkInterface(DAO_ID, "#Department#initVotePool dao host type not match");
 		_host = IDAO(host);
 		_description = description;
 		setLifespan(_lifespan);

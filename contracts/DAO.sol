@@ -12,7 +12,8 @@ contract DAO is IDAO, Department {
 	IVotePool private _root;
 	IMember private _member;
 	ILedger private _ledger;
-	IAssetShell private _assetShell;
+	IAssetShell private _openseaFirst;
+	IAssetShell private _openseaSecond;
 	IAsset private _asset;
 	address private __exchange;
 	EnumerableSet.AddressSet private _departments;
@@ -23,8 +24,8 @@ contract DAO is IDAO, Department {
 	function root() view external override returns (IVotePool) { return _root; }
 	function member() view external override returns (IMember) { return _member; }
 	function ledger() view external override returns (ILedger) { return _ledger; }
-	function assetShell() view external override returns (IAssetShell) { return _assetShell; }
-	function assetGlobal() view external override returns (IAssetShell) { return _assetShell; }
+	function openseaFirst() view external override returns (IAssetShell) { return _openseaFirst; }
+	function openseaSecond() view external override returns (IAssetShell) { return _openseaSecond; }
 	function asset() view external override returns (IAsset) { return _asset; }
 
 	function initInterfaceID() external {
@@ -38,14 +39,15 @@ contract DAO is IDAO, Department {
 		string memory description,
 		address operator, address root,
 		address member, address ledger,
-		address assetShell, address asset
+		address openseaFirst, address openseaSecond, address asset
 	) external {
 		initDepartment(address(this), description, operator);
 
 		ERC165(root).checkInterface(VotePool_ID, "#DAO#initDAO root type not match");
 		ERC165(member).checkInterface(Member_ID, "#DAO#initDAO member type not match");
 		ERC165(ledger).checkInterface(Ledger_ID, "#DAO#initDAO ledger type not match");
-		ERC165(assetShell).checkInterface(AssetShell_ID, "#DAO#initDAO assetShell type not match");
+		ERC165(openseaFirst).checkInterface(AssetShell_ID, "#DAO#initDAO openseaFirst type not match");
+		ERC165(openseaSecond).checkInterface(AssetShell_ID, "#DAO#initDAO openseaSecond type not match");
 		ERC165(asset).checkInterface(Asset_ID, "#DAO#initDAO asset type not match");
 
 		_name = name;
@@ -53,7 +55,8 @@ contract DAO is IDAO, Department {
 		_root = IVotePool(root);
 		_member = IMember(member);
 		_ledger = ILedger(ledger);
-		_assetShell = IAssetShell(assetShell);
+		_openseaFirst = IAssetShell(openseaFirst);
+		_openseaSecond = IAssetShell(openseaSecond);
 		_asset = IAsset(asset);
 
 		emit Change("Init");
@@ -71,10 +74,16 @@ contract DAO is IDAO, Department {
 		emit Change("Ledger");
 	}
 
-	function setAssetShell(address addr) external OnlyDAO {
-		ERC165(addr).checkInterface(AssetShell_ID, "#DAO#setAssetShell type not match");
-		_assetShell = IAssetShell(addr);
-		emit Change("AssetShell");
+	function setOpenseaFirst(address addr) external OnlyDAO {
+		ERC165(addr).checkInterface(AssetShell_ID, "#DAO#setOpenseaFirst type not match");
+		_openseaFirst = IAssetShell(addr);
+		emit Change("OpenseaFirst");
+	}
+
+	function setOpenseaSecond(address addr) external OnlyDAO {
+		ERC165(addr).checkInterface(AssetShell_ID, "#DAO#setOpenseaSecond type not match");
+		_openseaSecond = IAssetShell(addr);
+		emit Change("OpenseaSecond");
 	}
 
 	function setAsset(address addr) external OnlyDAO {

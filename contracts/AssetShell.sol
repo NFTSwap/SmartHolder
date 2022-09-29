@@ -13,9 +13,20 @@ contract AssetShell is IAssetShell, ERC721 {
 
 	mapping(uint256 => AssetID) private _assetsMeta;
 
+	struct TokenTransfer {
+		address from;
+		address to;
+		uint256 blockNumber;
+		uint256 tokenId;
+	}
+
+	TokenTransfer public lastTransfer;
+	SaleType public saleType; // is opensea first or second sale
+
 	/*{
 		"name": "OpenSea Creatures",
-		"description": "OpenSea Creatures are adorable aquatic beings primarily for demonstrating what can be done using the OpenSea platform. Adopt one today to try out all the OpenSea buying, selling, and bidding feature set.",
+		"description": "OpenSea Creatures are adorable aquatic beings primarily for \
+		demonstrating what can be done using the OpenSea platform. Adopt one today to try out all the OpenSea buying, selling, and bidding feature set.",
 		"image": "external-link-url/image.png",
 		"external_link": "external-link-url",
 		"seller_fee_basis_points": 100, # Indicates a 1% seller fee.
@@ -23,13 +34,15 @@ contract AssetShell is IAssetShell, ERC721 {
 	}*/
 	string public contractURI;// = "https://smart-dao.stars-mine.com/service-api/utils/getOpenseaContractJSON?";
 
-	TokenTransfer public lastTransfer;
-
-	function initAssetShell(address host, string memory description, address operator, string memory _contractURI) external {
+	function initAssetShell(
+		address host, string memory description, address operator,
+		string memory _contractURI, SaleType _saleType
+	) external {
 		initERC721(host, description, operator);
 		_registerInterface(AssetShell_ID);
 		_registerInterface(_ERC721_RECEIVED);
 		contractURI = _contractURI;
+		saleType = _saleType;
 	}
 
 	function setContractURI(string memory _contractURI) public {
@@ -54,7 +67,7 @@ contract AssetShell is IAssetShell, ERC721 {
 		uint256 id = convertTokenID(address(token), tokenId);
 		AssetID storage asset = _assetsMeta[id];
 
-		if (from == address(0)) { // mint
+		if (data.length != 0) { // mint or withdrawTo
 			from = abi.decode(data, (address));
 		}
 		require(asset.token == address(0), "#AssetShell#onERC721Received mint of asset already exists");
@@ -77,17 +90,20 @@ contract AssetShell is IAssetShell, ERC721 {
 		return IERC721Metadata(id.token).tokenURI(id.tokenId);
 	}
 
-	function assetMeta(uint256 tokenId) view public override returns (AssetID memory) {
-		AssetID storage asset = _assetsMeta[tokenId];
+	function assetMeta(uint256 tokenId) view public override returns (AssetID memory asset) {
+		asset = _assetsMeta[tokenId];
 		require(asset.token != address(0), "#AssetShell#assetMeta asset non exists");
-		return asset;
 	}
 
 	function withdraw(uint256 tokenId) external override OnlyDAO {
 		AssetID storage asset = _assetsMeta[tokenId];
 		require(asset.token != address(0), "#AssetShell#withdraw withdraw of asset non exists");
-		address owner = ownerOf(tokenId);
-		IERC721(asset.token).safeTransferFrom(address(this), owner, asset.tokenId);
+		withdrawTo(tokenId, ownerOf(tokenId), "");
+	}
+
+	function withdrawTo(uint256 tokenId, address to, bytes memory data) internal {
+		AssetID storage asset = _assetsMeta[tokenId];
+		IERC721(asset.token).safeTransferFrom(address(this), to, asset.tokenId, data);
 		delete _assetsMeta[tokenId];
 		_burn(tokenId);
 	}
@@ -102,9 +118,14 @@ contract AssetShell is IAssetShell, ERC721 {
 	}
 
 	receive() external payable {
+		require(msg.value != 0, "#AssetShell#receive msg.value != 0"); // price
 		require(lastTransfer.tokenId != 0, "#AssetShell#receive lastTransfer.tokenId != 0");
-		require(msg.value != 0, "#AssetShell#receive msg.value != 0"); // check price
+		AssetID memory asset = assetMeta(lastTransfer.tokenId);
+		_host.ledger().assetIncome{value: msg.value}(lastTransfer.to, asset.token, asset.tokenId, msg.sender, saleType);
+		if (saleType == SaleType.kOpenseaFirst) {
+			bytes memory data = abi.encodePacked(lastTransfer.to);
+			withdrawTo(lastTransfer.tokenId, address(_host.openseaSecond()), data);
+		}
 		lastTransfer.tokenId = 0;
 	}
-
 }
