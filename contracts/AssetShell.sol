@@ -34,10 +34,7 @@ contract AssetShell is IAssetShell, ERC721 {
 	}*/
 	string public contractURI;// = "https://smart-dao.stars-mine.com/service-api/utils/getOpenseaContractJSON?";
 
-	function initAssetShell(
-		address host, string memory description, address operator,
-		string memory _contractURI, SaleType _saleType
-	) external {
+	function initAssetShell(address host, string memory description, address operator, string memory _contractURI, SaleType _saleType) external {
 		initERC721(host, description, operator);
 		_registerInterface(AssetShell_ID);
 		_registerInterface(_ERC721_RECEIVED);
@@ -109,8 +106,13 @@ contract AssetShell is IAssetShell, ERC721 {
 	}
 
 	function _beforeTokenTransfer(address from, address to, uint256 tokenId, bytes memory _data) internal virtual override {
-		require(lastTransfer.tokenId == 0, "#AssetShell#_beforeTokenTransfer lastTransfer.tokenId == 0");
 		if (from == address(0) || to == address(0)) return;
+		if (lastTransfer.tokenId != 0) {
+			revert(string(abi.encodePacked("#AssetShell#_beforeTokenTransfer lastTransfer.tokenId == 0, from=", from, 
+				",to=", to,
+				",tokenId=", tokenId
+			)));
+		}
 		lastTransfer.from = from;
 		lastTransfer.to = to;
 		lastTransfer.blockNumber = block.number;
