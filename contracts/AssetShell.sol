@@ -123,7 +123,7 @@ contract AssetShell is IAssetShell, ERC721 {
 		AssetID memory asset = assetMeta(lastTransfer.tokenId);
 		_host.ledger().assetIncome{value: msg.value}(lastTransfer.to, asset.token, asset.tokenId, msg.sender, saleType);
 		if (saleType == SaleType.kOpenseaFirst) {
-			bytes memory data = abi.encodePacked(lastTransfer.to);
+			bytes memory data = abi.encode(lastTransfer.to);
 			withdrawTo(lastTransfer.tokenId, address(_host.openseaSecond()), data);
 		}
 		lastTransfer.tokenId = 0;

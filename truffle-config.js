@@ -18,10 +18,25 @@
  *
  */
 
+const req = require('somes/request');
 const HDWalletProvider = require('@truffle/hdwallet-provider');
-// const infuraKey = "fj4jll3k.....";
-// const fs = require('fs');
-// const mnemonic = fs.readFileSync(".secret").toString().trim();
+
+class Provider {
+	constructor(url) {
+		this.url = url;
+	}
+	send(payload, callback) {
+		this.request(payload).then(e=>callback(null, e)).catch(callback);
+	}
+	sendAsync(payload, callback) {
+		this.request(payload).then(e=>callback(null, e)).catch(callback);
+	}
+	async request(payload) {
+		let r = await req.request(this.url, { params: payload, method: 'POST', dataType: 'json' });
+		let data = JSON.parse(r.data.toString('utf-8'));
+		return data;
+	}
+}
 
 module.exports = {
 	/**
@@ -81,19 +96,18 @@ module.exports = {
 		rinkeby: {
 			network_id: 4,
 			provider: new HDWalletProvider({
-				//privateKeys: ['f81fb73a528c504cb5c02daeb03fb2f3c9d2eec79c859c91574da69f58c250f4'], // com
 				privateKeys: ['df9d24d6ad45d384525f5e894fb4331696885e236b1508da108f220305231ddf'], // home
-				providerOrUrl: "https://rinkeby.infura.io/v3/96af19f43a3d4e7cac531d93c431f5cf",
+				provider: new Provider('https://rinkeby.infura.io/v3/96af19f43a3d4e7cac531d93c431f5cf'),
 				// providerOrUrl: 'http://152.32.172.175:8545',
 			}),
 			production: true,
+			// networkCheckTimeout: 6e4,
 		},
 		matic: {
 			network_id: 137,
 			provider: new HDWalletProvider({
 				privateKeys: ['f81fb73a528c504cb5c02daeb03fb2f3c9d2eec79c859c91574da69f58c250f4'],
-				// providerOrUrl: "http://103.210.22.186:8545",
-				providerOrUrl: "https://rpc-mainnet.maticvigil.com/v1/ef8f16191b474bb494f33283a81a38487e4dc245",
+				provider: new Provider('https://rpc-mainnet.maticvigil.com/v1/ef8f16191b474bb494f33283a81a38487e4dc245'),
 			}),
 			production: true,
 		},
@@ -101,7 +115,7 @@ module.exports = {
 			network_id: 5,
 			provider: new HDWalletProvider({
 				privateKeys: ['f81fb73a528c504cb5c02daeb03fb2f3c9d2eec79c859c91574da69f58c250f4'],
-				providerOrUrl: "https://goerli.infura.io/v3/c782e504a32b4070b414a037167ae8ff",
+				provider: new Provider('https://goerli.infura.io/v3/c782e504a32b4070b414a037167ae8ff'),
 			}),
 			production: true,
 		}

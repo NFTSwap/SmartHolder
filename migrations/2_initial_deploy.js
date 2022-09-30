@@ -30,6 +30,8 @@ async function deploy(name, Contract, opts, args = [], isUpgrade = true) {
 module.exports = async function(deployer, networks, accounts) {
 	if (process.env.useCache == 'true' && fs.existsSync(`${__dirname}/../build/${networks}_deploy.json`)) return;
 
+	// if (networks.indexOf('fork') != -1) return;
+
 	var opts = { deployer, initializer: 'initialize', unsafeAllowCustomTypes: true };
 	var from = deployer.options.from;
 	var operator = from; // '0x0000000000000000000000000000000000000000';
