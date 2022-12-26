@@ -3,10 +3,9 @@ pragma solidity >=0.6.0 <=0.8.15;
 
 pragma experimental ABIEncoderV2;
 
-import "./Department.sol";
-import "./ERC721.sol";
+import './Asset.sol';
 
-contract AssetShell is IAssetShell, ERC721 {
+contract AssetShell is IAssetShell, ERC721_Department {
 
 	bytes4 private constant _ERC721_RECEIVED = 0x150b7a02;
 	bytes4 private constant _INTERFACE_ID_ERC721 = 0x80ac58cd;
@@ -34,9 +33,11 @@ contract AssetShell is IAssetShell, ERC721 {
 	}*/
 	string public contractURI;// = "https://smart-dao.stars-mine.com/service-api/utils/getOpenseaContractJSON?";
 
-	function initAssetShell(address host, string memory description, address operator, string memory _contractURI, SaleType _saleType) external {
-		initERC721(host, description, operator);
-		_registerInterface(AssetShell_ID);
+	function initAssetShell(address host, string memory description, address operator,
+		string memory _contractURI, SaleType _saleType, string memory name
+	) external {
+		initERC721_Department(host, description, name, name, operator);
+		_registerInterface(AssetShell_Type);
 		_registerInterface(_ERC721_RECEIVED);
 		contractURI = _contractURI;
 		saleType = _saleType;
@@ -49,7 +50,7 @@ contract AssetShell is IAssetShell, ERC721 {
 	// @dev convert addr to standard ERC721 NFT,will be revered if add is invalid.
 	function checkERC721(address addr, bytes4 id, string memory message) internal returns (IERC721) {
 		require(addr.isContract(), "#AssetShell#asERC721: INVLIAD_CONTRACT_ADDRESS");
-		require(IERC721(addr).supportsInterface(id), message);
+		IERC721(addr).checkInterface(id, message);
 		return IERC721(addr);
 	}
 
@@ -126,7 +127,7 @@ contract AssetShell is IAssetShell, ERC721 {
 		_host.ledger().assetIncome{value: msg.value}(lastTransfer.to, asset.token, asset.tokenId, msg.sender, saleType);
 		if (saleType == SaleType.kOpenseaFirst) {
 			bytes memory data = abi.encode(lastTransfer.to);
-			withdrawTo(lastTransfer.tokenId, address(_host.openseaSecond()), data);
+			withdrawTo(lastTransfer.tokenId, address(_host.department(Departments_OPENSEA_Second_ID)), data);
 		}
 		lastTransfer.tokenId = 0;
 	}

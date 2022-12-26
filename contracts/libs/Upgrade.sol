@@ -10,6 +10,8 @@ contract Upgrade {
 // 调用此合约的任何方法都会被导向`fallback()`中,然后使用`delegatecall()`调用实际实现并把当前数据上下文传递给impl
 contract ContextProxy is Upgrade {
 	// 这里分配的大小应该是动态编译指定,需从原始合约读取存储大小
+	// ... storage ...
+	// ...............
 
 	constructor(address impl) public {
 		require(impl != address(0));

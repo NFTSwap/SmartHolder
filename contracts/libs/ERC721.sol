@@ -2,18 +2,19 @@
 pragma solidity >=0.6.0 <=0.8.15;
 // pragma solidity ^0.6.0;
 
-import "./Department.sol";
-import "../openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
-import "../openzeppelin/contracts-ethereum-package/contracts/utils/Address.sol";
-import "../openzeppelin/contracts-ethereum-package/contracts/utils/EnumerableSet.sol";
-import "../openzeppelin/contracts-ethereum-package/contracts/utils/EnumerableMap.sol";
-import "../openzeppelin/contracts-ethereum-package/contracts/utils/Strings.sol";
+import './Interface.sol';
+import './AddressExp.sol';
+import '../../openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol';
+import '../../openzeppelin/contracts-ethereum-package/contracts/utils/EnumerableSet.sol';
+import '../../openzeppelin/contracts-ethereum-package/contracts/utils/EnumerableMap.sol';
+import '../../openzeppelin/contracts-ethereum-package/contracts/utils/Strings.sol';
+import '../Department.sol';
 
 /**
  * @title ERC721 Non-Fungible Token Standard basic implementation
  * @dev see https://eips.ethereum.org/EIPS/eip-721
  */
-abstract contract ERC721_IMPL is IERC721_PLUS {
+abstract contract ERC721 is IERC721_1 {
 	using SafeMath for uint256;
 	using Address for address;
 	using EnumerableSet for EnumerableSet.UintSet;
@@ -82,11 +83,11 @@ abstract contract ERC721_IMPL is IERC721_PLUS {
 		*/
 	bytes4 private constant _INTERFACE_ID_ERC721_ENUMERABLE = 0x780e9d63;
 
-	function _registerInterface(bytes4 interfaceId) internal virtual;
 	function _msgSender() internal view virtual returns (address);
 	function _msgData() internal view virtual returns (bytes memory);
+	function _registerInterface(bytes4 interfaceId) internal virtual;
 
-	function initERC721_IMPL(string memory name, string memory symbol) internal {
+	function initERC721(string memory name, string memory symbol) internal {
 		_name = name;
 		_symbol = symbol;
 
@@ -541,30 +542,10 @@ abstract contract ERC721_IMPL is IERC721_PLUS {
 		*/
 	function _beforeTokenTransfer(address from, address to, uint256 tokenId, bytes memory _data) internal virtual {}
 
-	// uint256[41] private __gap;
-}
-
-contract ERC721 is Department, ERC721_IMPL {
-
-	function initERC721(address host, string memory description, address operator) internal initializer {
-		initDepartment(host, description, operator);
-		initERC721_IMPL(description, description);
-	}
-
-	function _msgSender() internal view virtual override(Initializable,ERC721_IMPL) returns (address) {
-		return Initializable._msgSender();
-	}
-
-	function _msgData() internal view virtual override(Initializable,ERC721_IMPL) returns (bytes memory) {
-		return Initializable._msgData();
-	}
-
-	function _registerInterface(bytes4 interfaceId) internal virtual override(ERC165,ERC721_IMPL) {
-		ERC165._registerInterface(interfaceId);
-	}
-
+	//@overwrite
 	function exists(uint256 id) view public returns (bool) {
 		return _exists(id);
 	}
 
+	// uint256[41] private __gap;
 }

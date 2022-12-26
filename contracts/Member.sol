@@ -3,16 +3,14 @@ pragma solidity >=0.6.0 <=0.8.15;
 
 pragma experimental ABIEncoderV2;
 
-import "./ERC721.sol";
+import './Asset.sol';
 
-contract Member is IMember, ERC721 {
-
-	// event UpdateInfo(uint256 id);
-
+contract Member is IMember, ERC721_Department {
 	// member id => member info
 	mapping(uint256 => Info) private _infoMap; // 成员信息
 	uint256[] private _infoList; // 成员列表
 	uint256 private _votes; // 投票权总数
+	uint256 internal _executor; // executor
 
 	struct InitMemberArgs {
 		address owner;
@@ -20,18 +18,18 @@ contract Member is IMember, ERC721 {
 	}
 
 	function initMember(
-		address host, string memory description, 
-		address operator, InitMemberArgs[] memory members) external initializer 
+		address host, string memory description,
+		address operator, InitMemberArgs[] memory members, string memory name) external
 	{
-		initERC721(host, description, operator);
-		_registerInterface(Member_ID);
+		initERC721_Department(host, description, name, name, operator);
+		_registerInterface(Member_Type);
 
 		for (uint256 i = 0; i < members.length; i++) {
 			create0(members[i].owner, members[i].info);
 		}
 	}
 
-	function create0(address owner, Info memory info) private {
+	function createMember(address owner, Info memory info) private {
 		_mint(owner, info.id);
 
 		Info storage info_ = _infoMap[info.id];
@@ -67,7 +65,7 @@ contract Member is IMember, ERC721 {
 	}
 
 	function create(address owner, Info memory info) external OnlyDAO {
-		create0(owner, info);
+		createMember(owner, info);
 	}
 
 	function create2(
@@ -81,7 +79,7 @@ contract Member is IMember, ERC721 {
 		info.votes = votes;
 		info.avatar = avatar;
 		info.description = description;
-		create0(owner, info);
+		createMember(owner, info);
 	}
 
 	function votes() view external override returns (uint256) {
@@ -117,16 +115,21 @@ contract Member is IMember, ERC721 {
 		return _infoMap[_infoList[index]];
 	}
 
-	function isExists(uint256 id) view public override returns (bool) {
-		return _exists(id);
-	}
-
 	function isApprovedOrOwner(address spender, uint256 id) view public returns (bool) {
 		return _havePermission(spender, id);
 	}
 
 	function total() view public override returns (uint256) {
 		return _infoList.length;
+	}
+
+	function executor() view public returns(uint256) {
+		return _executor;
+	}
+
+	function setExecutor(uint256 id) public OnlyDAO {
+		require(_exists(id), "#Member#setExecutor: info query for nonexistent member");
+		_executor = id;
 	}
 
 }

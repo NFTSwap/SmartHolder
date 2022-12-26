@@ -1,9 +1,35 @@
 
-pragma solidity >=0.6.12 <=0.8.15;
+pragma solidity >=0.6.0 <=0.8.15;
 
-import "./ERC721.sol";
+import './Department.sol';
+import './libs/ERC721.sol';
 
-contract Asset is IAsset, ERC721 {
+contract ERC721_Department is Department, ERC721 {
+
+	function initERC721_Department(
+		address host, string memory description,
+		string memory name, string memory symbol,
+		address operator
+	) internal {
+		initDepartment(host, description, operator);
+		initERC721(name, symbol);
+	}
+
+	function _msgSender() internal view virtual override(ERC721) returns (address) {
+		return Initializable._msgSender();
+	}
+
+	function _msgData() internal view virtual override(ERC721) returns (bytes memory) {
+		return Initializable._msgData();
+	}
+
+	function _registerInterface(bytes4 interfaceId) internal virtual override(ERC721) {
+		ERC165._registerInterface(interfaceId);
+	}
+
+}
+
+contract Asset is IAsset, ERC721_Department {
 
 	/*{
 		"name": "OpenSea Creatures",
@@ -15,9 +41,12 @@ contract Asset is IAsset, ERC721 {
 	}*/
 	string public contractURI;// = "https://smart-dao.stars-mine.com/service-api/utils/getOpenseaContractJSON?";
 
-	function initAsset(address host, string memory description, address operator, string memory _contractURI) external {
-		initERC721(host, description, operator);
-		_registerInterface(Asset_ID);
+	function initAsset(
+		address host, string memory description, address operator,
+		string memory _contractURI, string memory name
+	) external {
+		initERC721_Department(host, description, name, name, operator);
+		_registerInterface(Asset_Type);
 		contractURI = _contractURI;
 	}
 

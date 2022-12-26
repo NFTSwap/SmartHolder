@@ -3,25 +3,37 @@ pragma solidity >=0.6.0 <=0.8.15;
 
 pragma experimental ABIEncoderV2;
 
-import "../openzeppelin/contracts-ethereum-package/contracts/introspection/IERC165.sol";
-import "../openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721.sol";
-import "../openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721Metadata.sol";
-import "../openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721Enumerable.sol";
-import "../openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721Receiver.sol";
+import '../../openzeppelin/contracts-ethereum-package/contracts/introspection/IERC165.sol';
+import '../../openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721.sol';
+import '../../openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721Metadata.sol';
+import '../../openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721Enumerable.sol';
+import '../../openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721Receiver.sol';
 
-interface IERC1651 {
+/**
+ * @title IERC165_1 extend erc165
+ */
+interface IERC165_1 {
 	function checkInterface(bytes4 interfaceId, string memory message) view external;
 }
 
-interface IERC721_PLUS is IERC721, IERC721Metadata, IERC721Enumerable {}
+/**
+ * @title IERC165_1 extend erc721
+ */
+interface IERC721_1 is IERC721, IERC721Metadata, IERC721Enumerable {
+	function exists(uint256 tokenId) external view returns (bool);
+}
 
-interface IDepartment is IERC165, IERC1651 {
+// DAO interfaces
+
+interface IDepartment is IERC165, IERC165_1 {
+	event Change(uint256 tag);
 	function operator() view external returns (IVotePool);
+	function setDescription(string memory description) external;
 	function setOperator(address vote) external;
 	function upgrade(address impl) external;
 }
 
-interface IAssetShell is IDepartment, IERC721_PLUS, IERC721Receiver {
+interface IAssetShell is IDepartment, IERC721_1, IERC721Receiver {
 	struct AssetID {
 		address token;
 		uint256 tokenId;
@@ -35,7 +47,7 @@ interface IAssetShell is IDepartment, IERC721_PLUS, IERC721Receiver {
 	function assetMeta(uint256 tokenId) view external returns (AssetID memory);
 }
 
-interface IAsset is IDepartment, IERC721_PLUS {
+interface IAsset is IDepartment, IERC721_1 {
 }
 
 interface ILedger is IDepartment {
@@ -51,7 +63,7 @@ interface ILedger is IDepartment {
 	function assetIncome(address to, address token, uint256 tokenId, address source, IAssetShell.SaleType saleType) external payable;
 }
 
-interface IMember is IDepartment, IERC721_PLUS {
+interface IMember is IDepartment, IERC721_1 {
 	enum Role {
 		DEFAULT
 	}
@@ -101,15 +113,12 @@ interface IVotePool {
 	event Close(uint256 id);
 	event Execute(uint256 indexed id);
 
-	function tryClose(uint256 id) external;
+	function tryClose(uint256 id, bool tryExecute) external;
 }
 
 interface IDAO is IDepartment {
-	event Change(string tag);
-	function root() view external returns (IVotePool);
 	function member() view external returns (IMember);
 	function ledger() view external returns (ILedger);
-	function openseaFirst() view external returns (IAssetShell);
-	function openseaSecond() view external returns (IAssetShell);
 	function asset() view external returns (IAsset);
+	function department(uint256 id) view external returns (IDepartment);
 }

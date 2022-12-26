@@ -62,7 +62,7 @@ function joinLayout(types, storage, defines, structs, indent) {
 
 async function genProxy(name, Contract, opts) {
 	var data = await getDeployData(opts, Contract);
-	var templ = fs.readFileSync(`${__dirname}/../contracts/Upgrade.sol`, 'utf-8');
+	var templ = fs.readFileSync(`${__dirname}/../contracts/libs/Upgrade.sol`, 'utf-8');
 	var defines = [];
 	var structs = {};
 	joinLayout(data.layout.types, data.layout.storage, defines, structs, 1);

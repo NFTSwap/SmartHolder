@@ -1,14 +1,29 @@
 
 pragma solidity >=0.6.0 <=0.8.15;
 
-import "./ERC721.sol";
-import "./ERC165.sol";
+import './libs/ERC721.sol';
+import './libs/ERC165.sol';
+import '../openzeppelin/contracts-ethereum-package/contracts/utils/Strings.sol';
 
-contract NFTs is ERC165, ERC721_IMPL {
+contract NFTs is ERC165, ERC721 {
+
+	// @overwrite ---------------
+	function _msgSender() internal view virtual override(ERC721) returns (address) {
+		return Initializable._msgSender();
+	}
+
+	function _msgData() internal view virtual override(ERC721) returns (bytes memory) {
+		return Initializable._msgData();
+	}
+
+	function _registerInterface(bytes4 interfaceId) internal virtual override(ERC721) {
+		ERC165._registerInterface(interfaceId);
+	}
+	// --------------------------
 
 	function initNFTs() external {
 		initERC165();
-		initERC721_IMPL("NFTs", "NFTs");
+		initERC721("NFTs", "NFTs");
 	}
 
 	function mint(uint256 tokenId) public {
@@ -37,24 +52,48 @@ contract NFTs is ERC165, ERC721_IMPL {
 		_setBaseURI(baseURI_);
 	}
 
-	function exists(uint256 tokenId) view public returns (bool) {
-		return _exists(tokenId);
-	}
-
 	function isApprovedOrOwner(address spender, uint256 tokenId) view public returns (bool) {
 		return _havePermission(spender, tokenId);
 	}
 
-	function _msgSender() internal view virtual override(Initializable,ERC721_IMPL) returns (address) {
-		return Initializable._msgSender();
+}
+
+contract NFTsTest is NFTs {
+	using Strings for uint256;
+
+	string public contractURI;
+
+	function initNFTsTest() external {
+		initNFTs();
+		string memory addr = uint256(address(this)).toString();
+		contractURI = string(abi.encodePacked("https://smart-dao-rel.stars-mine.com/service-api/test1/getOpenseaContractJSON?address=", addr));
+		// contractURI = "https://smart-dao-rel.stars-mine.com/service-api/test1/getOpenseaContractJSON?address=0x87Ae5AB6e5A7F925dCC091F3a2247786D5E26349";
 	}
 
-	function _msgData() internal view virtual override(Initializable,ERC721_IMPL) returns (bytes memory) {
-		return Initializable._msgData();
+	struct TokenTransfer {
+		address from;
+		address to;
+		uint256 blockNumber;
+		uint256 tokenId;
+		bytes data;
 	}
 
-	function _registerInterface(bytes4 interfaceId) internal virtual override(ERC165,ERC721_IMPL) {
-		ERC165._registerInterface(interfaceId);
+	TokenTransfer public lastTransfer;
+
+	function _beforeTokenTransfer(address from, address to, uint256 tokenId, bytes memory _data) internal virtual override {
+		require(lastTransfer.blockNumber == 0, "#NFTs#_beforeTokenTransfer lastTransfer.blockNumber == 0");
+		if (from == address(0) || to == address(0)) return;
+		lastTransfer.from = from;
+		lastTransfer.to = to;
+		lastTransfer.blockNumber = block.number;
+		lastTransfer.tokenId = tokenId;
+		lastTransfer.data = _data;
+	}
+
+	receive() external payable {
+		require(msg.value != 0, "#NFTs#receive msg.value != 0"); // price
+		require(lastTransfer.blockNumber != 0, "#NFTs#receive lastTransfer.blockNumber != 0");
+		lastTransfer.blockNumber = 0;
 	}
 
 }

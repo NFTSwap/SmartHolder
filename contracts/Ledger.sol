@@ -3,14 +3,14 @@ pragma solidity >=0.6.0 <=0.8.15;
 
 pragma experimental ABIEncoderV2;
 
-import "./Interface.sol";
-import "./Department.sol";
+import './Interface.sol';
+import './Department.sol';
 
 contract Ledger is ILedger, Department {
 
 	function initLedger(address host, string memory description, address operator) external {
 		initDepartment(host, description, operator);
-		_registerInterface(Ledger_ID);
+		_registerInterface(Ledger_Type);
 	}
 
 	function receiveBalance() internal {
