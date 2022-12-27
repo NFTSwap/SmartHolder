@@ -91,6 +91,7 @@ interface IVotePool {
 		string    name; // 名称
 		string    description; // 描述
 		address   origin; // 发起人 address
+		uint256   originId; // 发起人成员id (member id)
 		address[] target; // 目标合约,决议执行合约地址列表
 		uint256   lifespan; // 投票生命周期单位（分钟）
 		uint256   expiry; // 过期时间,为0时永不过期

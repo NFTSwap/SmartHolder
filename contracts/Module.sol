@@ -32,6 +32,12 @@ abstract contract PermissionCheck {
 		_;
 	}
 
+	modifier Check(uint256 memberId, uint256 action) {
+		if (!isPermissionDAO())
+			require(_host.member().isPermissionFrom(memberId, action), "#PermissionCheck#Check(uint256,uint256) caller does not have permission");
+		_;
+	}
+
 	function isPermissionDAO() view internal virtual returns (bool);
 }
 

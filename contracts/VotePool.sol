@@ -71,12 +71,12 @@ contract VotePool is Upgrade, IVotePool, ERC165, PermissionCheck {
 		return _proposalMap[id].id != 0;
 	}
 
-	function create(Proposal memory proposal) public Check(Action_VotePool_Create) {
+	function create(Proposal memory proposal) public Check(proposal.originId, Action_VotePool_Create) {
 		require(!exists(proposal.id), "#VotePool#create proposal already exists");
 		if (proposal.lifespan != 0)
 			require(proposal.lifespan >= lifespan, "#VotePool#create proposal lifespan not less than 7 days");
 		require(proposal.passRate > 5_000, "#VotePool#create proposal vote pass rate not less than 50%");
-		require(_host.member().tokenOfOwnerByIndex(msg.sender, 0) != 0, "#VotePool#create No call permission");
+		require(_host.member().ownerOf(proposal.originId) == msg.sender, "#VotePool#create No call permission");
 
 		if (proposal.loopCount != 0) {
 			require(proposal.loopTime >= 1 minutes, "#VotePool#create Loop time must be greater than 1 minute");
@@ -88,6 +88,7 @@ contract VotePool is Upgrade, IVotePool, ERC165, PermissionCheck {
 		obj.description = proposal.description;
 		obj.target = proposal.target;
 		obj.origin = msg.sender;
+		obj.originId = proposal.originId;
 		obj.data = proposal.data;
 		obj.lifespan = proposal.lifespan;
 		obj.expiry = proposal.lifespan == 0 ? 0: block.timestamp + proposal.lifespan;
@@ -112,10 +113,11 @@ contract VotePool is Upgrade, IVotePool, ERC165, PermissionCheck {
 		uint256       lifespan,    uint256 passRate,
 		int256        loopCount,   uint256 loopTime,
 		string memory name,        string memory description,
-		bytes memory  data
+		uint256       originId,    bytes memory  data
 	) external {
 		Proposal memory proposal;
 		proposal.id = id;
+		proposal.originId = originId; // member id
 		proposal.target = target;
 		proposal.lifespan = lifespan;
 		proposal.passRate = passRate;
