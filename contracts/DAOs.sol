@@ -3,14 +3,26 @@ pragma solidity >=0.6.0 <=0.8.15;
 
 import './Interface.sol';
 
+/**
+ * @title DAOs contract global DAOs manage
+ */
 contract DAOs {
-	mapping(bytes32 => IDAO) _DAOs;
+	mapping(uint256 => IDAO) _DAOs;
 
-	function NewDAO() external returns (IDAO) {
+	/**
+	 * @title make() create DAO from params
+	 */
+	function make() external returns (IDAO) {
 		// TODO ...
 	}
 
-	function DAOs(bytes32 id) view external returns (IDAO) {
+	/**
+	 * @title DAOs(id) get DAO object from id
+	 * @param id uint256 dao id
+	 * @return Returns the IDAO interface address
+	 */
+	function DAOs(uint256 id) view external returns (IDAO) {
 		// TODO ...
+		_DAOs[id]
 	}
 }

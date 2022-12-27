@@ -4,12 +4,15 @@ pragma solidity >=0.6.0 <=0.8.15;
 pragma experimental ABIEncoderV2;
 
 import './Interface.sol';
-import './Department.sol';
+import './Module.sol';
 
-contract Ledger is ILedger, Department {
+/**
+ * @title Ledger manage
+ */
+contract Ledger is ILedger, Module {
 
 	function initLedger(address host, string memory description, address operator) external {
-		initDepartment(host, description, operator);
+		initModule(host, description, operator);
 		_registerInterface(Ledger_Type);
 	}
 
@@ -23,7 +26,7 @@ contract Ledger is ILedger, Department {
 		return address(this).balance;
 	}
 
-	function release(uint256 amount, string memory description) external payable OnlyDAO {
+	function release(uint256 amount, string memory description) external payable Check {
 		receiveBalance();
 
 		uint256 curamount = address(this).balance;
@@ -55,17 +58,13 @@ contract Ledger is ILedger, Department {
 	}
 
 	function assetIncome(
-		address to,
-		address token, 
-		uint256 tokenId, 
-		address source,
-		IAssetShell.SaleType saleType
+		address to, address token, uint256 tokenId, address source, IAssetShell.SaleType saleType
 	) public payable override {
 		require(msg.value != 0, "#Ledger#assetIncome profit cannot be zero");
 		emit AssetIncome(token, tokenId, source, msg.value, to, saleType);
 	}
 
-	function withdraw(uint256 amount, address target, string memory description) external payable override OnlyDAO {
+	function withdraw(uint256 amount, address target, string memory description) external payable override Check {
 		require(target != address(0), "#Ledger#withdraw receive assress not address(0)");
 		receiveBalance();
 		target.sendValue(amount);
@@ -75,6 +74,7 @@ contract Ledger is ILedger, Department {
 	receive() external payable {
 		receiveBalance();
 	}
+
 	fallback() external payable {
 		receiveBalance();
 	}

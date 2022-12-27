@@ -5,7 +5,7 @@ pragma experimental ABIEncoderV2;
 
 import './Asset.sol';
 
-contract AssetShell is IAssetShell, ERC721_Department {
+contract AssetShell is IAssetShell, ERC721_Module {
 
 	bytes4 private constant _ERC721_RECEIVED = 0x150b7a02;
 	bytes4 private constant _INTERFACE_ID_ERC721 = 0x80ac58cd;
@@ -33,18 +33,15 @@ contract AssetShell is IAssetShell, ERC721_Department {
 	}*/
 	string public contractURI;// = "https://smart-dao.stars-mine.com/service-api/utils/getOpenseaContractJSON?";
 
-	function initAssetShell(address host, string memory description, address operator,
-		string memory _contractURI, SaleType _saleType, string memory name
+	function initAssetShell(
+		address host,      string memory name,          string memory description,
+		address operator,  string memory _contractURI,  SaleType _saleType
 	) external {
-		initERC721_Department(host, description, name, name, operator);
+		initERC721_Module(host, description, name, name, operator);
 		_registerInterface(AssetShell_Type);
 		_registerInterface(_ERC721_RECEIVED);
 		contractURI = _contractURI;
 		saleType = _saleType;
-	}
-
-	function setContractURI(string memory _contractURI) public {
-		contractURI = _contractURI;
 	}
 
 	// @dev convert addr to standard ERC721 NFT,will be revered if add is invalid.
@@ -93,7 +90,7 @@ contract AssetShell is IAssetShell, ERC721_Department {
 		require(asset.token != address(0), "#AssetShell#assetMeta asset non exists");
 	}
 
-	function withdraw(uint256 tokenId) external override OnlyDAO {
+	function withdraw(uint256 tokenId) external override Check {
 		AssetID storage asset = _assetsMeta[tokenId];
 		require(asset.token != address(0), "#AssetShell#withdraw withdraw of asset non exists");
 		withdrawTo(tokenId, ownerOf(tokenId), "");
@@ -127,7 +124,7 @@ contract AssetShell is IAssetShell, ERC721_Department {
 		_host.ledger().assetIncome{value: msg.value}(lastTransfer.to, asset.token, asset.tokenId, msg.sender, saleType);
 		if (saleType == SaleType.kOpenseaFirst) {
 			bytes memory data = abi.encode(lastTransfer.to);
-			withdrawTo(lastTransfer.tokenId, address(_host.department(Departments_OPENSEA_Second_ID)), data);
+			withdrawTo(lastTransfer.tokenId, address(_host.module(Module_OPENSEA_Second_ID)), data);
 		}
 		lastTransfer.tokenId = 0;
 	}

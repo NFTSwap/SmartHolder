@@ -5,11 +5,11 @@ pragma experimental ABIEncoderV2;
 
 import './Interface.sol';
 import './ERC165.sol';
-import './Upgrade.sol';
+import './Module.sol';
 import '../openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol';
 import '../openzeppelin/contracts-ethereum-package/contracts/utils/Address.sol';
 
-contract VotePool is Upgrade, IVotePool, ERC165 {
+contract VotePool is Upgrade, IVotePool, ERC165, PermissionCheck {
 	using Address for address;
 	using SafeMath for uint256;
 
@@ -17,9 +17,7 @@ contract VotePool is Upgrade, IVotePool, ERC165 {
 	bytes4 internal constant VotePool_ID = 0x0ddf27bf;
 
 	// define props
-	IDAO private _host;
 	string private _description;
-	uint256 private _current; // 当前执行的提案决议
 	// proposal id => Proposal
 	mapping(uint256 => Proposal) private _proposalMap; // 提案决议列表
 	uint256[] private _proposalList; // 提案列表索引
@@ -29,24 +27,25 @@ contract VotePool is Upgrade, IVotePool, ERC165 {
 	// @public
 	uint256 public lifespan; // 提案生命周期限制
 
-	function isPermissionDAO() view internal returns (bool) {
+	uint256[8] private __; // reserved storage space
+
+	function initVotePool(address host, string memory description, uint256 _lifespan) external {
+		initERC165();
+		_registerInterface(VotePool_Type);
+		//IDAO(host).checkInterface(DAO_Type, "#VotePool#initVotePool dao host type not match");
+		_host = IDAO(host);
+		_description = description;
+		setLifespan(_lifespan);
+	}
+
+	function isPermissionDAO() view internal override returns (bool) {
 		if (msg.sender != address(_host.operator()))
 			return msg.sender == address(_host.root());
 		return true;
 	}
 
-	function upgrade(address impl) public {
-		require(isPermissionDAO(), "#VotePool#upgrade caller does not have permission");
+	function upgrade(address impl) public Check {
 		_impl = impl;
-	}
-
-	function initVotePool(address host, string memory description, uint256 _lifespan) external {
-		initERC165();
-		_registerInterface(VotePool_Type);
-		//IDAO(host).checkInterface(DAO_Type, "#Department#initVotePool dao host type not match");
-		_host = IDAO(host);
-		_description = description;
-		setLifespan(_lifespan);
 	}
 
 	function setLifespan(uint256 _lifespan) private {
@@ -54,16 +53,8 @@ contract VotePool is Upgrade, IVotePool, ERC165 {
 		lifespan = _lifespan;
 	}
 
-	function host() view external returns (IDAO) {
-		return _host;
-	}
-
 	function description() view external returns (string memory) {
 		return _description;
-	}
-
-	function current() view public returns (uint256) {
-		return _current;
 	}
 
 	function getProposal(uint256 id) view public returns (Proposal memory) {
@@ -80,7 +71,7 @@ contract VotePool is Upgrade, IVotePool, ERC165 {
 		return _proposalMap[id].id != 0;
 	}
 
-	function create(Proposal memory proposal) public {
+	function create(Proposal memory proposal) public Check(Action_VotePool_Create) {
 		require(!exists(proposal.id), "#VotePool#create proposal already exists");
 		if (proposal.lifespan != 0)
 			require(proposal.lifespan >= lifespan, "#VotePool#create proposal lifespan not less than 7 days");
@@ -117,15 +108,11 @@ contract VotePool is Upgrade, IVotePool, ERC165 {
 	}
 
 	function create2(
-		uint256 id,
-		address target,
-		uint256 lifespan,
-		uint256 passRate,
-		int256 loopCount,
-		uint256 loopTime,
-		string memory name,
-		string memory description,
-		bytes memory data
+		uint256       id,          address target,
+		uint256       lifespan,    uint256 passRate,
+		int256        loopCount,   uint256 loopTime,
+		string memory name,        string memory description,
+		bytes memory  data
 	) external {
 		Proposal memory proposal;
 		proposal.id = id;
@@ -144,7 +131,7 @@ contract VotePool is Upgrade, IVotePool, ERC165 {
 		return value < 0 ? uint256(-value): uint256(value);
 	}
 
-	function vote(uint256 id, uint256 member, int256 votes, bool tryExecute) external {
+	function vote(uint256 id, uint256 member, int256 votes, bool tryExecute) external Check(Action_VotePool_Vote) {
 		Proposal storage obj = proposal(id);
 		IMember.Info memory info = _host.member().getInfo(member);
 
@@ -224,17 +211,16 @@ contract VotePool is Upgrade, IVotePool, ERC165 {
 	}
 
 	function exec(Proposal storage obj) internal {
-		_current = obj.id;
-		(bool suc, bytes memory _data) = obj.target.call{ value: msg.value }(obj.data);
-		_current = 0;
-
-		assembly {
-			let len := mload(_data)
-			let data := add(_data, 0x20)
-			switch suc
-			case 0 { revert(data, len) }
-			default {
-				// return(data, len)
+		for (uint256 i = 0; i < obj.target.length; i++) {
+			(bool suc, bytes memory _data) = obj.target[i].call{ value: msg.value }(obj.data[i]);
+			assembly {
+				let len := mload(_data)
+				let data := add(_data, 0x20)
+				switch suc
+				case 0 { revert(data, len) }
+				default {
+					// return(data, len)
+				}
 			}
 		}
 	}

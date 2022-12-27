@@ -25,15 +25,15 @@ interface IERC721_1 is IERC721, IERC721Metadata, IERC721Enumerable {
 
 // DAO interfaces
 
-interface IDepartment is IERC165, IERC165_1 {
-	event Change(uint256 tag);
-	function operator() view external returns (IVotePool);
+interface IModule is IERC165, IERC165_1 {
+	event Change(uint256 indexed tag, uint256 value);
+	function operator() view external returns (address);
 	function setDescription(string memory description) external;
-	function setOperator(address vote) external;
+	function setOperator(address operator) external;
 	function upgrade(address impl) external;
 }
 
-interface IAssetShell is IDepartment, IERC721_1, IERC721Receiver {
+interface IAssetShell is IModule, IERC721_1, IERC721Receiver {
 	struct AssetID {
 		address token;
 		uint256 tokenId;
@@ -47,10 +47,10 @@ interface IAssetShell is IDepartment, IERC721_1, IERC721Receiver {
 	function assetMeta(uint256 tokenId) view external returns (AssetID memory);
 }
 
-interface IAsset is IDepartment, IERC721_1 {
+interface IAsset is IModule, IERC721_1 {
 }
 
-interface ILedger is IDepartment {
+interface ILedger is IModule {
 	event Receive(address indexed from, uint256 balance);
 	event ReleaseLog(address indexed operator, uint256 balance, string log);
 	event Deposit(address indexed from, uint256 balance, string name, string description);
@@ -63,62 +63,62 @@ interface ILedger is IDepartment {
 	function assetIncome(address to, address token, uint256 tokenId, address source, IAssetShell.SaleType saleType) external payable;
 }
 
-interface IMember is IDepartment, IERC721_1 {
-	enum Role {
-		DEFAULT
-	}
+interface IMember is IModule, IERC721_1 {
 	struct Info {
 		uint256 id;
 		string name;
 		string description;
 		string avatar;
-		Role role;
-		uint32 votes; // 投票权
-		uint256 idx;
-		uint256[2] __ext;
+		uint32 votes; // vote power
+		uint256[2] __; // reserved storage space
 	}
-	event UpdateInfo(uint256 id);
+	event Update(uint256 indexed id); // update info
+	event TransferVotes(uint256 indexed from, uint256 indexed to, uint32 votes);
+	event AddPermissions(uint256[] ids, uint256[] actions);
+	event RemovePermissions(uint256[] ids, uint256[] actions);
 
+	function isPermission(address owner, uint256 action) view external returns (bool);
+	function isPermissionFrom(uint256 id, uint256 action) view external returns (bool);
 	function indexAt(uint256 index) view external returns (Info memory);
-	function getInfo(uint256 id) view external returns (Info memory);
-	function isExists(uint256 id) view external returns (bool);
+	function getMemberInfo(uint256 id) view external returns (Info memory);
 	function votes() view external returns (uint256);
 	function total() view external returns (uint256);
 }
 
 interface IVotePool {
 	struct Proposal {
-		uint256 id; // 随机256位长度id
-		string name; // 名称
-		string description; // 描述
-		address origin; // 发起人 address
-		address target; // 目标合约,决议执行合约地址
-		uint256 lifespan; // 投票生命周期单位（分钟）
-		uint256 expiry; // 过期时间,为0时永不过期
-		uint256 passRate; // 通过率不小于全体票数50% 1/10000
-		int256  loopCount; // 执行循环次数, -1表示永久定期执行决议
-		uint256 loopTime; // 执行循环间隔时间,不等于0时必须大于1分钟,0只执行一次
-		uint256 voteTotal; // 投票总数
-		uint256 agreeTotal; // 通过总数
-		uint256 executeTime; // 上次执行的时间
-		uint256 idx; //
-		bool isAgree; // 是否通过采用
-		bool isClose; // 投票是否截止
-		bool isExecuted; // 是否已执行完成
-		bytes data; // 调用方法与实参
+		uint256   id; // 随机256位长度id
+		string    name; // 名称
+		string    description; // 描述
+		address   origin; // 发起人 address
+		address[] target; // 目标合约,决议执行合约地址列表
+		uint256   lifespan; // 投票生命周期单位（分钟）
+		uint256   expiry; // 过期时间,为0时永不过期
+		uint256   passRate; // 通过率不小于全体票数50% 1/10000
+		int256    loopCount; // 执行循环次数, -1表示永久定期执行决议
+		uint256   loopTime; // 执行循环间隔时间,不等于0时必须大于1分钟,0只执行一次
+		uint256   voteTotal; // 投票总数
+		uint256   agreeTotal; // 通过总数
+		uint256   executeTime; // 上次执行的时间
+		uint256   idx; //
+		bool      isAgree; // 是否通过采用
+		bool      isClose; // 投票是否截止
+		bool      isExecuted; // 是否已执行完成
+		bytes[]   data; // 调用方法与实参列表
 	}
 	// define events
 	event Created(uint256 id);
 	event Vote(uint256 indexed id, uint256 member, int256 votes);
-	event Close(uint256 id);
+	event Close(uint256 indexed id);
 	event Execute(uint256 indexed id);
 
 	function tryClose(uint256 id, bool tryExecute) external;
 }
 
-interface IDAO is IDepartment {
+interface IDAO is IModule {
+	function root() view external returns (address);
 	function member() view external returns (IMember);
 	function ledger() view external returns (ILedger);
 	function asset() view external returns (IAsset);
-	function department(uint256 id) view external returns (IDepartment);
+	function module(uint256 id) view external returns (IModule);
 }

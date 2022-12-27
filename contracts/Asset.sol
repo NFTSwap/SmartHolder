@@ -1,17 +1,16 @@
 
 pragma solidity >=0.6.0 <=0.8.15;
 
-import './Department.sol';
+import './Module.sol';
 import './libs/ERC721.sol';
 
-contract ERC721_Department is Department, ERC721 {
+contract ERC721_Module is Module, ERC721 {
 
-	function initERC721_Department(
+	function initERC721_Module(
 		address host, string memory description,
-		string memory name, string memory symbol,
-		address operator
+		string memory name, string memory symbol, address operator
 	) internal {
-		initDepartment(host, description, operator);
+		initModule(host, description, operator);
 		initERC721(name, symbol);
 	}
 
@@ -29,7 +28,7 @@ contract ERC721_Department is Department, ERC721 {
 
 }
 
-contract Asset is IAsset, ERC721_Department {
+contract Asset is IAsset, ERC721_Module {
 
 	/*{
 		"name": "OpenSea Creatures",
@@ -42,30 +41,21 @@ contract Asset is IAsset, ERC721_Department {
 	string public contractURI;// = "https://smart-dao.stars-mine.com/service-api/utils/getOpenseaContractJSON?";
 
 	function initAsset(
-		address host, string memory description, address operator,
-		string memory _contractURI, string memory name
+		address host, string memory name, string memory description, address operator,
+		string memory _contractURI
 	) external {
-		initERC721_Department(host, description, name, name, operator);
+		initERC721_Module(host, description, name, name, operator);
 		_registerInterface(Asset_Type);
 		contractURI = _contractURI;
 	}
 
-	function setContractURI(string memory _contractURI) public {
-		contractURI = _contractURI;
-	}
-
-	function safeMint(address to, uint256 tokenId, string memory _tokenURI, address lock, bytes calldata _data) public {
+	function safeMint(address to, uint256 tokenId, string memory _tokenURI, bytes calldata _data) public Check(Action_Asset_SafeMint) {
 		_safeMint(to, tokenId, _data);
 		_setTokenURI(tokenId, _tokenURI);
 	}
 
 	function _burn(uint256 tokenId) internal virtual override {
 		// NOOP
-	}
-
-	function setTokenURI(uint256 tokenId, string memory _tokenURI) public {
-		require(_havePermission(_msgSender(), tokenId), "#NFTs#setTokenURI: owner no match");
-		_setTokenURI(tokenId, _tokenURI);
 	}
 
 }
