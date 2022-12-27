@@ -7,11 +7,11 @@ import '../openzeppelin/contracts-ethereum-package/contracts/utils/EnumerableMap
 contract DAO is IDAO, Module {
 	using UintToAddressMap for EnumerableMap.UintToAddressMap;
 
-	address private _root;
-	string private _name;
-	string private _mission;
-	UintToAddressMap private _modules;
-	uint256[50] private __; // Reserved storage space
+	address            private  _root;
+	string             private  _name;
+	string             private  _mission;
+	UintToAddressMap   private  _modules;
+	uint256[50]        private  __; // Reserved storage space
 
 	function root() view external override returns (address) { return _root; }
 	function name() view external returns (string memory) { return _name; }
