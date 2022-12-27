@@ -26,7 +26,7 @@ uint256 constant Change_Tag_Upgrade = 3;
 uint256 constant Change_Tag_DAO_Mission = 4;
 uint256 constant Change_Tag_DAO_Module = 5;
 
-// Action
+// Action Permission defines
 uint256 constant Action_Member_Create = 0x22a25870; // bytes4(keccak256('create(address,string memory,Info memory,uint256[] memory)'))
 uint256 constant Action_VotePool_Create = 0xdc6b0b72; // bytes4(keccak256('create(Proposal memory)'))
 uint256 constant Action_VotePool_Vote = 0x678ea396;  // bytes4(keccak256('vote(uint256,uint256,int256,bool)'))
