@@ -1,15 +1,17 @@
-
-pragma solidity >=0.6.0 <=0.8.15;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.17;
 
 pragma experimental ABIEncoderV2;
 
-import './Interface.sol';
-import './ERC165.sol';
-import './Module.sol';
-import '../openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol';
-import '../openzeppelin/contracts-ethereum-package/contracts/utils/Address.sol';
+import './libs/Interface.sol';
+import './libs/Constants.sol';
+import './libs/ERC165.sol';
+import './libs/Upgrade.sol';
+import './libs/Check.sol';
+import '../openzeppelin/contracts/utils/math/SafeMath.sol';
+import '../openzeppelin/contracts/utils/Address.sol';
 
-contract VotePool is Upgrade, IVotePool, ERC165, PermissionCheck {
+contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 	using Address for address;
 	using SafeMath for uint256;
 
@@ -44,7 +46,7 @@ contract VotePool is Upgrade, IVotePool, ERC165, PermissionCheck {
 		return true;
 	}
 
-	function upgrade(address impl) public Check {
+	function upgrade(address impl) public OnlyDAO {
 		_impl = impl;
 	}
 
@@ -71,30 +73,30 @@ contract VotePool is Upgrade, IVotePool, ERC165, PermissionCheck {
 		return _proposalMap[id].id != 0;
 	}
 
-	function create(Proposal memory proposal) public Check(proposal.originId, Action_VotePool_Create) {
-		require(!exists(proposal.id), "#VotePool#create proposal already exists");
-		if (proposal.lifespan != 0)
-			require(proposal.lifespan >= lifespan, "#VotePool#create proposal lifespan not less than 7 days");
-		require(proposal.passRate > 5_000, "#VotePool#create proposal vote pass rate not less than 50%");
-		require(_host.member().ownerOf(proposal.originId) == msg.sender, "#VotePool#create No call permission");
+	function create(Proposal memory arg0) public CheckFrom(arg0.originId, Action_VotePool_Create) {
+		require(!exists(arg0.id), "#VotePool#create proposal already exists");
+		if (arg0.lifespan != 0)
+			require(arg0.lifespan >= lifespan, "#VotePool#create proposal lifespan not less than 7 days");
+		require(arg0.passRate > 5_000, "#VotePool#create proposal vote pass rate not less than 50%");
+		require(_host.member().ownerOf(arg0.originId) == msg.sender, "#VotePool#create No call permission");
 
-		if (proposal.loopCount != 0) {
-			require(proposal.loopTime >= 1 minutes, "#VotePool#create Loop time must be greater than 1 minute");
+		if (arg0.loopCount != 0) {
+			require(arg0.loopTime >= 1 minutes, "#VotePool#create Loop time must be greater than 1 minute");
 		}
-		Proposal storage obj = _proposalMap[proposal.id];
+		Proposal storage obj = _proposalMap[arg0.id];
 
-		obj.id = proposal.id;
-		obj.name = proposal.name;
-		obj.description = proposal.description;
-		obj.target = proposal.target;
+		obj.id = arg0.id;
+		obj.name = arg0.name;
+		obj.description = arg0.description;
+		obj.target = arg0.target;
 		obj.origin = msg.sender;
-		obj.originId = proposal.originId;
-		obj.data = proposal.data;
-		obj.lifespan = proposal.lifespan;
-		obj.expiry = proposal.lifespan == 0 ? 0: block.timestamp + proposal.lifespan;
-		obj.passRate = proposal.passRate > 10_000 ? 10_000: proposal.passRate;
-		obj.loopCount = proposal.loopCount;
-		obj.loopTime = proposal.loopTime;
+		obj.originId = arg0.originId;
+		obj.data = arg0.data;
+		obj.lifespan = arg0.lifespan;
+		obj.expiry = arg0.lifespan == 0 ? 0: block.timestamp + arg0.lifespan;
+		obj.passRate = arg0.passRate > 10_000 ? 10_000: arg0.passRate;
+		obj.loopCount = arg0.loopCount;
+		obj.loopTime = arg0.loopTime;
 		obj.voteTotal = 0;
 		obj.agreeTotal = 0;
 		obj.executeTime = 0;
@@ -103,17 +105,17 @@ contract VotePool is Upgrade, IVotePool, ERC165, PermissionCheck {
 		obj.isClose = false;
 		obj.isExecuted = false;
 
-		_proposalList.push(proposal.id);
+		_proposalList.push(arg0.id);
 
-		emit Created(proposal.id);
+		emit Created(arg0.id);
 	}
 
 	function create2(
-		uint256       id,          address target,
+		uint256       id,          address[] memory target,
 		uint256       lifespan,    uint256 passRate,
 		int256        loopCount,   uint256 loopTime,
 		string memory name,        string memory description,
-		uint256       originId,    bytes memory  data
+		uint256       originId,    bytes[] memory  data
 	) external {
 		Proposal memory proposal;
 		proposal.id = id;
@@ -135,7 +137,7 @@ contract VotePool is Upgrade, IVotePool, ERC165, PermissionCheck {
 
 	function vote(uint256 id, uint256 member, int256 votes, bool tryExecute) external Check(Action_VotePool_Vote) {
 		Proposal storage obj = proposal(id);
-		IMember.Info memory info = _host.member().getInfo(member);
+		IMember.Info memory info = _host.member().getMemberInfo(member);
 
 		require(votes != 0, "#VotePool#vote parameter error, votes==0");
 		require(!obj.isClose, "#VotePool#vote Voting has been closed");

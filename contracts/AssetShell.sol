@@ -1,11 +1,12 @@
-
-pragma solidity >=0.6.0 <=0.8.15;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.17;
 
 pragma experimental ABIEncoderV2;
 
 import './Asset.sol';
 
-contract AssetShell is IAssetShell, ERC721_Module {
+contract AssetShell is ERC721_Module, IAssetShell {
+	using Address for address;
 
 	bytes4 private constant _ERC721_RECEIVED = 0x150b7a02;
 	bytes4 private constant _INTERFACE_ID_ERC721 = 0x80ac58cd;
@@ -37,7 +38,8 @@ contract AssetShell is IAssetShell, ERC721_Module {
 		address host,      string memory name,          string memory description,
 		address operator,  string memory _contractURI,  SaleType _saleType
 	) external {
-		initERC721_Module(host, description, name, name, operator);
+		initModule(host, description, operator);
+		initERC721(name, name);
 		_registerInterface(AssetShell_Type);
 		_registerInterface(_ERC721_RECEIVED);
 		contractURI = _contractURI;
@@ -45,13 +47,13 @@ contract AssetShell is IAssetShell, ERC721_Module {
 	}
 
 	// @dev convert addr to standard ERC721 NFT,will be revered if add is invalid.
-	function checkERC721(address addr, bytes4 id, string memory message) internal returns (IERC721) {
+	function checkERC721(address addr, bytes4 id, string memory message) view internal returns (IERC721) {
 		require(addr.isContract(), "#AssetShell#asERC721: INVLIAD_CONTRACT_ADDRESS");
-		IERC721(addr).checkInterface(id, message);
+		IERC165_1(addr).checkInterface(id, message);
 		return IERC721(addr);
 	}
 
-	function asERC721(address addr) internal returns (IERC721) {
+	function asERC721(address addr) view internal returns (IERC721) {
 		return checkERC721(addr, _INTERFACE_ID_ERC721, "#AssetShell#asERC721 The NFT contract has an invalid ERC721 implementation");
 	}
 
@@ -90,7 +92,7 @@ contract AssetShell is IAssetShell, ERC721_Module {
 		require(asset.token != address(0), "#AssetShell#assetMeta asset non exists");
 	}
 
-	function withdraw(uint256 tokenId) external override Check {
+	function withdraw(uint256 tokenId) external override OnlyDAO {
 		AssetID storage asset = _assetsMeta[tokenId];
 		require(asset.token != address(0), "#AssetShell#withdraw withdraw of asset non exists");
 		withdrawTo(tokenId, ownerOf(tokenId), "");

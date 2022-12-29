@@ -1,5 +1,5 @@
-
-pragma solidity >=0.6.0 <=0.8.15;
+//SPDX-License-Identifier: MIT
+pragma solidity 0.8.17;
 
 /**
  * @title Initializable
@@ -42,15 +42,6 @@ contract Initializable {
 		if (isTopLevelCall) {
 			initializing = false;
 		}
-	}
-
-	function _msgSender() internal view virtual returns (address) {
-		return msg.sender;
-	}
-
-	function _msgData() internal view virtual returns (bytes memory) {
-		this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
-		return msg.data;
 	}
 
 	/// @dev Returns true if and only if the function is running in the constructor

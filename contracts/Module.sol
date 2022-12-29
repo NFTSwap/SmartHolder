@@ -1,47 +1,14 @@
-
-pragma solidity >=0.6.0 <=0.8.15;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.17;
 
 import './libs/Upgrade.sol';
 import './libs/AddressExp.sol';
 import './libs/Constants.sol';
 import './libs/ERC165.sol';
 import './libs/Interface.sol';
-import './VotePool.sol';
+import './libs/Check.sol';
 
-abstract contract PermissionCheck {
-	IDAO internal _host; // address
-
-	function host() view external returns (IDAO) {
-		return _host;
-	}
-
-	/**
-		* @dev Throws if called by any account other than the owner.
-		*/
-	modifier Check() {
-		require(isPermissionDAO(), "#PermissionCheck#Check() caller does not have permission");
-		_;
-	}
-
-	/**
-	 * @dev check call Permission from action
-	 */
-	modifier Check(uint256 action) {
-		if (!isPermissionDAO())
-			require(_host.member().isPermission(msg.sender, action), "#PermissionCheck#Check(uint256) caller does not have permission");
-		_;
-	}
-
-	modifier Check(uint256 memberId, uint256 action) {
-		if (!isPermissionDAO())
-			require(_host.member().isPermissionFrom(memberId, action), "#PermissionCheck#Check(uint256,uint256) caller does not have permission");
-		_;
-	}
-
-	function isPermissionDAO() view internal virtual returns (bool);
-}
-
-contract Module is Upgrade, IModule, ERC165, PermissionCheck {
+contract Module is Upgrade, ERC165, PermissionCheck, IModule {
 	using Address for address;
 	using AddressExp for address;
 	address internal _operator; // address
@@ -79,6 +46,11 @@ contract Module is Upgrade, IModule, ERC165, PermissionCheck {
 		return _description;
 	}
 
+	function setDescription(string memory value) external Check(Action_DAO_Settings) {
+		_description = value;
+		emit Change(Change_Tag_Description, 0);
+	}
+
 	function setOperator1(address operator) internal {
 		if (operator != address(0)) {
 			if (operator.isContract())
@@ -87,18 +59,13 @@ contract Module is Upgrade, IModule, ERC165, PermissionCheck {
 		_operator = operator;
 	}
 
-	function setDescription(string memory value) external Check {
-		_description = value;
-		emit Change(Change_Tag_Description, 0);
-	}
-
-	function setOperator(address operator) external override Check {
+	function setOperator(address operator) external override OnlyDAO {
 		setOperator1(operator);
-		emit Change(Change_Tag_Operator, uint256(operator));
+		emit Change(Change_Tag_Operator, uint160(operator));
 	}
 
-	function upgrade(address impl) external override Check {
+	function upgrade(address impl) external override OnlyDAO {
 		_impl = impl;
-		emit Change(Change_Tag_Upgrade, uint256(impl));
+		emit Change(Change_Tag_Upgrade, uint160(impl));
 	}
 }

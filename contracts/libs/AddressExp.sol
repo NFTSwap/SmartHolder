@@ -1,7 +1,7 @@
+//SPDX-License-Identifier: MIT
+pragma solidity 0.8.17;
 
-pragma solidity >=0.6.0 <=0.8.15;
-
-import '../../openzeppelin/contracts-ethereum-package/contracts/utils/Address.sol';
+import '../../openzeppelin/contracts/utils/Address.sol';
 
 library AddressExp {
 	//@dev Converts an address to address payable.
@@ -10,7 +10,7 @@ library AddressExp {
 		pure
 		returns (address payable)
 	{
-		return address(uint160(account));
+		return payable(address(uint160(account)));
 	}
 
 	function sendValue(address recipient, uint256 amount) internal {

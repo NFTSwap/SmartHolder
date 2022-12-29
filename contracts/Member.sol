@@ -1,22 +1,22 @@
-
-pragma solidity >=0.6.0 <=0.8.15;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.17;
 
 pragma experimental ABIEncoderV2;
 
 import './Asset.sol';
-import '../openzeppelin/contracts-ethereum-package/contracts/utils/EnumerableSet.sol';
+import '../openzeppelin/contracts/utils/structs/EnumerableSet.sol';
 
 contract Member is IMember, ERC721_Module {
-	using UintSet for EnumerableSet.UintSet;
+	using EnumerableSet for EnumerableSet.UintSet;
 
 	mapping(uint256 => Info) private _infoMap; // member info, member id => member info
-	mapping(uint256 => UintSet) private _permissions; // member info, member id => permissions set
-	UintSet private _infoList; // member table list
+	mapping(uint256 => EnumerableSet.UintSet) private _permissions; // member info, member id => permissions set
+	EnumerableSet.UintSet private _infoList; // member table list
 	uint256 private _votes; // all vote total
 	uint256 internal _executor; // executor
 	uint256[16] private __; // reserved storage space
 
-	struct InitMemberArgs {
+	struct MintMemberArgs {
 		address   owner;
 		Info      info;
 		string    tokenURI;
@@ -25,9 +25,10 @@ contract Member is IMember, ERC721_Module {
 
 	function initMember(
 		address host, string memory name, string memory description,
-		address operator, InitMemberArgs[] memory members) external
+		address operator, MintMemberArgs[] memory members) external
 	{
-		initERC721_Module(host, description, name, name, operator);
+		initModule(host, description, operator);
+		initERC721(name, name);
 		_registerInterface(Member_Type);
 
 		for (uint256 i = 0; i < members.length; i++)
@@ -60,7 +61,7 @@ contract Member is IMember, ERC721_Module {
 	function remove(uint256 id) public {
 		require(isApprovedOrOwner(msg.sender, id) || isPermissionDAO(), "#Member#remove No permission");
 		_burn(id);
-		_votes -= info.votes;
+		_votes -= _infoMap[id].votes;
 		delete _infoMap[id];
 		delete _permissions[id]; // delete permissions
 		_infoList.remove(id);
@@ -121,14 +122,14 @@ contract Member is IMember, ERC721_Module {
 	}
 
 	function total() view public override returns (uint256) {
-		return _infoList.length;
+		return _infoList.length();
 	}
 
 	function executor() view public returns(uint256) {
 		return _executor;
 	}
 
-	function setExecutor(uint256 id) public Check {
+	function setExecutor(uint256 id) public OnlyDAO {
 		require(_exists(id), "#Member#setExecutor: info query for nonexistent member");
 		_executor = id;
 	}
@@ -143,34 +144,34 @@ contract Member is IMember, ERC721_Module {
 		return false;
 	}
 
-	function isPermissionFrom(uint256 id, uint256 action) view external override returns (bool) {
+	function isPermissionFrom(uint256 id, uint256 action) view public override returns (bool) {
 		return _permissions[id].contains(action);
 	}
 
-	function addPermissions(uint256[] memory IDs, uint256[] memory actions) external Check {
+	function addPermissions(uint256[] memory IDs, uint256[] memory actions) external OnlyDAO {
 		for (uint256 i = 0; i < IDs.length; i++) {
-			UintSet storage permissions = _permissions[IDs[i]];
+			EnumerableSet.UintSet storage permissions = _permissions[IDs[i]];
 			for (uint256 j = 0; j < actions.length; j++)
 				permissions.add(actions[j]);
 		}
 		emit AddPermissions(IDs, actions);
 	}
 
-	function removePermissions(uint256[] IDs, uint256[] actions) external Check {
+	function removePermissions(uint256[] memory IDs, uint256[] memory actions) external OnlyDAO {
 		for (uint256 i = 0; i < IDs.length; i++) {
-			UintSet storage permissions = _permissions[IDs[i]];
+			EnumerableSet.UintSet storage permissions = _permissions[IDs[i]];
 			for (uint256 j = 0; j < actions.length; j++)
 				permissions.remove(actions[j]);
 		}
 		emit RemovePermissions(IDs, actions);
 	}
 
-	function addVotes(uint256 id, int32 votes) external Check {
+	function addVotes(uint256 id, int32 votes) external OnlyDAO {
 		require(_exists(id), "#Member#setVotes: info query for nonexistent member");
 		Info storage info = _infoMap[id];
 
-		info.votes += votes;
-		_votes += votes;
+		info.votes += uint32(votes);
+		_votes += uint32(votes);
 
 		if (votes > 0)
 			emit TransferVotes(0, id, uint32(votes));
@@ -178,15 +179,15 @@ contract Member is IMember, ERC721_Module {
 			emit TransferVotes(id, 0, uint32(-votes));
 	}
 
-	function transferVotes(uint256 from, uint256 to, uint32 votes) external Check {
+	function transferVotes(uint256 from, uint256 to, uint32 votes) external OnlyDAO {
 		require(_exists(from), "#Member#transferVotes: info query for nonexistent member from");
 		require(_exists(to), "#Member#transferVotes: info query for nonexistent member to");
 		Info storage infoFrom = _infoMap[from];
 		Info storage infoTo = _infoMap[to];
 		require(infoFrom.votes >= votes, "#Member#transferVotes: not votes power enough");
 
-		infoFrom -= votes;
-		infoTo += votes;
+		infoFrom.votes -= uint32(votes);
+		infoTo.votes += uint32(votes);
 
 		emit TransferVotes(from, to, votes);
 	}

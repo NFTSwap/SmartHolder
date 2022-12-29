@@ -1,13 +1,13 @@
-
-pragma solidity >=0.6.0 <=0.8.15;
+//SPDX-License-Identifier: MIT
+pragma solidity 0.8.17;
 
 pragma experimental ABIEncoderV2;
 
-import '../../openzeppelin/contracts-ethereum-package/contracts/introspection/IERC165.sol';
-import '../../openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721.sol';
-import '../../openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721Metadata.sol';
-import '../../openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721Enumerable.sol';
-import '../../openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721Receiver.sol';
+import '../../openzeppelin/contracts/utils/introspection/IERC165.sol';
+import '../../openzeppelin/contracts/token/ERC721/IERC721.sol';
+import '../../openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol';
+import '../../openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol';
+import '../../openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
 
 /**
  * @title IERC165_1 extend erc165
@@ -17,7 +17,7 @@ interface IERC165_1 {
 }
 
 /**
- * @title IERC165_1 extend erc721
+ * @title IERC721_1 extend erc721
  */
 interface IERC721_1 is IERC721, IERC721Metadata, IERC721Enumerable {
 	function exists(uint256 tokenId) external view returns (bool);
@@ -117,9 +117,15 @@ interface IVotePool {
 }
 
 interface IDAO is IModule {
+	event SetModule(uint256 indexed id, address addr);
 	function root() view external returns (address);
 	function member() view external returns (IMember);
 	function ledger() view external returns (ILedger);
 	function asset() view external returns (IAsset);
 	function module(uint256 id) view external returns (IModule);
+}
+
+interface IDAOs {
+	event Created(address indexed dao);
+	// function make() external returns (IDAO);
 }

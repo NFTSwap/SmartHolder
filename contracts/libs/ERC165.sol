@@ -1,4 +1,5 @@
-pragma solidity >=0.6.0 <=0.8.15;
+//SPDX-License-Identifier: MIT
+pragma solidity 0.8.17;
 
 import './Initializable.sol';
 import './Interface.sol';
@@ -38,7 +39,6 @@ contract ERC165 is Initializable, IERC165, IERC165_1 {
 	function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
 		return _supportedInterfaces[interfaceId];
 	}
-
 
 	/**
 	 * @dev Registers the contract as an implementer of the interface defined by

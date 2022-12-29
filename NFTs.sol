@@ -1,27 +1,19 @@
-
-pragma solidity >=0.6.0 <=0.8.15;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.17;
 
 import './libs/ERC721.sol';
 import './libs/ERC165.sol';
-import '../openzeppelin/contracts-ethereum-package/contracts/utils/Strings.sol';
+import '../openzeppelin/contracts/utils/Strings.sol';
 
 contract NFTs is ERC165, ERC721 {
 
 	// @overwrite ---------------
-	function _msgSender() internal view virtual override(ERC721) returns (address) {
-		return Initializable._msgSender();
-	}
-
-	function _msgData() internal view virtual override(ERC721) returns (bytes memory) {
-		return Initializable._msgData();
-	}
-
-	function _registerInterface(bytes4 interfaceId) internal virtual override(ERC721) {
+	function _registerInterface(bytes4 interfaceId) internal virtual override(ERC165,ERC721) {
 		ERC165._registerInterface(interfaceId);
 	}
 	// --------------------------
 
-	function initNFTs() external {
+	function initNFTs() public {
 		initERC165();
 		initERC721("NFTs", "NFTs");
 	}
@@ -65,7 +57,7 @@ contract NFTsTest is NFTs {
 
 	function initNFTsTest() external {
 		initNFTs();
-		string memory addr = uint256(address(this)).toString();
+		string memory addr = uint256(uint160(address(this))).toString();
 		contractURI = string(abi.encodePacked("https://smart-dao-rel.stars-mine.com/service-api/test1/getOpenseaContractJSON?address=", addr));
 		// contractURI = "https://smart-dao-rel.stars-mine.com/service-api/test1/getOpenseaContractJSON?address=0x87Ae5AB6e5A7F925dCC091F3a2247786D5E26349";
 	}

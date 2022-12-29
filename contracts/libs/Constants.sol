@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity >=0.6.0 <=0.8.15;
+pragma solidity 0.8.17;
 
 // Module type
 bytes4 constant Module_Type = 0x6b27a068; // bytes4(keccak256('initDepartment(address,string,address)'))
@@ -33,3 +33,5 @@ uint256 constant Action_VotePool_Vote = 0x678ea396;  // bytes4(keccak256('vote(u
 uint256 constant Action_Asset_SafeMint = 0x59baef2a; // bytes4(keccak256('safeMint(address,uint256,string memory,bytes calldata)'))
 uint256 constant Action_DAO_Settings = 0xd0a4ad96; // bytes4(keccak256('DAO::settings()'))
 uint256 constant Action_DAO_SetModule = 0x5d29163; // bytes4(keccak256('setModule(uint256,address)'))
+
+contract Constants {}

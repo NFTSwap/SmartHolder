@@ -22,7 +22,7 @@ contract('SmartHolder All', (accounts) => {
 	var mid3 = '0x1cf8ee266012053335fbfec23b8afbff37d61b0558ad301598b4afe9f27cdf92';
 
 	before(async () => {
-		app = await createApp(users[0]);
+		app = await create(users[0]);
 	});
 
 	context("ETH", () => {

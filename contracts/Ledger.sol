@@ -1,15 +1,16 @@
-
-pragma solidity >=0.6.0 <=0.8.15;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.17;
 
 pragma experimental ABIEncoderV2;
 
-import './Interface.sol';
+import './libs/Interface.sol';
 import './Module.sol';
 
 /**
  * @title Ledger manage
  */
 contract Ledger is ILedger, Module {
+	using AddressExp for address;
 
 	function initLedger(address host, string memory description, address operator) external {
 		initModule(host, description, operator);
@@ -26,7 +27,7 @@ contract Ledger is ILedger, Module {
 		return address(this).balance;
 	}
 
-	function release(uint256 amount, string memory description) external payable Check {
+	function release(uint256 amount, string memory description) external payable OnlyDAO {
 		receiveBalance();
 
 		uint256 curamount = address(this).balance;
@@ -64,7 +65,7 @@ contract Ledger is ILedger, Module {
 		emit AssetIncome(token, tokenId, source, msg.value, to, saleType);
 	}
 
-	function withdraw(uint256 amount, address target, string memory description) external payable override Check {
+	function withdraw(uint256 amount, address target, string memory description) external payable override OnlyDAO {
 		require(target != address(0), "#Ledger#withdraw receive assress not address(0)");
 		receiveBalance();
 		target.sendValue(amount);

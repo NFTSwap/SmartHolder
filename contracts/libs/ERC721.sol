@@ -1,20 +1,19 @@
-
-pragma solidity >=0.6.0 <=0.8.15;
-// pragma solidity ^0.6.0;
+//SPDX-License-Identifier: MIT
+pragma solidity 0.8.17;
 
 import './Interface.sol';
 import './AddressExp.sol';
-import '../../openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol';
-import '../../openzeppelin/contracts-ethereum-package/contracts/utils/EnumerableSet.sol';
-import '../../openzeppelin/contracts-ethereum-package/contracts/utils/EnumerableMap.sol';
-import '../../openzeppelin/contracts-ethereum-package/contracts/utils/Strings.sol';
-import '../Department.sol';
+import '../../openzeppelin/contracts/utils/math/SafeMath.sol';
+import '../../openzeppelin/contracts/utils/structs/EnumerableSet.sol';
+import '../../openzeppelin/contracts/utils/structs/EnumerableMap.sol';
+import '../../openzeppelin/contracts/utils/Strings.sol';
+import '../../openzeppelin/contracts/utils/Context.sol';
 
 /**
  * @title ERC721 Non-Fungible Token Standard basic implementation
  * @dev see https://eips.ethereum.org/EIPS/eip-721
  */
-abstract contract ERC721 is IERC721_1 {
+abstract contract ERC721 is Context, IERC721_1 {
 	using SafeMath for uint256;
 	using Address for address;
 	using EnumerableSet for EnumerableSet.UintSet;
@@ -83,8 +82,6 @@ abstract contract ERC721 is IERC721_1 {
 		*/
 	bytes4 private constant _INTERFACE_ID_ERC721_ENUMERABLE = 0x780e9d63;
 
-	function _msgSender() internal view virtual returns (address);
-	function _msgData() internal view virtual returns (bytes memory);
 	function _registerInterface(bytes4 interfaceId) internal virtual;
 
 	function initERC721(string memory name, string memory symbol) internal {
