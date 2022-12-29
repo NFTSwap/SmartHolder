@@ -42,8 +42,8 @@ class Provider {
 	}
 }
 
-// const walletKey = cfg.walletKey || 'f81fb73a528c504cb5c02daeb03fb2f3c9d2eec79c859c91574da69f58c250f4';
-const walletKey = cfg.walletKey || 'b85b9a8c85cc6017b257f09b38ee64193e7f2066db0c103db618b11b7e085e43';
+// address 0xdF359Fc681CD24f40b2DcdBd1C30AA413EF64993
+const walletKey = cfg.walletKey || '635bab5b876bf4bca5162954f6a372bfcb601f558b9755f7ffd83070583e99df';
 
 module.exports = {
 	/**
