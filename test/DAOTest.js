@@ -1,6 +1,6 @@
 
 const { expect, assert } = require("chai");
-const { createApp } = require("./app");
+const { create } = require("./app");
 const cryptoTx = require('crypto-tx');
 const DAO = artifacts.require("DAO.sol");
 

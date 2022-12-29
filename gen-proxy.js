@@ -1,6 +1,6 @@
 
 const fs = require('fs');
-const { getDeployData } = require('@openzeppelin/truffle-upgrades/dist/utils/deploy-impl');
+const deployImpl = require('@openzeppelin/truffle-upgrades/dist/utils/deploy-impl');
 
 function pushDefine(type, label, defines, names, indent) {
 	if (label) {
@@ -70,13 +70,19 @@ function joinLayout(types, storage, defines, names, structs, indent) {
 }
 
 async function genStore(name, Contract, opts) {
-	let data = await getDeployData({...opts, unsafeSkipStorageCheck: true}, Contract);
+	let data = await deployImpl.getDeployData(opts, Contract);
+	// {
+	// 	withMetadata: '0846ec7062f5e60e29b48ca6e0bccdbe43c881f4fad2d7c26a05476ba44673a2',
+	// 	withoutMetadata: 'f8ef373b58307a883693d440bc08fe245bfc73b9b047a2a76184358c27a1e625',
+	// 	linkedWithoutMetadata: 'f8ef373b58307a883693d440bc08fe245bfc73b9b047a2a76184358c27a1e625'
+	// }
+	//console.log(name, data.version.linkedWithoutMetadata);
 	let templ = fs.readFileSync(`${__dirname}/contracts/libs/Upgrade.sol`, 'utf-8');
 	let defines = [];
 	let defineStructs = {};
 	joinLayout(data.layout.types, data.layout.storage, defines, {}, defineStructs, 1);
 	templ = templ.replaceAll('Upgrade', `${name}Store`);
-	templ = templ.replace('ProxyStore', `${name}ProxyStore`);
+	templ = templ.replace('ProxyStore', `${name}Proxy`);
 
 	let structsStr = '';
 	for (let [k,v] of Object.entries(defineStructs)) {
@@ -92,12 +98,12 @@ module.exports = async function(deployer) {
 
 	fs.mkdirSync(`${__dirname}/contracts/gen`, {recursive: true});
 
-	await genStore('DAO', artifacts.require("DAO.sol"), opts);
 	await genStore('Asset', artifacts.require("Asset.sol"), opts);
 	await genStore('AssetShell', artifacts.require("AssetShell.sol"), opts);
 	await genStore('Ledger', artifacts.require("Ledger.sol"), opts);
 	await genStore('Member', artifacts.require("Member.sol"), opts);
 	await genStore('VotePool', artifacts.require("VotePool.sol"), opts);
+	await genStore('DAO', artifacts.require("DAO.sol"), opts);
 
 	if (fs.existsSync(`${__dirname}/contracts/DAOs.sol`)) {
 		await genStore('DAOs', artifacts.require("DAOs.sol"), opts);

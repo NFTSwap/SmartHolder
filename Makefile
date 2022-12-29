@@ -10,18 +10,12 @@ build:
 		then mv contracts/DAOs.sol contracts/DAOs.sol.bk;\
 	fi
 	rm -rf build
-	npm run build-all
+	npm run build
 	npm run build-proxy
 	mv contracts/DAOs.sol.bk contracts/DAOs.sol
-	npm run build-all
+	npm run build
 	npm run build-proxy
 	npm run build
-
-deploy-impl: build
-	IMPL=1 $(NODE) ./node_modules/.bin/truffle deploy --network $(NET)
-
-deploy-proxy: build
-	PROXY=1 $(NODE) ./node_modules/.bin/truffle deploy --network $(NET)
 
 # deploy or upgrade
 deploy: build

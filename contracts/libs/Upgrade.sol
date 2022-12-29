@@ -12,12 +12,12 @@ contract ProxyStore is Upgrade {
 	// Layout Store 分配的大小应该是动态编译指定,需从原始合约读取存储大小
 
 	constructor(address impl) public {
-		require(impl != address(0));
+		// require(impl != address(0));
 		_impl = impl;
 	}
 
 	fallback() external payable {
-		require(_impl != address(0), "Proxy call not implemented");
+		//require(_impl != address(0), "Proxy call not implemented");
 		(bool suc, bytes memory _data) = _impl.delegatecall(msg.data);
 		assembly {
 			let len := mload(_data)

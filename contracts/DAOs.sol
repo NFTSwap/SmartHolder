@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import '../openzeppelin/contracts/utils/structs/EnumerableSet.sol';
+// import '../openzeppelin/contracts/utils/structs/EnumerableSet.sol';
 import './libs/Ownable.sol';
 // Module impl
 import './DAO.sol';
@@ -24,16 +24,14 @@ import './gen/VotePoolProxy.sol';
 contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 	using EnumerableSet for EnumerableSet.AddressSet;
 
-	EnumerableSet.AddressSet    private  _DAOs;
-	// proxy logic impl
-	DAO           private  _DAO;
-	Member        private  _Member;
-	VotePool      private  _VotePool;
-	Ledger        private  _Ledger;
-	Asset         private  _Asset;
-	AssetShell    private  _AssetShell;
-
-	uint256[50]   private  __; // reserved storage space
+	struct DAOIMPLs {
+		address   DAO;
+		address   Member;
+		address   VotePool;
+		address   Ledger;
+		address   Asset;
+		address   AssetShell;
+	}
 
 	struct InitMemberArgs {
 		string name;
@@ -46,27 +44,29 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 		uint256 lifespan;
 	}
 
+	EnumerableSet.AddressSet private  _DAOs; // global DAOs list
+	DAOIMPLs                 public   defaultIMPLs; // default logic impl
+	uint256[50]              private  __; // reserved storage space
+
 	function initDAOs() external initializer {
 		initOwnable();
-		_DAO = new DAO();
-		_Member = new Member();
-		_VotePool = new VotePool();
-		_Ledger = new Ledger();
-		_Asset = new Asset();
-		_AssetShell = new AssetShell();
+	}
+
+	function setDefaultIMPLs(DAOIMPLs memory IMPLs) public onlyOwner {
+		defaultIMPLs = IMPLs;
 	}
 
 	/**
-	 * @dev makeDAO() create voting DAO
+	 * @dev deploy() deploy common voting DAO
 	 */
-	function makeDAO(
+	function deploy(
 		string           memory    name,              string           memory    mission,
 		string           memory    description,       address                    operator,
 		InitMemberArgs   memory    memberArgs,        InitVotePoolArgs memory    votePoolArgs
 	) external returns (IDAO) {
-		DAO host = new DAO();
-		Member member = new Member();
-		VotePool root = new VotePool();
+		DAO host      = DAO( address(new DAOProxy(defaultIMPLs.DAO)) );
+		Member member = Member( address(new MemberProxy(defaultIMPLs.Member)) );
+		VotePool root = VotePool( address(new VotePoolProxy(defaultIMPLs.VotePool)) );
 
 		member.initMember(address(host), memberArgs.name, memberArgs.description, address(0), memberArgs.members);
 		root.initVotePool(address(host), votePoolArgs.description, votePoolArgs.lifespan);
@@ -78,9 +78,9 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 	}
 
 	/**
-	 * @dev makeAssetSales() create asset sales DAO
+	 * @dev makeAssetSales() deploy asset sales DAO
 	 */
-	function makeAssetSalesDAO(
+	function deployAssetSalesDAO(
 		string           memory    name,              string           memory    mission,
 		string           memory    description,       address                    operator,
 		InitMemberArgs   memory    memberArgs,        InitVotePoolArgs memory    votePoolArgs

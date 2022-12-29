@@ -40,5 +40,4 @@ contract Asset is IAsset, ERC721_Module {
 	function _burn(uint256 tokenId) internal virtual override {
 		// NOOP
 	}
-
 }

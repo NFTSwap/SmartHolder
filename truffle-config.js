@@ -21,6 +21,10 @@
 const req = require('somes/request');
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 
+try {
+	var cfg = require('./.config');
+} catch { var cfg = {} }
+
 class Provider {
 	constructor(url) {
 		this.url = url;
@@ -37,6 +41,9 @@ class Provider {
 		return data;
 	}
 }
+
+// const walletKey = cfg.walletKey || 'f81fb73a528c504cb5c02daeb03fb2f3c9d2eec79c859c91574da69f58c250f4';
+const walletKey = cfg.walletKey || 'b85b9a8c85cc6017b257f09b38ee64193e7f2066db0c103db618b11b7e085e43';
 
 module.exports = {
 	/**
@@ -58,7 +65,7 @@ module.exports = {
 		goerli: {
 			network_id: 5,
 			provider: new HDWalletProvider({
-				privateKeys: ['f81fb73a528c504cb5c02daeb03fb2f3c9d2eec79c859c91574da69f58c250f4'],
+				privateKeys: [walletKey],
 				provider: new Provider('https://goerli.infura.io/v3/c782e504a32b4070b414a037167ae8ff'),
 			}),
 			production: true,
@@ -66,7 +73,7 @@ module.exports = {
 		matic: {
 			network_id: 137,
 			provider: new HDWalletProvider({
-				privateKeys: ['f81fb73a528c504cb5c02daeb03fb2f3c9d2eec79c859c91574da69f58c250f4'],
+				privateKeys: [walletKey],
 				provider: new Provider('https://rpc-mainnet.maticvigil.com/v1/ef8f16191b474bb494f33283a81a38487e4dc245'),
 			}),
 			production: true,

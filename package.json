@@ -4,11 +4,10 @@
 	"description": "smart-holder",
 	"main": "",
 	"scripts": {
-		"build": "truffle compile",
-		"build-all": "truffle compile --all",
+		"build": "truffle compile --all",
 		"build-proxy": "GEN_PROXY=1 truffle deploy --network development",
 		"deploy": "truffle deploy --network goerli",
-		"__test__": "truffle test --network goerli --compile-none"
+		"__test": "truffle test --network goerli --compile-none"
 	},
 	"keywords": [],
 	"author": "blue.chu",

@@ -1,8 +1,7 @@
 
-const { singletons } = require('@openzeppelin/test-helpers');
+const helpers = require('@openzeppelin/test-helpers');
 const configure = require('@openzeppelin/test-helpers/configure');
 const fs = require('fs');
-const { inherits } = require('util');
 
 const DAO = artifacts.require("DAO.sol");
 const Asset = artifacts.require("Asset.sol");
@@ -10,9 +9,6 @@ const AssetGlobal = artifacts.require("AssetGlobal.sol");
 const Ledger = artifacts.require("Ledger.sol");
 const Member = artifacts.require("Member.sol");
 const VotePool = artifacts.require("VotePool.sol");
-
-// init some thing
-require("@openzeppelin/test-helpers");
 
 class App {
 
@@ -39,7 +35,7 @@ class App {
 			}
 		});
 		// reg 1820
-		await singletons.ERC1820Registry(user);
+		await helpers.singletons.ERC1820Registry(user);
 	}
 
 	static async create(account) {
