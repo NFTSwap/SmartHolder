@@ -115,7 +115,7 @@ contract AssetShell is AssetBase, IAssetShell {
 		if (_RollBACK) return;
 
 		if (locked.tokenId != 0) { // RollBACK last transfer action
-			require(tokenId != locked.tokenId, "#AssetShell#_beforeTokenTransfer The transfer has been blocked");
+			require(tokenId != locked.tokenId, "#AssetShell#_afterTokenTransfer The transfer has been blocked");
 			_RollBACK = true;
 			_safeTransfer(locked.to, locked.from, locked.tokenId, "");
 			_RollBACK = false;
