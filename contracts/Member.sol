@@ -9,12 +9,12 @@ import '../openzeppelin/contracts/utils/structs/EnumerableSet.sol';
 contract Member is IMember, ERC721_Module {
 	using EnumerableSet for EnumerableSet.UintSet;
 
-	mapping(uint256 => Info) private _infoMap; // member info, member id => member info
+	mapping(uint256 => Info) private  _infoMap; // member info, member id => member info
 	mapping(uint256 => EnumerableSet.UintSet) private _permissions; // member info, member id => permissions set
-	EnumerableSet.UintSet private _infoList; // member table list
-	uint256 private _votes; // all vote total
-	uint256 internal _executor; // executor
-	uint256[16] private __; // reserved storage space
+	EnumerableSet.UintSet    private  _infoList; // member table list
+	uint256                  private  _votes; // all vote total
+	uint256                  internal _executor; // executor
+	uint256[16]              private  __; // reserved storage space
 
 	struct MintMemberArgs {
 		address   owner;
@@ -39,11 +39,11 @@ contract Member is IMember, ERC721_Module {
 		_mint(owner, info.id);
 
 		Info storage info_ = _infoMap[info.id];
-		info_.id = info.id;
-		info_.name = info.name;
-		info_.description = info.description;
-		info_.avatar = info.avatar;
-		info_.votes = info.votes == 0 ? 1: info.votes; // limit votes to 1
+		info_.id           = info.id;
+		info_.name         = info.name;
+		info_.description  = info.description;
+		info_.avatar       = info.avatar;
+		info_.votes        = info.votes == 0 ? 1: info.votes; // limit votes to 1
 
 		_votes += info_.votes;
 

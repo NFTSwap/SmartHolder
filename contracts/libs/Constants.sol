@@ -15,8 +15,8 @@ uint256 constant Module_DAO_ID = 0;
 uint256 constant Module_MEMBER_ID = 1;
 uint256 constant Module_LEDGER_ID = 2;
 uint256 constant Module_ASSET_ID = 3;
-uint256 constant Module_OPENSEA_First_ID = 4;
-uint256 constant Module_OPENSEA_Second_ID = 5;
+uint256 constant Module_ASSET_First_ID = 4;
+uint256 constant Module_ASSET_Second_ID = 5;
 
 // Departments Change tag
 uint256 constant Change_Tag_Common = 0;
@@ -33,5 +33,8 @@ uint256 constant Action_VotePool_Vote = 0x678ea396;  // bytes4(keccak256('vote(u
 uint256 constant Action_Asset_SafeMint = 0x59baef2a; // bytes4(keccak256('safeMint(address,uint256,string memory,bytes calldata)'))
 uint256 constant Action_DAO_Settings = 0xd0a4ad96; // bytes4(keccak256('DAO::settings()'))
 uint256 constant Action_DAO_SetModule = 0x5d29163; // bytes4(keccak256('setModule(uint256,address)'))
+uint256 constant Action_DAO_set_seller_fee_basis_points = 0x91eb3dee; // bytes4(keccak256('set_seller_fee_basis_points(uint32)'))
+uint256 constant Action_Asset_Shell_Withdraw = 0x2e1a7d4d; // bytes4(keccak256('withdraw(uint256)'))
+uint256 constant Action_Ledger_Withdraw = 0xf108a7d2; // bytes4(keccak256('withdraw(uint256,address,string)'))
 
 contract Constants {}

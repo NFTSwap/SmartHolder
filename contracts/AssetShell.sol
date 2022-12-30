@@ -5,45 +5,31 @@ pragma experimental ABIEncoderV2;
 
 import './Asset.sol';
 
-contract AssetShell is ERC721_Module, IAssetShell {
+contract AssetShell is AssetBase, IAssetShell {
 	using Address for address;
 
 	bytes4 private constant _ERC721_RECEIVED = 0x150b7a02;
 	bytes4 private constant _INTERFACE_ID_ERC721 = 0x80ac58cd;
 
-	mapping(uint256 => AssetID) private _assetsMeta;
+	mapping(uint256 => AssetID) private _assetsMeta;   // tokenId => raw asset id
+	mapping(uint256 => uint256) private _minimumPrices; // tokenId => minimum price
 
-	struct TokenTransfer {
+	struct Locked {
 		address from;
 		address to;
-		uint256 blockNumber;
 		uint256 tokenId;
 	}
 
-	TokenTransfer public lastTransfer;
-	SaleType public saleType; // is opensea first or second sale
+	Locked    public locked;
+	SaleType  public saleType; // is opensea first or second sale
+	bool      private _RollBACK;
 
-	/*{
-		"name": "OpenSea Creatures",
-		"description": "OpenSea Creatures are adorable aquatic beings primarily for \
-		demonstrating what can be done using the OpenSea platform. Adopt one today to try out all the OpenSea buying, selling, and bidding feature set.",
-		"image": "external-link-url/image.png",
-		"external_link": "external-link-url",
-		"seller_fee_basis_points": 100, # Indicates a 1% seller fee.
-		"fee_recipient": "0xA97F337c39cccE66adfeCB2BF99C1DdC54C2D721" # Where seller fees will be paid to.
-	}*/
-	string public contractURI;// = "https://smart-dao.stars-mine.com/service-api/utils/getOpenseaContractJSON?";
-
-	function initAssetShell(
-		address host,      string memory name,          string memory description,
-		address operator,  string memory _contractURI,  SaleType _saleType
-	) external {
-		initModule(host, description, operator);
-		initERC721(name, name);
+	function initAssetShell(address host, address operator, SaleType _saleType, InitContractURI memory uri) external {
+		initAssetBase(host, operator, uri);
 		_registerInterface(AssetShell_Type);
 		_registerInterface(_ERC721_RECEIVED);
-		contractURI = _contractURI;
 		saleType = _saleType;
+		_RollBACK = false;
 	}
 
 	// @dev convert addr to standard ERC721 NFT,will be revered if add is invalid.
@@ -64,20 +50,26 @@ contract AssetShell is ERC721_Module, IAssetShell {
 		uint256 id = convertTokenID(address(token), tokenId);
 		AssetID storage asset = _assetsMeta[id];
 
-		if (data.length != 0) { // mint or withdrawTo
-			from = abi.decode(data, (address));
-		}
+		address to;
+		uint256 minimumPrice;
+
+		(to,minimumPrice) = abi.decode(data, (address, uint256));
+
 		require(asset.token == address(0), "#AssetShell#onERC721Received mint of asset already exists");
 		require(from != address(this), "#AssetShell#onERC721Received from not for myself");
 
 		asset.token = address(token);
 		asset.tokenId = tokenId;
+		_minimumPrices[id] = minimumPrice;
 
 		_mint(from, id);
 
 		return _ERC721_RECEIVED;
 	}
 
+	/**
+	 * @dev convertTokenID() convert meta token and token id to token id
+	 */
 	function convertTokenID(address metaToken, uint256 metaTokenId) pure public returns (uint256) {
 		return uint256(keccak256(abi.encodePacked(metaToken, metaTokenId)));
 	}
@@ -87,12 +79,18 @@ contract AssetShell is ERC721_Module, IAssetShell {
 		return IERC721Metadata(id.token).tokenURI(id.tokenId);
 	}
 
+	/**
+	 * @dev assetMeta(tokenId) Returns the asset meta data of this tokenId
+	 */
 	function assetMeta(uint256 tokenId) view public override returns (AssetID memory asset) {
 		asset = _assetsMeta[tokenId];
 		require(asset.token != address(0), "#AssetShell#assetMeta asset non exists");
 	}
 
-	function withdraw(uint256 tokenId) external override OnlyDAO {
+	/**
+	 * @dev withdraw() withdraw and unlock meta asset
+	 */
+	function withdraw(uint256 tokenId) external override Check(Action_Asset_Shell_Withdraw) {
 		AssetID storage asset = _assetsMeta[tokenId];
 		require(asset.token != address(0), "#AssetShell#withdraw withdraw of asset non exists");
 		withdrawTo(tokenId, ownerOf(tokenId), "");
@@ -102,32 +100,67 @@ contract AssetShell is ERC721_Module, IAssetShell {
 		AssetID storage asset = _assetsMeta[tokenId];
 		IERC721(asset.token).safeTransferFrom(address(this), to, asset.tokenId, data);
 		delete _assetsMeta[tokenId];
+		delete _minimumPrices[tokenId];
 		_burn(tokenId);
 	}
 
-	function _beforeTokenTransfer(address from, address to, uint256 tokenId, bytes memory _data) internal virtual override {
-		if (from == address(0) || to == address(0)) return;
-		if (lastTransfer.tokenId != 0) {
-			revert(string(abi.encodePacked("#AssetShell#_beforeTokenTransfer lastTransfer.tokenId == 0, from=", from, 
-				",to=", to,
-				",tokenId=", tokenId
-			)));
+	/**
+	 * @dev minimumPrice(tokenId) Returns the minimum price of this tokenId asset
+	 */
+	function minimumPrice(uint256 tokenId) view public returns (uint256) {
+		return _minimumPrices[tokenId];
+	}
+
+	function _afterTokenTransfer(address from, address to, uint256 tokenId, bytes memory _data) internal virtual override {
+		if (_RollBACK) return;
+
+		if (locked.tokenId != 0) { // RollBACK last transfer action
+			require(tokenId != locked.tokenId, "#AssetShell#_beforeTokenTransfer The transfer has been blocked");
+			_RollBACK = true;
+			_safeTransfer(locked.to, locked.from, locked.tokenId, "");
+			_RollBACK = false;
 		}
-		lastTransfer.from = from;
-		lastTransfer.to = to;
-		lastTransfer.blockNumber = block.number;
-		lastTransfer.tokenId = tokenId;
+
+		if (from != address(0) && to != address(0)) {
+			// lock asset
+			locked.from = from;
+			locked.to = to;
+			locked.tokenId = tokenId;
+
+			if (msg.value != 0) {
+				_receive(); // receive eth
+			}
+		}
+	}
+
+	/**
+	 * @dev _receive() receive eth transaction collection
+	 */
+	function _receive() private {
+		// require(locked.tokenId != 0, "#AssetShell#receive locked.tokenId != 0");
+		if (locked.tokenId == 0) return;
+		require(msg.value != 0, "#AssetShell#_receive msg.value != 0"); // price
+
+		address to      = locked.to;
+		uint256 tokenId = locked.tokenId;
+		uint256 price = msg.value * 10_000 / seller_fee_basis_points; // transfer price
+
+		// check transfer price
+		require(price >= _minimumPrices[tokenId], "#AssetShell#_receive price >= minimum price"); // price
+
+		AssetID memory asset = assetMeta(tokenId);
+		_host.ledger().assetIncome{value: msg.value}(asset.token, asset.tokenId, msg.sender, to, price, saleType);
+
+		Locked memory tmp;
+		locked = tmp; // unlock
+
+		if (saleType == SaleType.kFirst) {
+			bytes memory data = abi.encode(to, _minimumPrices[tokenId]);
+			withdrawTo(tokenId, address(_host.module(Module_ASSET_Second_ID)), data);
+		}
 	}
 
 	receive() external payable {
-		require(msg.value != 0, "#AssetShell#receive msg.value != 0"); // price
-		require(lastTransfer.tokenId != 0, "#AssetShell#receive lastTransfer.tokenId != 0");
-		AssetID memory asset = assetMeta(lastTransfer.tokenId);
-		_host.ledger().assetIncome{value: msg.value}(lastTransfer.to, asset.token, asset.tokenId, msg.sender, saleType);
-		if (saleType == SaleType.kOpenseaFirst) {
-			bytes memory data = abi.encode(lastTransfer.to);
-			withdrawTo(lastTransfer.tokenId, address(_host.module(Module_OPENSEA_Second_ID)), data);
-		}
-		lastTransfer.tokenId = 0;
+		_receive();
 	}
 }

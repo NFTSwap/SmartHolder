@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import '../openzeppelin/contracts/utils/Strings.sol';
 import './libs/ERC721.sol';
 import './libs/ERC165.sol';
 

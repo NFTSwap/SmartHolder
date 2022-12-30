@@ -40,8 +40,8 @@ interface IAssetShell is IModule, IERC721_1, IERC721Receiver {
 	}
 	enum SaleType {
 		kDefault,
-		kOpenseaFirst,
-		kOpenseaSecond
+		kFirst,
+		kSecond
 	}
 	function withdraw(uint256 tokenId) external;
 	function assetMeta(uint256 tokenId) view external returns (AssetID memory);
@@ -56,11 +56,15 @@ interface ILedger is IModule {
 	event Deposit(address indexed from, uint256 balance, string name, string description);
 	event Withdraw(address indexed target, uint256 balance, string description);
 	event Release(uint256 indexed member, address indexed to, uint256 balance);
-	event AssetIncome(address indexed token, uint256 indexed tokenId, 
-		address indexed source, uint256 balance, address to, IAssetShell.SaleType saleType
+	event AssetIncome(
+		address indexed token, uint256 indexed tokenId,
+		address indexed source, address to, uint256 balance, uint256 price, IAssetShell.SaleType saleType
 	);
 	function withdraw(uint256 amount, address target, string memory description) external payable;
-	function assetIncome(address to, address token, uint256 tokenId, address source, IAssetShell.SaleType saleType) external payable;
+	function assetIncome(
+		address token, uint256 tokenId,
+		address source, address to, uint256 price, IAssetShell.SaleType saleType
+	) external payable;
 }
 
 interface IMember is IModule, IERC721_1 {

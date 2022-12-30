@@ -287,6 +287,7 @@ abstract contract ERC721 is Context, IERC721_1 {
 		//solhint-disable-next-line max-line-length
 		require(_havePermission(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
 		_transfer(from, to, tokenId, "");
+		_afterTokenTransfer(from, to, tokenId, "");
 	}
 
 	/**
@@ -336,6 +337,7 @@ abstract contract ERC721 is Context, IERC721_1 {
 	function _safeTransfer(address from, address to, uint256 tokenId, bytes memory _data) internal virtual {
 		_transfer(from, to, tokenId, _data);
 		require(_checkOnERC721Received(from, to, tokenId, _data), "ERC721: transfer to non ERC721Receiver implementer");
+		_afterTokenTransfer(from, to, tokenId, _data);
 	}
 
 	/**
@@ -538,6 +540,11 @@ abstract contract ERC721 is Context, IERC721_1 {
 		* To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
 		*/
 	function _beforeTokenTransfer(address from, address to, uint256 tokenId, bytes memory _data) internal virtual {}
+
+	/**
+	 * @dev _afterTokenTransfer() Hook that is called after any token transfer. This includes minting
+	 */
+	function _afterTokenTransfer(address from, address to, uint256 tokenId, bytes memory _data) internal virtual {}
 
 	//@overwrite
 	function exists(uint256 id) view public returns (bool) {
