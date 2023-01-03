@@ -1,12 +1,12 @@
 {
   "goerli": {
     "Asset": {
-      "version": "69f9a7f112a013cdb6406d4242e4ad32b00c3f511286e11d6f7ba4385b320fd8",
-      "address": "0x0aE2763526E3c9a6ae68F30B2fD4a2DD70503ed5"
+      "version": "d283118ae0be8127535294b9b509d88d98d51462c4afcd2eec730fbc96e6230e",
+      "address": "0xc51351f18FF603B997E84257742403664180f0e3"
     },
     "AssetShell": {
-      "version": "c5bf53304ac364a2f826152490d1e887d57d7926e94f643487dc024f18fba4bf",
-      "address": "0xE9e70c00E5BF0400E3A295d97bAC986D2c9C349e"
+      "version": "ed5cfa155565f02a00b54765b2f2a9f90551c0813652e625b42324cb074542f2",
+      "address": "0xF0802b9Af5DC077fB04E2Cf713F812a88E01ca84"
     },
     "Ledger": {
       "version": "6834a15bd47a9249356349c951b5236ee20d57ae07e9c11cf1a41167c1845ec8",
