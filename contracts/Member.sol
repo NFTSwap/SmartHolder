@@ -9,12 +9,16 @@ import '../openzeppelin/contracts/utils/structs/EnumerableSet.sol';
 contract Member is IMember, ERC721_Module {
 	using EnumerableSet for EnumerableSet.UintSet;
 
-	mapping(uint256 => Info) private  _infoMap; // member info, member id => member info
-	mapping(uint256 => EnumerableSet.UintSet) private _permissions; // member info, member id => permissions set
-	EnumerableSet.UintSet    private  _infoList; // member table list
-	uint256                  private  _votes; // all vote total
-	uint256                  internal _executor; // executor
-	uint256[16]              private  __; // reserved storage space
+	struct Info0 {
+		Info                  info;
+		EnumerableSet.UintSet permissions; // permissions
+	}
+
+	mapping(uint256=>Info0) private  _infoMap; // member info, member id => member info
+	EnumerableSet.UintSet   private  _infoList; // member table list
+	uint256                 private  _votes; // all vote total
+	uint256                 internal _executor; // executor
+	uint256[16]             private  __; // reserved storage space
 
 	struct MintMemberArgs {
 		address   owner;
@@ -38,7 +42,8 @@ contract Member is IMember, ERC721_Module {
 	function mint(address owner, Info memory info, string memory tokenURI, uint256[] memory permissions) private {
 		_mint(owner, info.id);
 
-		Info storage info_ = _infoMap[info.id];
+		Info0 storage i0 = _infoMap[info.id];
+		Info storage info_ = i0.info;
 		info_.id           = info.id;
 		info_.name         = info.name;
 		info_.description  = info.description;
@@ -55,15 +60,14 @@ contract Member is IMember, ERC721_Module {
 
 		// add permissions
 		for (uint256 i = 0; i < permissions.length; i++)
-			_permissions[info.id].add(permissions[i]);
+			i0.permissions.add(permissions[i]);
 	}
 
 	function remove(uint256 id) public {
 		require(isApprovedOrOwner(msg.sender, id) || isPermissionDAO(), "#Member#remove No permission");
 		_burn(id);
-		_votes -= _infoMap[id].votes;
+		_votes -= _infoMap[id].info.votes;
 		delete _infoMap[id];
-		delete _permissions[id]; // delete permissions
 		_infoList.remove(id);
 	}
 
@@ -97,12 +101,12 @@ contract Member is IMember, ERC721_Module {
 
 	function getMemberInfo(uint256 id) view external override returns (Info memory) {
 		require(_exists(id), "#Member#info: info query for nonexistent member");
-		return _infoMap[id];
+		return _infoMap[id].info;
 	}
 
 	function setMemberInfo(uint256 id, string memory name, string memory description, string memory avatar) public {
 		require(ownerOf(id) == _msgSender(), "#Member#setMemberInfo: owner no match");
-		Info storage info_ = _infoMap[id];
+		Info storage info_ = _infoMap[id].info;
 		if (bytes(name).length != 0)        info_.name        = name;
 		if (bytes(description).length != 0) info_.description = description;
 		if (bytes(avatar).length != 0)      info_.avatar      = avatar;
@@ -114,7 +118,7 @@ contract Member is IMember, ERC721_Module {
 	}
 
 	function indexAt(uint256 index) view public override returns (Info memory) {
-		return _infoMap[_infoList.at(index)];
+		return _infoMap[_infoList.at(index)].info;
 	}
 
 	function isApprovedOrOwner(address spender, uint256 id) view public returns (bool) {
@@ -145,12 +149,12 @@ contract Member is IMember, ERC721_Module {
 	}
 
 	function isPermissionFrom(uint256 id, uint256 action) view public override returns (bool) {
-		return _permissions[id].contains(action);
+		return _infoMap[id].permissions.contains(action);
 	}
 
 	function addPermissions(uint256[] memory IDs, uint256[] memory actions) external OnlyDAO {
 		for (uint256 i = 0; i < IDs.length; i++) {
-			EnumerableSet.UintSet storage permissions = _permissions[IDs[i]];
+			EnumerableSet.UintSet storage permissions = _infoMap[IDs[i]].permissions;
 			for (uint256 j = 0; j < actions.length; j++)
 				permissions.add(actions[j]);
 		}
@@ -159,7 +163,7 @@ contract Member is IMember, ERC721_Module {
 
 	function removePermissions(uint256[] memory IDs, uint256[] memory actions) external OnlyDAO {
 		for (uint256 i = 0; i < IDs.length; i++) {
-			EnumerableSet.UintSet storage permissions = _permissions[IDs[i]];
+			EnumerableSet.UintSet storage permissions = _infoMap[IDs[i]].permissions;
 			for (uint256 j = 0; j < actions.length; j++)
 				permissions.remove(actions[j]);
 		}
@@ -168,7 +172,7 @@ contract Member is IMember, ERC721_Module {
 
 	function addVotes(uint256 id, int32 votes) external OnlyDAO {
 		require(_exists(id), "#Member#setVotes: info query for nonexistent member");
-		Info storage info = _infoMap[id];
+		Info storage info = _infoMap[id].info;
 
 		info.votes += uint32(votes);
 		_votes += uint32(votes);
@@ -182,8 +186,8 @@ contract Member is IMember, ERC721_Module {
 	function transferVotes(uint256 from, uint256 to, uint32 votes) external OnlyDAO {
 		require(_exists(from), "#Member#transferVotes: info query for nonexistent member from");
 		require(_exists(to), "#Member#transferVotes: info query for nonexistent member to");
-		Info storage infoFrom = _infoMap[from];
-		Info storage infoTo = _infoMap[to];
+		Info storage infoFrom = _infoMap[from].info;
+		Info storage infoTo = _infoMap[to].info;
 		require(infoFrom.votes >= votes, "#Member#transferVotes: not votes power enough");
 
 		infoFrom.votes -= uint32(votes);

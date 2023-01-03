@@ -48,7 +48,7 @@ contract AssetBase is ERC721_Module {
 		initERC721(uri.name, uri.name);
 		image = uri.image;
 		external_link = uri.external_link;
-		fee_recipient = uri.fee_recipient;
+		fee_recipient = uri.fee_recipient == address(0) ? address(this): uri.fee_recipient;
 		seller_fee_basis_points = uri.seller_fee_basis_points;
 		contractURIPrefix = uri.contractURIPrefix;
 	}

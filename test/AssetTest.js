@@ -3,12 +3,13 @@ const { expect, assert } = require("chai");
 const App = require("./util");
 const cryptoTx = require('crypto-tx');
 const DAO = artifacts.require("DAO.sol");
+// const Asset = artifacts.require("Asset.sol");
 
-contract('DAO', (accounts) => {
-	let app;
+contract('Asset', (accounts) => {
+	let DAOs;
 
 	before(async () => {
-		app = await App.create();
+		DAOs = await App.create();
 	});
 
 	context("A", () => {

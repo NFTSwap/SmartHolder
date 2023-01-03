@@ -21,8 +21,7 @@ contract Module is Upgrade, ERC165, PermissionCheck, IModule {
 		//ERC165(host).checkInterface(DAO_Type, "#Module#initModule dao host type not match");
 		_host = IDAO(host);
 		_description = description;
-
-		setOperator1(operator);
+		_operator = operator;
 	}
 
 	function isPermissionDAO() view internal override returns (bool) {
@@ -51,16 +50,8 @@ contract Module is Upgrade, ERC165, PermissionCheck, IModule {
 		emit Change(Change_Tag_Description, 0);
 	}
 
-	function setOperator1(address operator) internal {
-		if (operator != address(0)) {
-			if (operator.isContract())
-				ERC165(operator).checkInterface(VotePool_Type, "#Module#setOperator1 operator type not match");
-		}
-		_operator = operator;
-	}
-
 	function setOperator(address operator) external override OnlyDAO {
-		setOperator1(operator);
+		_operator = operator;
 		emit Change(Change_Tag_Operator, uint160(operator));
 	}
 

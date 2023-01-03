@@ -22,7 +22,8 @@ import './gen/VotePoolProxy.sol';
  * @title DAOs contract global DAOs manage
  */
 contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
-	using EnumerableSet for EnumerableSet.AddressSet;
+	// using EnumerableSet for EnumerableSet.AddressSet;
+	using EnumerableMap for EnumerableMap.UintToAddressMap;
 
 	struct DAOIMPLs {
 		address   DAO;
@@ -59,9 +60,9 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 		string  contractURIPrefix;
 	}
 
-	EnumerableSet.AddressSet private  _DAOs; // global DAOs list
-	DAOIMPLs                 public   defaultIMPLs; // default logic impl
-	uint256[50]              private  __; // reserved storage space
+	EnumerableMap.UintToAddressMap private  _DAOs; // global DAOs list
+	DAOIMPLs                       public   defaultIMPLs; // default logic impl
+	uint256[50]                    private  __; // reserved storage space
 
 	function initDAOs() external initializer {
 		initOwnable();
@@ -75,11 +76,15 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 	 * @dev deploy() deploy common voting DAO
 	 */
 	function deploy(
-		string           memory    name,              string           memory    mission,
-		string           memory    description,       address                    operator,
-		InitMemberArgs   memory    memberArgs,        InitVotePoolArgs memory    votePoolArgs
-	) external returns (IDAO) {
-		DAO host      = DAO( address(new DAOProxy(defaultIMPLs.DAO)) );
+		string           calldata    name,              string           calldata    mission,
+		string           calldata    description,       address                      operator,
+		InitMemberArgs   calldata    memberArgs,        InitVotePoolArgs calldata    votePoolArgs
+	) public returns (DAO host) {
+		uint256 id = uint256(keccak256(bytes(name)));
+
+		require(!_DAOs.contains(id), "#DAOs#deploy DAO with corresponding name already exists");
+
+		host          = DAO( address(new DAOProxy(defaultIMPLs.DAO)) );
 		Member member = Member( address(new MemberProxy(defaultIMPLs.Member)) );
 		VotePool root = VotePool( address(new VotePoolProxy(defaultIMPLs.VotePool)) );
 
@@ -87,33 +92,26 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 		root.initVotePool(address(host), votePoolArgs.description, votePoolArgs.lifespan);
 		host.initDAO(name, mission, description, address(root), operator, address(member));
 
-		emit Created(address(host));
+		_DAOs.set(id, address(host));
 
-		return host;
+		emit Created(address(host));
 	}
 
 	/**
 	 * @dev makeAssetSales() deploy asset sales DAO
 	 */
 	function deployAssetSalesDAO(
-		string             memory    name,              string             memory    mission,
-		string             memory    description,       address                      operator,
-		InitMemberArgs     memory    memberArgs,        InitVotePoolArgs   memory    votePoolArgs,
-		InitLedgerArgs     memory    ledgerArgs,        InitAssetArgs      memory    assetArgs
-	) external returns (IDAO) {
+		string             calldata    name,              string             calldata    mission,
+		string             calldata    description,       address                        operator,
+		InitMemberArgs     calldata    memberArgs,        InitVotePoolArgs   calldata    votePoolArgs,
+		InitLedgerArgs     calldata    ledgerArgs,        InitAssetArgs      calldata    assetArgs
+	) public returns (DAO host) {
 
-		DAO host      = DAO( address(new DAOProxy(defaultIMPLs.DAO)) );
-		Member member = Member( address(new MemberProxy(defaultIMPLs.Member)) );
-		VotePool root = VotePool( address(new VotePoolProxy(defaultIMPLs.VotePool)) );
-
-		member.initMember(address(host), memberArgs.name, memberArgs.description, address(0), memberArgs.members);
-		root.initVotePool(address(host), votePoolArgs.description, votePoolArgs.lifespan);
-		host.initDAO(name, mission, description, address(root), address(this), address(member));
-
+		host = deploy(name, mission, description, address(this), memberArgs, votePoolArgs);
 		// sales
-		Ledger ledger = Ledger( payable(address(new LedgerProxy(defaultIMPLs.Ledger))) );
-		Asset  asset = Asset( address(new AssetProxy(defaultIMPLs.Asset)));
-		AssetShell  assetFirst = AssetShell( payable(address(new AssetShellProxy(defaultIMPLs.AssetShell))));
+		Ledger      ledger      = Ledger( payable(address(new LedgerProxy(defaultIMPLs.Ledger))) );
+		Asset       asset       = Asset( address(new AssetProxy(defaultIMPLs.Asset)));
+		AssetShell  assetFirst  = AssetShell( payable(address(new AssetShellProxy(defaultIMPLs.AssetShell))));
 		AssetShell  assetSecond = AssetShell( payable(address(new AssetShellProxy(defaultIMPLs.AssetShell))));
 
 		AssetBase.InitContractURI memory uri;
@@ -142,8 +140,6 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 		host.setOperator(operator); // change to raw operator
 
 		emit Created(address(host));
-
-		return host;
 	}
 
 	/**
@@ -156,17 +152,26 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 	/**
 	 * @dev contains(address) is contains dao address
 	 */
-	function contains(address addr) view public returns (bool) {
-		return _DAOs.contains(addr);
+	function get(string memory name) view public returns (DAO) {
+		return DAO(_DAOs.get(uint256(keccak256(bytes(name)))));
 	}
 
 	/**
 	 * @dev at(id) get DAO object from index
 	 * @param index uint256 dao index
-	 * @return Returns the IDAO interface address
+	 * @return Returns the IDAO interface address and key
 	 */
-	function at(uint256 index) view external returns (IDAO) {
-		return IDAO(_DAOs.at(index));
+	function at(uint256 index) view external returns (DAO) {
+		address addr;
+		(, addr) = _DAOs.at(index);
+		return DAO(addr);
+	}
+
+	/**
+	 * @dev Returns the implementation contract address
+	 */
+	function impl() view external returns (address) {
+		return _impl;
 	}
 
 	/**

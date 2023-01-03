@@ -36,7 +36,19 @@ class Provider {
 		this.request(payload).then(e=>callback(null, e)).catch(callback);
 	}
 	async request(payload) {
-		let r = await req.request(this.url, { params: payload, method: 'POST', dataType: 'json' });
+		let retry = 2;
+		while(1) {
+			try {
+				var r = await req.request(this.url, { params: payload, method: 'POST', dataType: 'json' });
+				break;
+			} catch (err) {
+				if (retry--) {
+					console.warn(`   --- retry rpc request ${retry}`);
+				} else {
+					throw err;
+				}
+			}
+		}
 		let data = JSON.parse(r.data.toString('utf-8'));
 		return data;
 	}
@@ -68,7 +80,7 @@ module.exports = {
 				privateKeys: [walletKey],
 				provider: new Provider('https://goerli.infura.io/v3/c782e504a32b4070b414a037167ae8ff'),
 			}),
-			production: true,
+			production: false,
 		},
 		matic: {
 			network_id: 137,

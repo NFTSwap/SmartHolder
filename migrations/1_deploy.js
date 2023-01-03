@@ -2,7 +2,7 @@
 const fs = require('fs');
 const deployImpl = require('@openzeppelin/truffle-upgrades/dist/utils/deploy-impl');
 const genProxy = require('../gen-proxy');
-const {GEN_PROXY} = process.env;
+const {GEN_PROXY,TEST} = process.env;
 
 function deployInfo() {
 	try {
@@ -28,7 +28,8 @@ async function getDeployData(name, opts, args = []) {
 	let info = deployInfo()[opts.networks] || {};
 	let infoData = info[name] || {};
 	let prevVersion =  infoData.version || '';
-	let currentVersion = version.linkedWithoutMetadata || '';
+	//let currentVersion = version.linkedWithoutMetadata || '';
+	let currentVersion = version.withoutMetadata || '';
 	return {
 		opts,
 		name,
@@ -43,9 +44,10 @@ async function getDeployData(name, opts, args = []) {
 
 async function deploy(name, opts, args = [], initializer = async ()=>{}) {
 	let data = await getDeployData(name, opts, args);
+	let Contract = data.Contract;
 	if (data.hasUpdate) {
-		await opts.deployer.deploy(data.Contract, ...args);
-		let deployed = await data.Contract.deployed();
+		await opts.deployer.deploy(Contract, ...args);
+		let deployed = await Contract.deployed();
 		data.address = deployed.address;
 		await initializer(deployed);
 		if (opts.networks.indexOf('-fork') == -1) { // Not a simulator
@@ -57,10 +59,12 @@ async function deploy(name, opts, args = [], initializer = async ()=>{}) {
 }
 
 module.exports = async function(deployer, networks, accounts) {
-	if (GEN_PROXY == '1') {
+	if (TEST) return;
+	if (GEN_PROXY) {
 		await genProxy();
 		process.exit(0);
 	}
+
 	let opts = { deployer, networks };
 
 	// deploy all impl
@@ -76,19 +80,27 @@ module.exports = async function(deployer, networks, accounts) {
 	});
 
 	let DAOsObj = await DAOs.Contract.at(DAOsProxy.address);
+	let impl = await DAOsObj.impl();
+
+	// upgrade DAOs
+	if (impl != DAOs.address) {
+		await DAOsObj.upgrade(DAOs.address);
+		console.log('   call DAOsObj.upgrade(DAOs.address)');
+	}
+
 	let defaultIMPLs = await DAOsObj.defaultIMPLs();
 
 	if (
 		defaultIMPLs.DAO != DAO.address           || defaultIMPLs.Member != Member.address ||
 		defaultIMPLs.VotePool != VotePool.address || defaultIMPLs.Ledger != Ledger.address ||
-		defaultIMPLs.Asset != Member.Asset        || defaultIMPLs.AssetShell != Member.AssetShell
+		defaultIMPLs.Asset != Asset.address       || defaultIMPLs.AssetShell != AssetShell.address
 	) {
 		await DAOsObj.setDefaultIMPLs({
 			DAO: DAO.address,           Member: Member.address,
 			VotePool: VotePool.address, Ledger: Ledger.address,
 			Asset: Asset.address,       AssetShell: AssetShell.address,
 		});
-		console.log('call DAOs.setDefaultIMPLs()');
+		console.log('   call DAOsObj.setDefaultIMPLs()');
 	}
 
 	//console.log(Asset.address, Asset.version);

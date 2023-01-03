@@ -1,8 +1,13 @@
 
 NET     ?= goerli
 NODE    ?= node
+DEBUG   ?=
 
-.PHONY: build deploy deploy-impl deploy-proxy
+ifeq ($(DEBUG),1)
+	DEBUG = --inspect-brk=9230
+endif
+
+.PHONY: build deploy test
 
 # build all and proxy
 build:
@@ -19,4 +24,7 @@ build:
 
 # deploy or upgrade
 deploy: build
-	$(NODE) ./node_modules/.bin/truffle deploy --network $(NET)
+	$(NODE) $(DEBUG) ./node_modules/.bin/truffle deploy --network $(NET)
+
+test:
+	TEST=1 $(NODE) $(DEBUG)  ./node_modules/.bin/truffle test --network $(NET) --compile-none
