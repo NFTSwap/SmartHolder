@@ -53,24 +53,24 @@ contract AssetBase is ERC721_Module {
 		contractURIPrefix = uri.contractURIPrefix;
 	}
 
-	bytes16 private constant _SYMBOLS = "0123456789abcdef";
-
 	function contractURI() view public returns (string memory uri) {
 		bytes memory a = abi.encodePacked("?name=hex,",                      bytes(name()).toHexString());
 		bytes memory b = abi.encodePacked("&description=hex,",               bytes(_description).toHexString());
 		bytes memory c = abi.encodePacked("&image=hex,",                     bytes(image).toHexString());
 		bytes memory d = abi.encodePacked("&external_link=hex,",             bytes(external_link).toHexString());
-		bytes memory e = abi.encodePacked("&seller_fee_basis_points=hex,",   uint256(seller_fee_basis_points).toString());
+		bytes memory e = abi.encodePacked("&seller_fee_basis_points=",       uint256(seller_fee_basis_points).toString());
 		bytes memory f = abi.encodePacked("&fee_recipient=",                 fee_recipient.toHexString());
 		uri = string(abi.encodePacked(contractURIPrefix, a, b, c, d, e, f));
 	}
 
 	function set_seller_fee_basis_points(uint32 value) external Check(Action_DAO_set_seller_fee_basis_points) {
 		seller_fee_basis_points = value;
+		emit Change(Change_Tag_Asset_set_seller_fee_basis_points, value);
 	}
 
 	function set_fee_recipient(address recipient) external OnlyDAO {
 		fee_recipient = recipient;
+		emit Change(Change_Tag_Asset_set_fee_recipient, uint160(recipient));
 	}
 }
 

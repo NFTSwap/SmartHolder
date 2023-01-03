@@ -29,7 +29,7 @@ class Application {
 		this.deployInfo = require('../deployInfo')[config.network];
 		await this.initConfigure();
 		this.DAOs = await DAOs.at(this.deployInfo.DAOsProxy.address);
-		await this.deployAssetSalesDAO(); // deploy DAO
+		this.DAO = await this.deployAssetSalesDAO(); // deploy DAO
 		return this;
 	}
 

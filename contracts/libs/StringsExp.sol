@@ -5,15 +5,14 @@ library StringsExp {
 	bytes16 private constant _SYMBOLS = "0123456789abcdef";
 
 	/**
-	 * @dev toHexString() 
+	 * @dev toHexString()
 	 */
 	function toHexString(bytes memory value) internal pure returns (string memory) {
-		uint256 length = 2 * value.length;
-		bytes memory buffer = new bytes(length);
-		for (uint256 i = 0; i < length; i+=2) {
+		bytes memory buffer = new bytes(2 * value.length);
+		for (uint256 i = 0; i < value.length; i++) {
 			uint8 b = uint8(value[i]);
-			buffer[i] = _SYMBOLS[b & 0xf];
-			buffer[i+1] = _SYMBOLS[(b >> 4)];
+			buffer[(i<<1)  ] = _SYMBOLS[b >> 4];
+			buffer[(i<<1)+1] = _SYMBOLS[b & 0xf];
 		}
 		return string(buffer);
 	}

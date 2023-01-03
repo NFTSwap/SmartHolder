@@ -1,32 +1,32 @@
 {
   "goerli": {
     "Asset": {
-      "version": "e009b5dbc7d02cf26a720c170c16f645a6f31a7c8201e18b4463f3cfa4a0223c",
-      "address": "0x873B16803ca62BBFdAea1Db38F073Af888e6EbF9"
+      "version": "69f9a7f112a013cdb6406d4242e4ad32b00c3f511286e11d6f7ba4385b320fd8",
+      "address": "0x0aE2763526E3c9a6ae68F30B2fD4a2DD70503ed5"
     },
     "AssetShell": {
-      "version": "29b341a3871d83ddd38c7f97c5eb0f66aaef600536871def3e8ad8af7068a5b7",
-      "address": "0x586f2bF353AA98Ddfce16A48546F9016739FA4Dc"
+      "version": "c5bf53304ac364a2f826152490d1e887d57d7926e94f643487dc024f18fba4bf",
+      "address": "0xE9e70c00E5BF0400E3A295d97bAC986D2c9C349e"
     },
     "Ledger": {
-      "version": "3584ab512fc86db28498fadf6d626009a573424d2a0eda8d9925ba23bc1605a2",
-      "address": "0xF2B080D4D8dcB0b940582a85236FcAE04E9E2C4F"
+      "version": "6834a15bd47a9249356349c951b5236ee20d57ae07e9c11cf1a41167c1845ec8",
+      "address": "0x1b8db32344B6A797c79b328d4323beFfdfa32f1B"
     },
     "Member": {
-      "version": "2f6e363d4a0704e1630d05c2fbf2244580ee5782f2ebcb25d5116c13c64f298c",
-      "address": "0x9A3D92e42b37040C38DBE4dB1e5D3d39Ff7DD09F"
+      "version": "44a6b6fa29c776ebcd7cfc8df1c01bc11dbd2f8436c6d0ed8dca2e966fa586bb",
+      "address": "0xA66D6247DC4A5dE048ab7F98B75d84E6717Ec127"
     },
     "VotePool": {
       "version": "11dd9d8863dc51bff967d6cd8fd327ba4b16b7b7c971a6ad4d9b7467a88b068a",
       "address": "0x03E7720aF6FDA9f56BFa072Be104fa2bE4819050"
     },
     "DAO": {
-      "version": "8248e663a0ff92fd3d1468bc319f81737af80d0abdbeaf443cc156ed0fea280d",
-      "address": "0x28B7a436613c38369C3C88b86b88bf8fCBEE1E0F"
+      "version": "ed02d3eb9a05b1815f05e6027028386f075b952708e816df8d12fb99d43ca2e6",
+      "address": "0xfBe8a2C40c1F065045F41757cBe0F741825E62f3"
     },
     "DAOs": {
-      "version": "e9fd03863ca108032feb3d7fa36dce9200d7bffaf25a9b9648f8951217bb342a",
-      "address": "0xddA50cC7630d468408b56E3352dc17Bd92B16A36"
+      "version": "64ee523b67af66a2b7de4a85fa31e1c2851a7570649b4ce862a44d3f97fdd8e8",
+      "address": "0x7e14aC40182CeDAacD310d268cCA42559D1cFd39"
     },
     "DAOsProxy": {
       "version": "93b79a147f589ef2243f1351f34bb6a26915a39a93ad935346b107c7dc7d0988",
