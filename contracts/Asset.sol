@@ -63,7 +63,7 @@ contract AssetBase is ERC721_Module {
 		uri = string(abi.encodePacked(contractURIPrefix, a, b, c, d, e, f));
 	}
 
-	function set_seller_fee_basis_points(uint32 value) external Check(Action_DAO_set_seller_fee_basis_points) {
+	function set_seller_fee_basis_points(uint32 value) external Check(Action_Asset_set_seller_fee_basis_points) {
 		seller_fee_basis_points = value;
 		emit Change(Change_Tag_Asset_set_seller_fee_basis_points, value);
 	}

@@ -9,7 +9,7 @@ endif
 
 .PHONY: build deploy test
 
-# build all and proxy
+# Build all and proxy
 build:
 	if [ -f contracts/DAOs.sol ]; \
 		then mv contracts/DAOs.sol contracts/DAOs.sol.bk;\
@@ -22,9 +22,10 @@ build:
 	npm run build-proxy
 	npm run build
 
-# deploy or upgrade
+# Deploy or upgrade
 deploy: build
 	$(NODE) $(DEBUG) ./node_modules/.bin/truffle deploy --network $(NET)
 
+# Deploy contracts before testing
 test:
 	TEST=1 $(NODE) $(DEBUG)  ./node_modules/.bin/truffle test --network $(NET) --compile-none

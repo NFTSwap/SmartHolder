@@ -27,6 +27,7 @@ uint256 constant Change_Tag_DAO_Mission = 4;
 uint256 constant Change_Tag_DAO_Module = 5;
 uint256 constant Change_Tag_Asset_set_seller_fee_basis_points = 6;
 uint256 constant Change_Tag_Asset_set_fee_recipient = 7;
+uint256 constant Change_Tag_Member_Set_Executor = 8;
 
 // Action Permission defines
 uint256 constant Action_Member_Create = 0x22a25870; // bytes4(keccak256('create(address,string memory,Info memory,uint256[] memory)'))
@@ -35,7 +36,7 @@ uint256 constant Action_VotePool_Vote = 0x678ea396;  // bytes4(keccak256('vote(u
 uint256 constant Action_Asset_SafeMint = 0x59baef2a; // bytes4(keccak256('safeMint(address,uint256,string memory,bytes calldata)'))
 uint256 constant Action_DAO_Settings = 0xd0a4ad96; // bytes4(keccak256('DAO::settings()'))
 uint256 constant Action_DAO_SetModule = 0x5d29163; // bytes4(keccak256('setModule(uint256,address)'))
-uint256 constant Action_DAO_set_seller_fee_basis_points = 0x91eb3dee; // bytes4(keccak256('set_seller_fee_basis_points(uint32)'))
+uint256 constant Action_Asset_set_seller_fee_basis_points = 0x91eb3dee; // bytes4(keccak256('set_seller_fee_basis_points(uint32)'))
 uint256 constant Action_Asset_Shell_Withdraw = 0x2e1a7d4d; // bytes4(keccak256('withdraw(uint256)'))
 uint256 constant Action_Ledger_Withdraw = 0xf108a7d2; // bytes4(keccak256('withdraw(uint256,address,string)'))
 

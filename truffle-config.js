@@ -18,6 +18,7 @@
  *
  */
 
+const somes = require('somes').default;
 const req = require('somes/request');
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 
@@ -36,26 +37,31 @@ class Provider {
 		this.request(payload).then(e=>callback(null, e)).catch(callback);
 	}
 	async request(payload) {
-		let retry = 2;
+		let retry = 3;
 		while(1) {
 			try {
-				var r = await req.request(this.url, { params: payload, method: 'POST', dataType: 'json' });
-				break;
+				//let url = this.url[somes.random(0, this.url.length-1)];
+				// console.log('--------------', this.url, payload);
+				let r = await req.request(this.url, { params: payload, method: 'POST', dataType: 'json' });
+				let data = JSON.parse(r.data.toString('utf-8'));
+				// console.log('--------------', data)
+				return data;
 			} catch (err) {
 				if (retry--) {
-					console.warn(`   --- retry rpc request ${retry}`);
+					// console.warn(`   --- retry rpc request ${retry}`);
 				} else {
 					throw err;
 				}
 			}
 		}
-		let data = JSON.parse(r.data.toString('utf-8'));
-		return data;
 	}
 }
 
-// address 0xdF359Fc681CD24f40b2DcdBd1C30AA413EF64993
-const walletKey = cfg.walletKey || '635bab5b876bf4bca5162954f6a372bfcb601f558b9755f7ffd83070583e99df';
+const walletKeys0 = [
+	'086e4a8871fc21995d67cddcec5cc230ff6b826c8def7faafaffde8b7222279a', // 0x8CCDD1B199eb2AF1BbcE21b525b2ea8Fc6FC1B31
+	'787822bf9bcb4773d4c0a57cee15a06ec807259573200a1752776fea86e71306', // 0x1900D7066fF7498f59BC4ABc3141dC3AE6Fb2c99
+];
+const walletKeys = cfg.walletKeys || walletKeys0;
 
 module.exports = {
 	/**
@@ -77,15 +83,18 @@ module.exports = {
 		goerli: {
 			network_id: 5,
 			provider: new HDWalletProvider({
-				privateKeys: [walletKey],
-				provider: new Provider('https://goerli.infura.io/v3/c782e504a32b4070b414a037167ae8ff'),
+				privateKeys: walletKeys,
+				provider: new Provider(
+					'https://goerli.infura.io/v3/6b4f3897597e41d1adc12b7447c84767'
+					// 'https://eth-goerli.g.alchemy.com/v2/HQmL43x9rRAXLbBBY4rqi2ugNLBYU-Lc'
+				),
 			}),
 			production: false,
 		},
 		matic: {
 			network_id: 137,
 			provider: new HDWalletProvider({
-				privateKeys: [walletKey],
+				privateKeys: walletKeys,
 				provider: new Provider('https://rpc-mainnet.maticvigil.com/v1/ef8f16191b474bb494f33283a81a38487e4dc245'),
 			}),
 			production: true,

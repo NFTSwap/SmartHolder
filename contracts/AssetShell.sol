@@ -63,7 +63,7 @@ contract AssetShell is AssetBase, IAssetShell {
 		ad.meta.tokenId = tokenId;
 		ad.minimumPrice = price;
 
-		_mint(from, id);
+		_mint(to, id);
 
 		return _ERC721_RECEIVED;
 	}
@@ -108,6 +108,13 @@ contract AssetShell is AssetBase, IAssetShell {
 	}
 
 	/**
+	 * @dev Returns whether the token is locked
+	 */
+	function isLocked(uint256 tokenId) view public returns (bool) {
+		return _assetsData[tokenId].locked != address(0);
+	}
+
+	/**
 	 * @dev minimumPrice(tokenId) Returns the minimum price of this tokenId asset
 	 */
 	function minimumPrice(uint256 tokenId) view public returns (uint256) {
@@ -120,18 +127,13 @@ contract AssetShell is AssetBase, IAssetShell {
 	function _afterTokenTransfer(address from, address to, uint256 tokenId, bytes memory _data) internal virtual override {
 		AssetData storage ad = _assetsData[tokenId];
 
-		if (ad.locked == address(0)) { // not lock
-			_lastLocked = tokenId;
-			ad.locked = from; // lock asset
-			if (msg.value != 0) { // can unlock now
-				unlock(tokenId); // receive eth and unlock asset
-			}
-		} else { //  transfer out from the exchange
-			require(msg.value != 0, "#AssetShell#_afterTokenTransfer The asset has been locked and cannot be transfer");
-			// Non contract transfer out needs to be unlocked first
-			require(from.isContract(), "#AssetShell#_afterTokenTransfer You need to unlock the asset first");
-			unlock(tokenId); // unlock asset
+		if (ad.locked != address(0)) { //  transfer out from the exchange
+			// Non contract transfer out needs to be unlocked first and the last lock cannot be a contract
+			require(!ad.locked.isContract(), "#AssetShell#_afterTokenTransfer 1 You need to unlock the asset first");
+			require(from.isContract(), "#AssetShell#_afterTokenTransfer 2 You need to unlock the asset first");
 		}
+		ad.locked = from; // lock asset
+		_lastLocked = tokenId;
 	}
 
 	/**

@@ -5,28 +5,28 @@
       "address": "0xc51351f18FF603B997E84257742403664180f0e3"
     },
     "AssetShell": {
-      "version": "ed5cfa155565f02a00b54765b2f2a9f90551c0813652e625b42324cb074542f2",
-      "address": "0xF0802b9Af5DC077fB04E2Cf713F812a88E01ca84"
+      "version": "4a436c5d5c030ee835d82614dfd281e2c8eead76c4964b73b7565859c5ee26e5",
+      "address": "0x8da66272975099c4e726583D6e8287151E52349C"
     },
     "Ledger": {
       "version": "6834a15bd47a9249356349c951b5236ee20d57ae07e9c11cf1a41167c1845ec8",
       "address": "0x1b8db32344B6A797c79b328d4323beFfdfa32f1B"
     },
     "Member": {
-      "version": "44a6b6fa29c776ebcd7cfc8df1c01bc11dbd2f8436c6d0ed8dca2e966fa586bb",
-      "address": "0xA66D6247DC4A5dE048ab7F98B75d84E6717Ec127"
+      "version": "f7bb4c23d0e956da9bdcff5b69f8a18e58094db01d49c01b5c496515bd031707",
+      "address": "0x289A3b6092Ad9658c527a4a3FBC3072Ec94A934E"
     },
     "VotePool": {
-      "version": "11dd9d8863dc51bff967d6cd8fd327ba4b16b7b7c971a6ad4d9b7467a88b068a",
-      "address": "0x03E7720aF6FDA9f56BFa072Be104fa2bE4819050"
+      "version": "c5b44a675b293eae9e01871b591d9110637eb66e7bdb0092453e5f449ee4241f",
+      "address": "0x5B5DA848Ce67d9c958ff621a6E6237B29dFd4644"
     },
     "DAO": {
       "version": "ed02d3eb9a05b1815f05e6027028386f075b952708e816df8d12fb99d43ca2e6",
       "address": "0xfBe8a2C40c1F065045F41757cBe0F741825E62f3"
     },
     "DAOs": {
-      "version": "64ee523b67af66a2b7de4a85fa31e1c2851a7570649b4ce862a44d3f97fdd8e8",
-      "address": "0x7e14aC40182CeDAacD310d268cCA42559D1cFd39"
+      "version": "b37825d86d830bcc845d8f9b516d702349e4e0092489a1eea6625baaf15ca7de",
+      "address": "0x78CeE27bd1cf715C3B37b78deDFc3A84eb8f757b"
     },
     "DAOsProxy": {
       "version": "93b79a147f589ef2243f1351f34bb6a26915a39a93ad935346b107c7dc7d0988",

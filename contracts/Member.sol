@@ -136,6 +136,7 @@ contract Member is IMember, ERC721_Module {
 	function setExecutor(uint256 id) public OnlyDAO {
 		require(_exists(id), "#Member#setExecutor: info query for nonexistent member");
 		_executor = id;
+		emit Change(Change_Tag_Member_Set_Executor, uint160(id));
 	}
 
 	function isPermission(address owner, uint256 action) view external override returns (bool) {

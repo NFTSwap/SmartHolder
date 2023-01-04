@@ -60,11 +60,10 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 	}
 
 	function getProposal(uint256 id) view public returns (Proposal memory) {
-		require(exists(id), "#VotePool#proposal proposal not exists");
-		return _proposalMap[id];
+		return proposal(id);
 	}
 
-	function proposal(uint256 id) private returns (Proposal storage) {
+	function proposal(uint256 id) view private returns (Proposal storage) {
 		require(exists(id), "#VotePool#proposal proposal not exists");
 		return _proposalMap[id];
 	}

@@ -138,8 +138,6 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 		host.setModule(Module_ASSET_Second_ID, address(assetSecond));
 
 		host.setOperator(operator); // change to raw operator
-
-		emit Created(address(host));
 	}
 
 	/**
