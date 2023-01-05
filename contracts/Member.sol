@@ -6,10 +6,13 @@ pragma experimental ABIEncoderV2;
 import './Asset.sol';
 import './libs/StringsExp.sol';
 import '../openzeppelin/contracts/utils/structs/EnumerableSet.sol';
+import '../openzeppelin/contracts/utils/Strings.sol';
 
 contract Member is IMember, ERC721_Module {
 	using EnumerableSet for EnumerableSet.UintSet;
 	using StringsExp for bytes;
+	using Strings for uint256;
+	using Strings for address;
 
 	struct Info0 {
 		Info                  info;
@@ -70,7 +73,7 @@ contract Member is IMember, ERC721_Module {
 	}
 
 	function create(
-		address owner, Info memory info,   uint256[] memory permissions
+		address owner, Info memory info, uint256[] memory permissions
 	) external Check(Action_Member_Create)
 	{
 		mint(owner, info, permissions);
@@ -91,6 +94,40 @@ contract Member is IMember, ERC721_Module {
 		mint(owner, info, permissions);
 	}
 
+	/**
+	 * @dev request join to DAO, create join vote proposal
+	 */
+	function requestJoin(address owner, Info memory info, uint256[] memory permissions) public returns (uint256 id) {
+		require(owner != address(0), "#Member#requestJoin mint to the zero address");
+		require(!_exists(info.id), "#Member#requestJoin token already minted");
+
+		uint256 salt = block.number / 5000;
+		id = uint256(keccak256(abi.encodePacked("requestJoin", msg.sender.toHexString(), salt.toString())));
+
+		address[] memory target = new address[](1);
+		bytes[] memory data = new bytes[](1);
+
+		target[0] = address(this);
+		data[0] = abi.encodeWithSelector(this.create.selector, owner, info, permissions);
+
+		IVotePool.Proposal memory pro;
+		pro.id          = id;
+		pro.originId    = 0; // member id
+		pro.target      = target;
+		pro.lifespan    = 0;
+		pro.passRate    = 5001;
+		pro.loopCount   = 0;
+		pro.loopTime    = 0;
+		pro.name        = "request join to DAO";
+		pro.description = info.name;
+		pro.data        = data;
+
+		IVotePool(_host.root()).create(pro);
+	}
+
+	/**
+	 * @dev Returns the token URI of member
+	 */
 	function tokenURI(uint256 tokenId) view public override(ERC721,IERC721Metadata) returns (string memory uri) {
 		Info storage info = _infoMap[tokenId].info;
 		bytes memory a = abi.encodePacked("?name=hex,",                      bytes(info.name).toHexString());

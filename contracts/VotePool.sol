@@ -60,10 +60,10 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 	}
 
 	function getProposal(uint256 id) view public returns (Proposal memory) {
-		return proposal(id);
+		return _proposal(id);
 	}
 
-	function proposal(uint256 id) view private returns (Proposal storage) {
+	function _proposal(uint256 id) view private returns (Proposal storage) {
 		require(exists(id), "#VotePool#proposal proposal not exists");
 		return _proposalMap[id];
 	}
@@ -72,37 +72,42 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 		return _proposalMap[id].id != 0;
 	}
 
-	function create(Proposal memory arg0) public CheckFrom(arg0.originId, Action_VotePool_Create) {
-		require(!exists(arg0.id), "#VotePool#create proposal already exists");
-		if (arg0.lifespan != 0)
-			require(arg0.lifespan >= lifespan, "#VotePool#create proposal lifespan not less than 7 days");
-		require(arg0.passRate > 5_000, "#VotePool#create proposal vote pass rate not less than 50%");
-		require(_host.member().ownerOf(arg0.originId) == msg.sender, "#VotePool#create No call permission");
+	function create(Proposal memory arg0) public {
+		// check permission
+		if (msg.sender != address(_host.member())) {
+			checkFrom(arg0.originId, Action_VotePool_Create);
+		}
 
+		require(!exists(arg0.id), "#VotePool#create proposal already exists");
+		require(arg0.passRate > 5_000, "#VotePool#create proposal vote pass rate not less than 50%");
+
+		if (arg0.lifespan != 0) {
+			require(arg0.lifespan >= lifespan, "#VotePool#create proposal lifespan not less than 7 days");
+		}
 		if (arg0.loopCount != 0) {
 			require(arg0.loopTime >= 1 minutes, "#VotePool#create Loop time must be greater than 1 minute");
 		}
 		Proposal storage obj = _proposalMap[arg0.id];
 
-		obj.id = arg0.id;
-		obj.name = arg0.name;
+		obj.id          = arg0.id;
+		obj.name        = arg0.name;
 		obj.description = arg0.description;
-		obj.target = arg0.target;
-		obj.origin = msg.sender;
-		obj.originId = arg0.originId;
-		obj.data = arg0.data;
-		obj.lifespan = arg0.lifespan;
-		obj.expiry = arg0.lifespan == 0 ? 0: block.timestamp + arg0.lifespan;
-		obj.passRate = arg0.passRate > 10_000 ? 10_000: arg0.passRate;
-		obj.loopCount = arg0.loopCount;
-		obj.loopTime = arg0.loopTime;
-		obj.voteTotal = 0;
-		obj.agreeTotal = 0;
+		obj.target      = arg0.target;
+		obj.origin      = msg.sender;
+		obj.originId    = arg0.originId;
+		obj.data        = arg0.data;
+		obj.lifespan    = arg0.lifespan;
+		obj.expiry      = arg0.lifespan == 0 ? 0: block.timestamp + arg0.lifespan;
+		obj.passRate    = arg0.passRate > 10_000 ? 10_000: arg0.passRate;
+		obj.loopCount   = arg0.loopCount;
+		obj.loopTime    = arg0.loopTime;
+		obj.voteTotal   = 0;
+		obj.agreeTotal  = 0;
 		obj.executeTime = 0;
-		obj.idx = _proposalList.length;
-		obj.isAgree = false;
-		obj.isClose = false;
-		obj.isExecuted = false;
+		obj.idx         = _proposalList.length;
+		obj.isAgree     = false;
+		obj.isClose     = false;
+		obj.isExecuted  = false;
 
 		_proposalList.push(arg0.id);
 
@@ -116,18 +121,18 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 		string memory name,        string memory description,
 		uint256       originId,    bytes[] memory  data
 	) external {
-		Proposal memory proposal;
-		proposal.id = id;
-		proposal.originId = originId; // member id
-		proposal.target = target;
-		proposal.lifespan = lifespan;
-		proposal.passRate = passRate;
-		proposal.loopCount = loopCount;
-		proposal.loopTime = loopTime;
-		proposal.name = name;
-		proposal.description = description;
-		proposal.data = data;
-		create(proposal);
+		Proposal memory pro;
+		pro.id          = id;
+		pro.originId    = originId; // member id
+		pro.target      = target;
+		pro.lifespan    = lifespan;
+		pro.passRate    = passRate;
+		pro.loopCount   = loopCount;
+		pro.loopTime    = loopTime;
+		pro.name        = name;
+		pro.description = description;
+		pro.data        = data;
+		create(pro);
 	}
 
 	function abs(int256 value) pure internal returns (uint256) {
@@ -135,7 +140,7 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 	}
 
 	function vote(uint256 id, uint256 member, int256 votes, bool tryExecute) external Check(Action_VotePool_Vote) {
-		Proposal storage obj = proposal(id);
+		Proposal storage obj = _proposal(id);
 		IMember.Info memory info = _host.member().getMemberInfo(member);
 
 		require(votes != 0, "#VotePool#vote parameter error, votes==0");
@@ -161,7 +166,7 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 	* @dev try close proposal
 	*/
 	function tryClose(uint256 id, bool tryExecute) public override {
-		Proposal storage obj = proposal(id);
+		Proposal storage obj = _proposal(id);
 		require(!obj.isClose, "#VotePool#tryClose Voting has been closed");
 
 		uint256 votes  = _host.member().votes();
@@ -190,7 +195,7 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 	}
 
 	function execute(uint256 id) public {
-		Proposal storage obj = proposal(id);
+		Proposal storage obj = _proposal(id);
 
 		require(obj.isAgree, "#VotePool#execute Proposal was not passed");
 		require(!obj.isExecuted, "#VotePool#execute Resolution has been implemented");

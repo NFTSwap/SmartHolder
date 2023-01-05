@@ -14,7 +14,7 @@ abstract contract PermissionCheck {
 		* @dev Throws if called by any account other than the owner.
 		*/
 	modifier OnlyDAO() {
-		require(isPermissionDAO(), "#PermissionCheck#Check() caller does not have permission");
+		require(isPermissionDAO(), "#PermissionCheck#Check caller does not have permission");
 		_;
 	}
 
@@ -23,14 +23,20 @@ abstract contract PermissionCheck {
 	 */
 	modifier Check(uint256 action) {
 		if (!isPermissionDAO())
-			require(_host.member().isPermission(msg.sender, action), "#PermissionCheck#Check(uint256) caller does not have permission");
+			require(_host.member().isPermission(msg.sender, action), "#PermissionCheck#Check caller does not have permission");
 		_;
 	}
 
 	modifier CheckFrom(uint256 memberId, uint256 action) {
-		if (!isPermissionDAO())
-			require(_host.member().isPermissionFrom(memberId, action), "#PermissionCheck#Check(uint256,uint256) caller does not have permission");
+		checkFrom(memberId, action);
 		_;
+	}
+
+	function checkFrom(uint256 memberId, uint256 action) view internal {
+		if (!isPermissionDAO()) {
+			require(_host.member().ownerOf(memberId) == msg.sender, "#PermissionCheck#checkFrom member owner mismatch");
+			require(_host.member().isPermissionFrom(memberId, action), "#PermissionCheck#checkFrom member does not have permission");
+		}
 	}
 
 	function isPermissionDAO() view internal virtual returns (bool);

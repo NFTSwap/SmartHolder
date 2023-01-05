@@ -13,8 +13,8 @@
       "address": "0x1b8db32344B6A797c79b328d4323beFfdfa32f1B"
     },
     "Member": {
-      "version": "1e8f3a06b61e1c2dd0cf0d9b50dd899e54788377005c1fa7c2f823c71e2c7de5",
-      "address": "0x79AAEbfeBdAc7f4f2C88bC4212F829D64EcCE72A"
+      "version": "f37b4bbd153a8a6a35301725c9e602b31ed0825406478450e5ad69a3440150bd",
+      "address": "0x4E474d76f1354053c3bbc8cdB21262b0728a961E"
     },
     "VotePool": {
       "version": "c5b44a675b293eae9e01871b591d9110637eb66e7bdb0092453e5f449ee4241f",
@@ -25,8 +25,8 @@
       "address": "0xfBe8a2C40c1F065045F41757cBe0F741825E62f3"
     },
     "DAOs": {
-      "version": "59c1df5f84b13edc7477ecf5e5c1c1b4ca9af2093475c456dc68c449b90be8c7",
-      "address": "0x603ebA2226ADCB2D617eBd5ee86622c1971D2363"
+      "version": "670054b348c21733936eca3af0c8bb304e97069af1bdd831ec389fd62ef2c1c3",
+      "address": "0x3F637e699ff3204c9c79B2e002Cb1A94Da344e5d"
     },
     "DAOsProxy": {
       "version": "93b79a147f589ef2243f1351f34bb6a26915a39a93ad935346b107c7dc7d0988",
