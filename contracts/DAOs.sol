@@ -37,6 +37,7 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 	struct InitMemberArgs {
 		string name;
 		string description;
+		string baseURI;
 		Member.MintMemberArgs[] members;
 	}
 
@@ -88,7 +89,7 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 		Member member = Member( address(new MemberProxy(defaultIMPLs.Member)) );
 		VotePool root = VotePool( address(new VotePoolProxy(defaultIMPLs.VotePool)) );
 
-		member.initMember(address(host), memberArgs.name, memberArgs.description, address(0), memberArgs.members);
+		member.initMember(address(host), memberArgs.name, memberArgs.description, memberArgs.baseURI, address(0), memberArgs.members);
 		root.initVotePool(address(host), votePoolArgs.description, votePoolArgs.lifespan);
 		host.initDAO(name, mission, description, address(root), operator, address(member));
 

@@ -4,10 +4,12 @@ pragma solidity 0.8.17;
 pragma experimental ABIEncoderV2;
 
 import './Asset.sol';
+import './libs/StringsExp.sol';
 import '../openzeppelin/contracts/utils/structs/EnumerableSet.sol';
 
 contract Member is IMember, ERC721_Module {
 	using EnumerableSet for EnumerableSet.UintSet;
+	using StringsExp for bytes;
 
 	struct Info0 {
 		Info                  info;
@@ -23,40 +25,36 @@ contract Member is IMember, ERC721_Module {
 	struct MintMemberArgs {
 		address   owner;
 		Info      info;
-		string    tokenURI;
 		uint256[] permissions;
 	}
 
 	function initMember(
 		address host, string memory name, string memory description,
-		address operator, MintMemberArgs[] memory members) external
+		string memory baseURI, address operator, MintMemberArgs[] memory members) external
 	{
 		initModule(host, description, operator);
 		initERC721(name, name);
 		_registerInterface(Member_Type);
+		_setBaseURI(baseURI);
 
 		for (uint256 i = 0; i < members.length; i++)
-			mint(members[i].owner, members[i].info, members[i].tokenURI, members[i].permissions);
+			mint(members[i].owner, members[i].info, members[i].permissions);
 	}
 
-	function mint(address owner, Info memory info, string memory tokenURI, uint256[] memory permissions) private {
+	function mint(address owner, Info memory info, uint256[] memory permissions) private {
 		_mint(owner, info.id);
 
-		Info0 storage i0 = _infoMap[info.id];
+		Info0 storage i0   = _infoMap[info.id];
 		Info storage info_ = i0.info;
 		info_.id           = info.id;
 		info_.name         = info.name;
 		info_.description  = info.description;
-		info_.avatar       = info.avatar;
+		info_.image       = info.image;
 		info_.votes        = info.votes == 0 ? 1: info.votes; // limit votes to 1
 
 		_votes += info_.votes;
 
 		_infoList.add(info.id);
-
-		// set token uri
-		if (bytes(tokenURI).length != 0)
-			_setTokenURI(info.id, tokenURI);
 
 		// add permissions
 		for (uint256 i = 0; i < permissions.length; i++)
@@ -72,27 +70,33 @@ contract Member is IMember, ERC721_Module {
 	}
 
 	function create(
-		address owner,      string memory tokenURI,
-		Info memory info,   uint256[] memory permissions
+		address owner, Info memory info,   uint256[] memory permissions
 	) external Check(Action_Member_Create)
 	{
-		mint(owner, info, tokenURI, permissions);
+		mint(owner, info, permissions);
 	}
 
 	function createFrom(
-		address owner,             uint256 id,
-		string memory tokenURI,    uint256[] memory permissions,
-		uint32 votes,              string memory name,
-		string memory description, string memory avatar
+		address owner,       uint256 id,
+		uint32 votes,        uint256[] memory permissions,
+		string memory name,  string memory description, string memory image
 	) external Check(Action_Member_Create)
 	{
 		Info memory info;
 		info.id = id;
 		info.name = name;
 		info.votes = votes;
-		info.avatar = avatar;
+		info.image = image;
 		info.description = description;
-		mint(owner, info, tokenURI, permissions);
+		mint(owner, info, permissions);
+	}
+
+	function tokenURI(uint256 tokenId) view public override(ERC721,IERC721Metadata) returns (string memory uri) {
+		Info storage info = _infoMap[tokenId].info;
+		bytes memory a = abi.encodePacked("?name=hex,",                      bytes(info.name).toHexString());
+		bytes memory b = abi.encodePacked("&description=hex,",               bytes(info.description).toHexString());
+		bytes memory c = abi.encodePacked("&image=hex,",                     bytes(info.image).toHexString());
+		uri = string(abi.encodePacked(baseURI(), a, b, c));
 	}
 
 	function votes() view external override returns (uint256) {
@@ -104,17 +108,17 @@ contract Member is IMember, ERC721_Module {
 		return _infoMap[id].info;
 	}
 
-	function setMemberInfo(uint256 id, string memory name, string memory description, string memory avatar) public {
+	function setMemberInfo(uint256 id, string memory name, string memory description, string memory image) public {
 		require(ownerOf(id) == _msgSender(), "#Member#setMemberInfo: owner no match");
 		Info storage info_ = _infoMap[id].info;
 		if (bytes(name).length != 0)        info_.name        = name;
 		if (bytes(description).length != 0) info_.description = description;
-		if (bytes(avatar).length != 0)      info_.avatar      = avatar;
+		if (bytes(image).length != 0)       info_.image      = image;
 		emit Update(id);
 	}
 
 	function setInfo(uint256 id, Info memory info) external {
-		setMemberInfo(id, info.name, info.description, info.avatar);
+		setMemberInfo(id, info.name, info.description, info.image);
 	}
 
 	function indexAt(uint256 index) view public override returns (Info memory) {

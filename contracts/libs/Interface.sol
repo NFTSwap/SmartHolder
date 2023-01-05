@@ -72,7 +72,7 @@ interface IMember is IModule, IERC721_1 {
 		uint256 id;
 		string name;
 		string description;
-		string avatar;
+		string image;
 		uint32 votes; // vote power
 	}
 	event Update(uint256 indexed id); // update info

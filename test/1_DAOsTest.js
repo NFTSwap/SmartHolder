@@ -17,16 +17,16 @@ contract('DAOs', ([from]) => {
 			{ // InitMemberArgs
 				name: 'Member',
 				description: 'Member description',
+				baseURI: 'https://smart-dao-rel.stars-mine.com/service-api/utils/printJSON',
 				members: [{
 					owner: from,
 					info: {
 						id: 0,
 						name: 'Test',
 						description: 'Test',
-						avatar: 'https://picx.zhimg.com/v2-72e9fd76f8d5b941acb976826ff2ba90_l.jpg?source=32738c0c',
+						image: 'https://picx.zhimg.com/v2-72e9fd76f8d5b941acb976826ff2ba90_l.jpg?source=32738c0c',
 						votes: 1,
 					},
-					tokenURI: 'https://picx.zhimg.com/v2-72e9fd76f8d5b941acb976826ff2ba90_l.jpg?source=32738c0c',
 					permissions: [0xdc6b0b72, 0x678ea396],
 				}]
 			}, { //InitVotePoolArgs
@@ -44,16 +44,16 @@ contract('DAOs', ([from]) => {
 			{ // InitMemberArgs
 				name: 'Member',
 				description: 'Member description',
+				baseURI: 'https://smart-dao-rel.stars-mine.com/service-api/utils/printJSON',
 				members: [{
 					owner: from,
 					info: {
 						id: 0,
 						name: 'Test',
 						description: 'Test',
-						avatar: 'https://picx.zhimg.com/v2-72e9fd76f8d5b941acb976826ff2ba90_l.jpg?source=32738c0c',
+						image: 'https://picx.zhimg.com/v2-72e9fd76f8d5b941acb976826ff2ba90_l.jpg?source=32738c0c',
 						votes: 1,
 					},
-					tokenURI: 'https://picx.zhimg.com/v2-72e9fd76f8d5b941acb976826ff2ba90_l.jpg?source=32738c0c',
 					permissions: [0xdc6b0b72, 0x678ea396],
 				}]
 			}, { //InitVotePoolArgs

@@ -15,12 +15,11 @@ contract('Member', ([from]) => {
 		it('create()', async () => {
 			await member.create(
 				from,
-				'https://upload.jianshu.io/users/upload_avatars/7936206/11941ca0-442d-4d7c-a300-a81f4206fd87.JPG?imageMogr2/auto-orient/strip|imageView2/1/w/120/h/120',
 				{
 					id: 1,
 					name: 'Test 1',
 					description: 'Test 1 Desc',
-					avatar: 'https://upload.jianshu.io/users/upload_avatars/7936206/11941ca0-442d-4d7c-a300-a81f4206fd87.JPG?imageMogr2/auto-orient/strip|imageView2/1/w/120/h/120',
+					image: 'https://upload.jianshu.io/users/upload_avatars/7936206/11941ca0-442d-4d7c-a300-a81f4206fd87.JPG?imageMogr2/auto-orient/strip|imageView2/1/w/120/h/120',
 					votes: 3,
 				}, [0xdc6b0b72, 0x678ea396]);
 		});
@@ -29,9 +28,8 @@ contract('Member', ([from]) => {
 			await member.createFrom(
 				from,
 				2,
-				'https://avatars.githubusercontent.com/u/1221969?v=4',
-				[0xdc6b0b72, 0x678ea396],
 				1,
+				[0xdc6b0b72, 0x678ea396],
 				'Test 2',
 				'Test 2 Desc',
 				'https://avatars.githubusercontent.com/u/1221969?v=4'
@@ -42,9 +40,8 @@ contract('Member', ([from]) => {
 			await member.createFrom(
 				from,
 				3,
-				'https://avatars.githubusercontent.com/u/1221969?v=4',
-				[0xdc6b0b72, 0x678ea396],
 				1,
+				[0xdc6b0b72, 0x678ea396],
 				'Test 3',
 				'Test 3 Desc',
 				'https://avatars.githubusercontent.com/u/1221969?v=4'

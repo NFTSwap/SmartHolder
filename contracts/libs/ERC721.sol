@@ -178,7 +178,7 @@ abstract contract ERC721 is Context, IERC721_1 {
 		return string(abi.encodePacked(_baseURI, tokenId.toString()));
 	}
 
-	function tokenURI(uint256 tokenId) public view override returns (string memory) {
+	function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
 		return _tokenURI(tokenId);
 	}
 
