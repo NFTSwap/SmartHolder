@@ -20,6 +20,7 @@ contract AssetShell is AssetBase, IAssetShell {
 	mapping(uint256 => AssetData) private _assetsData;   // tokenId => raw asset id
 	uint256                       private _lastLocked;
 	SaleType                      public  saleType; // is opensea first or second sale
+	uint256[16]                   private  __; // reserved storage space
 
 	function initAssetShell(address host, address operator, SaleType _saleType, InitContractURI memory uri) external {
 		initAssetBase(host, operator, uri);

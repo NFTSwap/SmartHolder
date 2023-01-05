@@ -12,6 +12,8 @@ import './Module.sol';
 contract Ledger is ILedger, Module {
 	using AddressExp for address;
 
+	uint256[16] private __; // reserved storage space
+
 	function initLedger(address host, string memory description, address operator) external {
 		initModule(host, description, operator);
 		_registerInterface(Ledger_Type);

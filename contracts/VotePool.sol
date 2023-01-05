@@ -29,7 +29,7 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 	// @public
 	uint256 public lifespan; // 提案生命周期限制
 
-	uint256[8] private __; // reserved storage space
+	uint256[16] private __; // reserved storage space
 
 	function initVotePool(address host, string memory description, uint256 _lifespan) external {
 		initERC165();

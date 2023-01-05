@@ -75,7 +75,7 @@ contract AssetBase is ERC721_Module {
 }
 
 contract Asset is AssetBase, IAsset {
-	// Minimum price
+	uint256[16] private  __; // reserved storage space
 
 	function initAsset(address host, address operator, InitContractURI memory uri) external {
 		initAssetBase(host, operator, uri);
