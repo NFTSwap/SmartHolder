@@ -34,8 +34,8 @@ abstract contract PermissionCheck {
 
 	function checkFrom(uint256 memberId, uint256 action) view internal {
 		if (!isPermissionDAO()) {
-			require(_host.member().ownerOf(memberId) == msg.sender, "#PermissionCheck#checkFrom member owner mismatch");
-			require(_host.member().isPermissionFrom(memberId, action), "#PermissionCheck#checkFrom member does not have permission");
+			require(_host.member().ownerOf(memberId) == msg.sender, "#PermissionCheck#checkFrom Member owner mismatch");
+			require(_host.member().isPermissionFrom(memberId, action), "#PermissionCheck#checkFrom Check caller does not have permission");
 		}
 	}
 

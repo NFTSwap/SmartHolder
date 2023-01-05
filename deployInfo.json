@@ -1,28 +1,28 @@
 {
   "goerli": {
     "Asset": {
-      "version": "d283118ae0be8127535294b9b509d88d98d51462c4afcd2eec730fbc96e6230e",
-      "address": "0xc51351f18FF603B997E84257742403664180f0e3"
+      "version": "15dfd55f28a734fb3c66321cec46036b7e8e42a9a75d26595af2b7d28e21bec7",
+      "address": "0xF52090C6F54c2Aa5B51039EAd5C3DF2d0dB64C8F"
     },
     "AssetShell": {
-      "version": "4a436c5d5c030ee835d82614dfd281e2c8eead76c4964b73b7565859c5ee26e5",
-      "address": "0x8da66272975099c4e726583D6e8287151E52349C"
+      "version": "b9238bb20bd680300282466308bf1cbea98e446dfd890f68d8e813b855455165",
+      "address": "0xE3c6b8C229c97fA2E82c2Fd0eCF0c671CA78d06d"
     },
     "Ledger": {
-      "version": "6834a15bd47a9249356349c951b5236ee20d57ae07e9c11cf1a41167c1845ec8",
-      "address": "0x1b8db32344B6A797c79b328d4323beFfdfa32f1B"
+      "version": "a62f7854b98adfb6080bc402016c2a61bdfceb763b1783dd2939706a61d70c04",
+      "address": "0x69F407793710bB070f324fa07C9CCf2Ba3AADc23"
     },
     "Member": {
-      "version": "f37b4bbd153a8a6a35301725c9e602b31ed0825406478450e5ad69a3440150bd",
-      "address": "0x4E474d76f1354053c3bbc8cdB21262b0728a961E"
+      "version": "94f2d2363ea563241263cbc7d921b657a855e192948598b9cae9699921299746",
+      "address": "0x1C3EF9Ac015D8875c784D0a771F4872Ee9cC1ED9"
     },
     "VotePool": {
-      "version": "c5b44a675b293eae9e01871b591d9110637eb66e7bdb0092453e5f449ee4241f",
-      "address": "0x5B5DA848Ce67d9c958ff621a6E6237B29dFd4644"
+      "version": "771e9843f9d74aabfbe759943e9109ec1b586f617970417cac5410dd166d957a",
+      "address": "0x39b227eC3d5121429750E8Bdac87263D16DA460a"
     },
     "DAO": {
-      "version": "ed02d3eb9a05b1815f05e6027028386f075b952708e816df8d12fb99d43ca2e6",
-      "address": "0xfBe8a2C40c1F065045F41757cBe0F741825E62f3"
+      "version": "b8d5e59bcee0cbffc3aaa9a403b4b817f3b5df472052e19f2da07ebb965eccc5",
+      "address": "0xb335088F2ddf90F1a112167a3Cb4C0ebD6120888"
     },
     "DAOs": {
       "version": "670054b348c21733936eca3af0c8bb304e97069af1bdd831ec389fd62ef2c1c3",
