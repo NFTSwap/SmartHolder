@@ -31,6 +31,9 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 
 	uint256[16] private __; // reserved storage space
 
+	/**
+	 * @dev Init vote pool
+	 */
 	function initVotePool(address host, string memory description, uint256 _lifespan) external {
 		initERC165();
 		_registerInterface(VotePool_Type);
@@ -46,6 +49,9 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 		return true;
 	}
 
+	/**
+	 * @dev Upgrade vote pool
+	 */
 	function upgrade(address impl) public OnlyDAO {
 		_impl = impl;
 	}
@@ -55,10 +61,16 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 		lifespan = _lifespan;
 	}
 
+	/**
+	 * @dev Returns the description of vote pools
+	 */
 	function description() view external returns (string memory) {
 		return _description;
 	}
 
+	/**
+	 * @dev Gettings proposal object from id
+	 */
 	function getProposal(uint256 id) view public returns (Proposal memory) {
 		return _proposal(id);
 	}
@@ -68,10 +80,16 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 		return _proposalMap[id];
 	}
 
+	/**
+	 * @dev Return whether the proposal object exists
+	 */
 	function exists(uint256 id) view public returns (bool) {
 		return _proposalMap[id].id != 0;
 	}
 
+	/**
+	 * @dev Create proposal object from proposal arg
+	 */
 	function create(Proposal memory arg0) public {
 		// check permission
 		if (msg.sender != address(_host.member())) {
@@ -114,6 +132,9 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 		emit Created(arg0.id);
 	}
 
+	/**
+	 * @dev Create proposal object
+	 */
 	function create2(
 		uint256       id,          address[] memory target,
 		uint256       lifespan,    uint256 passRate,
@@ -139,6 +160,9 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 		return value < 0 ? uint256(-value): uint256(value);
 	}
 
+	/**
+	 * @dev Vote on the proposal
+	 */
 	function vote(uint256 id, uint256 member, int256 votes, bool tryExecute) external Check(Action_VotePool_Vote) {
 		Proposal storage obj = _proposal(id);
 		IMember.Info memory info = _host.member().getMemberInfo(member);
@@ -194,6 +218,9 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 		}
 	}
 
+	/**
+	 * @dev Execute proposal resolution
+	 */
 	function execute(uint256 id) public {
 		Proposal storage obj = _proposal(id);
 
@@ -218,6 +245,9 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 		emit Execute(id);
 	}
 
+	/**
+	 * @dev Execute proposal resolution, internal methods
+	 */
 	function exec(Proposal storage obj) internal {
 		for (uint256 i = 0; i < obj.target.length; i++) {
 			(bool suc, bytes memory _data) = obj.target[i].call{ value: msg.value }(obj.data[i]);
@@ -233,8 +263,19 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 		}
 	}
 
+	/**
+	 * @dev Returns the total of Proposal object
+	 */
 	function total() view public returns (uint256) {
 		return _proposalList.length;
+	}
+
+	/**
+	 * @dev Returns the Proposal object from index
+	 */
+	function indexAt(uint256 index) view public returns (Proposal memory pro) {
+		require(index < _proposalList.length, "#VotePool#at Index out of bounds");
+		pro = _proposalMap[_proposalList[index]];
 	}
 
 }
