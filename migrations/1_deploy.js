@@ -34,6 +34,7 @@ async function getDeployData(name, opts, args = []) {
 		opts,
 		name,
 		Contract,
+		blockNumber: infoData.blockNumber || 0,
 		address: infoData.address || '0x0000000000000000000000000000000000000000',
 		prevVersion,
 		currentVersion,
@@ -45,15 +46,21 @@ async function getDeployData(name, opts, args = []) {
 async function deploy(name, opts, args = [], initializer = async ()=>{}) {
 	let data = await getDeployData(name, opts, args);
 	let Contract = data.Contract;
+	let isFork = opts.networks.indexOf('-fork') != -1;
+
 	if (data.hasUpdate) {
 		await opts.deployer.deploy(Contract, ...args);
 		let deployed = await Contract.deployed();
 		data.address = deployed.address;
 		await initializer(deployed);
-		if (opts.networks.indexOf('-fork') == -1) { // Not a simulator
+		if (!isFork) { // Not a simulator
 			setDeployInfo(opts.networks, name, data.currentVersion, 'version');
 			setDeployInfo(opts.networks, name, data.address, 'address');
 		}
+	}
+	if (!data.blockNumber && !isFork) {
+		let blockNumber = await web3.eth.getBlockNumber();
+		setDeployInfo(opts.networks, name, blockNumber, 'blockNumber');
 	}
 	return data;
 }

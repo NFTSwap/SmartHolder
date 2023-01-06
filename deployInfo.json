@@ -2,35 +2,43 @@
   "goerli": {
     "Asset": {
       "version": "15dfd55f28a734fb3c66321cec46036b7e8e42a9a75d26595af2b7d28e21bec7",
-      "address": "0xF52090C6F54c2Aa5B51039EAd5C3DF2d0dB64C8F"
+      "address": "0xF52090C6F54c2Aa5B51039EAd5C3DF2d0dB64C8F",
+      "blockNumber": 8265431
     },
     "AssetShell": {
       "version": "b9238bb20bd680300282466308bf1cbea98e446dfd890f68d8e813b855455165",
-      "address": "0xE3c6b8C229c97fA2E82c2Fd0eCF0c671CA78d06d"
+      "address": "0xE3c6b8C229c97fA2E82c2Fd0eCF0c671CA78d06d",
+      "blockNumber": 8265431
     },
     "Ledger": {
       "version": "a62f7854b98adfb6080bc402016c2a61bdfceb763b1783dd2939706a61d70c04",
-      "address": "0x69F407793710bB070f324fa07C9CCf2Ba3AADc23"
+      "address": "0x69F407793710bB070f324fa07C9CCf2Ba3AADc23",
+      "blockNumber": 8265431
     },
     "Member": {
       "version": "94f2d2363ea563241263cbc7d921b657a855e192948598b9cae9699921299746",
-      "address": "0x1C3EF9Ac015D8875c784D0a771F4872Ee9cC1ED9"
+      "address": "0x1C3EF9Ac015D8875c784D0a771F4872Ee9cC1ED9",
+      "blockNumber": 8265432
     },
     "VotePool": {
       "version": "c4f13958a3e261cb141ca3698a8f68da0ff546c6bff38331735fb2a6d1d974d5",
-      "address": "0xf8771f4f7CD5F23b55363e784d959366E8f0F6b2"
+      "address": "0xf8771f4f7CD5F23b55363e784d959366E8f0F6b2",
+      "blockNumber": 8265432
     },
     "DAO": {
       "version": "6cb25c58739f1d4f76fb0122df67ad4bfd1eb15acd9cf2993f2362ea2cabd00e",
-      "address": "0xD81A5c620C2b3ffe6a834d5E02803845fA83b503"
+      "address": "0xD81A5c620C2b3ffe6a834d5E02803845fA83b503",
+      "blockNumber": 8265432
     },
     "DAOs": {
       "version": "670054b348c21733936eca3af0c8bb304e97069af1bdd831ec389fd62ef2c1c3",
-      "address": "0x3F637e699ff3204c9c79B2e002Cb1A94Da344e5d"
+      "address": "0x3F637e699ff3204c9c79B2e002Cb1A94Da344e5d",
+      "blockNumber": 8265432
     },
     "DAOsProxy": {
       "version": "93b79a147f589ef2243f1351f34bb6a26915a39a93ad935346b107c7dc7d0988",
-      "address": "0x4237E9a558Ff18Bac731ca8491573C97BbF2a60e"
+      "address": "0x4237E9a558Ff18Bac731ca8491573C97BbF2a60e",
+      "blockNumber": 8248925
     }
   }
 }
