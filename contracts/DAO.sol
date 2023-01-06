@@ -39,7 +39,7 @@ contract DAO is IDAO, Module {
 		_mission = mission;
 
 		_modules.set(Module_MEMBER_ID, member);
-		emit SetModule(Module_MEMBER_ID, member);
+		// emit SetModule(Module_MEMBER_ID, member);
 	}
 
 	function setMission(string memory value) external Check(Action_DAO_Settings) {
