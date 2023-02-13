@@ -13,7 +13,20 @@ contract('DAOs', ([from]) => {
 		it('deploy()', async()=>{
 			if (1) return; // skip
 			let name = `Test_${somes.random()}`;
-			await app.DAOs.deploy(name, `${name} mission`, `${name} description`, from,
+
+			// string name;
+			// string mission;
+			// string description;
+			// string image;
+
+			await app.DAOs.deploy(
+			{ // InitDAOArgs
+				name, 
+				mission: `${name} mission`,
+				description: `${name} description`,
+				image: `https://smart-dao-home-rel.stars-mine.com/assets/logo.c5133168.png`,
+			},
+			from, // operator
 			{ // InitMemberArgs
 				name: 'Member',
 				description: 'Member description',
@@ -28,7 +41,8 @@ contract('DAOs', ([from]) => {
 						votes: 1,
 					},
 					permissions: [0xdc6b0b72, 0x678ea396],
-				}]
+				}],
+				executor: 0,
 			}, { //InitVotePoolArgs
 				description: 'VotePool description',
 				lifespan: 7 * 24 * 60 * 60, /*7 days*/
@@ -40,7 +54,14 @@ contract('DAOs', ([from]) => {
 
 		it('deployAssetSalesDAO()', async ()=>{
 			let name = `Test_Asset_Sales_DAO_${somes.random()}`;
-			await app.DAOs.deployAssetSalesDAO(name, `${name} mission`, `${name} description`, from,
+			await app.DAOs.deployAssetSalesDAO(
+			{ // InitDAOArgs
+				name, 
+				mission: `${name} mission`,
+				description: `${name} description`,
+				image: `https://smart-dao-home-rel.stars-mine.com/assets/logo.c5133168.png`,
+			},
+			from, // operator
 			{ // InitMemberArgs
 				name: 'Member',
 				description: 'Member description',
@@ -55,7 +76,8 @@ contract('DAOs', ([from]) => {
 						votes: 1,
 					},
 					permissions: [0xdc6b0b72, 0x678ea396],
-				}]
+				}],
+				executor: 0,
 			}, { //InitVotePoolArgs
 				description: 'VotePool description',
 				lifespan: 7 * 24 * 60 * 60, /*7 days*/

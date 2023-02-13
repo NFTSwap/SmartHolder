@@ -34,11 +34,19 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 		address   AssetShell;
 	}
 
+	struct InitDAOArgs {
+		string name;
+		string mission;
+		string description;
+		string image;
+	}
+
 	struct InitMemberArgs {
 		string name;
 		string description;
 		string baseURI;
 		Member.MintMemberArgs[] members;
+		uint256 executor;
 	}
 
 	struct InitVotePoolArgs {
@@ -77,11 +85,10 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 	 * @dev deploy() deploy common voting DAO
 	 */
 	function deploy(
-		string           calldata    name,              string           calldata    mission,
-		string           calldata    description,       address                      operator,
+		InitDAOArgs      calldata    daoArgs,           address                      operator,
 		InitMemberArgs   calldata    memberArgs,        InitVotePoolArgs calldata    votePoolArgs
 	) public returns (DAO host) {
-		uint256 id = uint256(keccak256(bytes(name)));
+		uint256 id = uint256(keccak256(bytes(daoArgs.name)));
 
 		require(!_DAOs.contains(id), "#DAOs#deploy DAO with corresponding name already exists");
 
@@ -91,9 +98,14 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 
 		member.initMember(address(host), memberArgs.name, memberArgs.description, memberArgs.baseURI, address(0), memberArgs.members);
 		root.initVotePool(address(host), votePoolArgs.description, votePoolArgs.lifespan);
-		host.initDAO(name, mission, description, address(root), operator, address(member));
+		host.initDAO(daoArgs.name, daoArgs.mission, daoArgs.description, address(root), operator, address(member));
 
 		_DAOs.set(id, address(host));
+
+		if (memberArgs.executor != 0)
+			member.setExecutor(memberArgs.executor);
+
+		host.setImage(daoArgs.image);
 
 		emit Created(address(host));
 	}
@@ -102,13 +114,12 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 	 * @dev makeAssetSales() deploy asset sales DAO
 	 */
 	function deployAssetSalesDAO(
-		string             calldata    name,              string             calldata    mission,
-		string             calldata    description,       address                        operator,
+		InitDAOArgs        calldata    daoArgs,           address                        operator,
 		InitMemberArgs     calldata    memberArgs,        InitVotePoolArgs   calldata    votePoolArgs,
 		InitLedgerArgs     calldata    ledgerArgs,        InitAssetArgs      calldata    assetArgs
 	) public returns (DAO host) {
 
-		host = deploy(name, mission, description, address(this), memberArgs, votePoolArgs);
+		host = deploy(daoArgs, address(this), memberArgs, votePoolArgs);
 		// sales
 		Ledger      ledger      = Ledger( payable(address(new LedgerProxy(defaultIMPLs.Ledger))) );
 		Asset       asset       = Asset( address(new AssetProxy(defaultIMPLs.Asset)));

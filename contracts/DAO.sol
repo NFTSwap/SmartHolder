@@ -11,11 +11,13 @@ contract DAO is IDAO, Module {
 	string             private  _name;
 	string             private  _mission;
 	EnumerableMap.UintToAddressMap private _modules;
-	uint256[50]        private  __; // reserved storage space
+	string             private  _image;
+	uint256[49]        private  __; // reserved storage space
 
 	function root() view external override returns (address) { return _root; }
 	function name() view external returns (string memory) { return _name; }
 	function mission() view external returns (string memory) { return _mission; }
+	function image() view external returns (string memory) { return _image; }
 	function member() view external override returns (IMember) { return IMember(_modules.get(Module_MEMBER_ID)); }
 	function ledger() view external override returns (ILedger) { return ILedger(_modules.get(Module_LEDGER_ID)); }
 	function asset() view external override returns (IAsset) { return IAsset(_modules.get(Module_ASSET_ID)); }
@@ -40,6 +42,11 @@ contract DAO is IDAO, Module {
 
 		_modules.set(Module_MEMBER_ID, member);
 		// emit SetModule(Module_MEMBER_ID, member);
+	}
+
+	function setImage(string memory value) external Check(Action_DAO_Settings) {
+		_image = value;
+		emit Change(Change_Tag_DAO_Image, 0);
 	}
 
 	function setMission(string memory value) external Check(Action_DAO_Settings) {
