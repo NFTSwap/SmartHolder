@@ -57,7 +57,7 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 	}
 
 	function setLifespan(uint256 _lifespan) private {
-		require(_lifespan >= 7 days, "#VotePool#setLifespan proposal lifespan not less than 7 days");
+		require(_lifespan >= 12 hours, "#VotePool#setLifespan proposal lifespan not less than 12 hours");
 		lifespan = _lifespan;
 	}
 
@@ -100,7 +100,7 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 		require(arg0.passRate > 5_000, "#VotePool#create proposal vote pass rate not less than 50%");
 
 		if (arg0.lifespan != 0) {
-			require(arg0.lifespan >= lifespan, "#VotePool#create proposal lifespan not less than 7 days");
+			require(arg0.lifespan >= lifespan, "#VotePool#create proposal lifespan not less than current setting lifespan days");
 		}
 		if (arg0.loopCount != 0) {
 			require(arg0.loopTime >= 1 minutes, "#VotePool#create Loop time must be greater than 1 minute");
