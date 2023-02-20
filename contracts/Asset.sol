@@ -54,10 +54,10 @@ contract AssetBase is ERC721_Module {
 	}
 
 	function contractURI() view public returns (string memory uri) {
-		bytes memory a = abi.encodePacked("?name=hex,",                      bytes(name()).toHexString());
-		bytes memory b = abi.encodePacked("&description=hex,",               bytes(_description).toHexString());
-		bytes memory c = abi.encodePacked("&image=hex,",                     bytes(image).toHexString());
-		bytes memory d = abi.encodePacked("&external_link=hex,",             bytes(external_link).toHexString());
+		bytes memory a = abi.encodePacked("?name=0XS",                      bytes(name()).toHexString());
+		bytes memory b = abi.encodePacked("&description=0XS",               bytes(_description).toHexString());
+		bytes memory c = abi.encodePacked("&image=0XS",                     bytes(image).toHexString());
+		bytes memory d = abi.encodePacked("&external_link=0XS",             bytes(external_link).toHexString());
 		bytes memory e = abi.encodePacked("&seller_fee_basis_points=",       uint256(seller_fee_basis_points).toString());
 		bytes memory f = abi.encodePacked("&fee_recipient=",                 fee_recipient.toHexString());
 		uri = string(abi.encodePacked(contractURIPrefix, a, b, c, d, e, f));
