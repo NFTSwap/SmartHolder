@@ -1,13 +1,13 @@
 {
   "goerli": {
     "Asset": {
-      "version": "0b0b65bfdb78514827e0282a4401dac81e0629ac0c62ca477e2374ff806011e1",
-      "address": "0xA82329C0e78f2ea33Fd810d2b8e1e4d650d58043",
+      "version": "171eca748915eb137f3ed67d250a58c917ca3d6925823e572211c326cf041d6a",
+      "address": "0x4156fAa5CD20a273f9FC3408B0714DdF867607B7",
       "blockNumber": 8265431
     },
     "AssetShell": {
-      "version": "f0030b145d53964af13d9b5ca637d6daff59e948c9db47a5cc3d1f0d53f1976c",
-      "address": "0x00FE596FA992e2054a178f6E61CC2771daf415fd",
+      "version": "c1806f3abe80ef9226d22d657178b8373108bae9cdbc58cce8d3132220ac321f",
+      "address": "0xc07aD5f69a7A276830534E0cCf569BC3055781fD",
       "blockNumber": 8265431
     },
     "Ledger": {
@@ -16,8 +16,8 @@
       "blockNumber": 8265431
     },
     "Member": {
-      "version": "1d7e91c0ddb06ea70ef9ae0135ffdf3713b9bcc1cdcf460fa4f92974e9e350bd",
-      "address": "0xf9a5b3A2445fEbc5b6A291D26B162C24AE8433Ed",
+      "version": "15b26ab77b7eba638ef6a887103919fed7992222b1ad3ec43c6250e637070375",
+      "address": "0xcC9e9323Afc37D89Ff6CdfA9C7dD8dD885C7145c",
       "blockNumber": 8265432
     },
     "VotePool": {
