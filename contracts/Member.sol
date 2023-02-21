@@ -130,9 +130,9 @@ contract Member is IMember, ERC721_Module {
 	 */
 	function tokenURI(uint256 tokenId) view public override(ERC721,IERC721Metadata) returns (string memory uri) {
 		Info storage info = _infoMap[tokenId].info;
-		bytes memory a = abi.encodePacked("?name=0XS",                      bytes(info.name).toHexString());
-		bytes memory b = abi.encodePacked("&description=0XS",               bytes(info.description).toHexString());
-		bytes memory c = abi.encodePacked("&image=0XS",                     bytes(info.image).toHexString());
+		bytes memory a = abi.encodePacked("?name=0xs",                      bytes(info.name).toHexString());
+		bytes memory b = abi.encodePacked("&description=0xs",               bytes(info.description).toHexString());
+		bytes memory c = abi.encodePacked("&image=0xs",                     bytes(info.image).toHexString());
 		uri = string(abi.encodePacked(baseURI(), a, b, c));
 	}
 
