@@ -17,7 +17,7 @@
 		"@openzeppelin/contracts": "^4.8.0",
 		"@openzeppelin/truffle-upgrades": "^1.17.0",
 		"@truffle/hdwallet-provider": "^2.0.9",
-		"crypto-tx": "^0.5.2",
+		"crypto-tx": "0.5.3",
 		"chai": "^4.3.4"
 	}
 }
