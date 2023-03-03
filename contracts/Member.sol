@@ -194,22 +194,14 @@ contract Member is IMember, ERC721_Module {
 		return _infoMap[id].permissions.contains(action);
 	}
 
-	function addPermissions(uint256[] memory IDs, uint256[] memory actions) external OnlyDAO {
-		for (uint256 i = 0; i < IDs.length; i++) {
-			EnumerableSet.UintSet storage permissions = _infoMap[IDs[i]].permissions;
-			for (uint256 j = 0; j < actions.length; j++)
-				permissions.add(actions[j]);
-		}
-		emit AddPermissions(IDs, actions);
-	}
-
-	function removePermissions(uint256[] memory IDs, uint256[] memory actions) external OnlyDAO {
-		for (uint256 i = 0; i < IDs.length; i++) {
-			EnumerableSet.UintSet storage permissions = _infoMap[IDs[i]].permissions;
-			for (uint256 j = 0; j < actions.length; j++)
-				permissions.remove(actions[j]);
-		}
-		emit RemovePermissions(IDs, actions);
+	function setPermissions(uint256 id, uint256[] memory addActions, uint256[] memory removeActions) external OnlyDAO {
+		require(_exists(id), "#Member#setPermissions: info query for nonexistent member");
+		EnumerableSet.UintSet storage permissions = _infoMap[id].permissions;
+		for (uint256 j = 0; j < addActions.length; j++)
+			permissions.add(addActions[j]);
+		for (uint256 j = 0; j < removeActions.length; j++)
+			permissions.remove(removeActions[j]);
+		emit SetPermissions(id, addActions, removeActions);
 	}
 
 	function addVotes(uint256 id, int32 votes) external OnlyDAO {

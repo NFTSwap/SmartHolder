@@ -79,6 +79,7 @@ interface IMember is IModule, IERC721_1 {
 	event TransferVotes(uint256 indexed from, uint256 indexed to, uint32 votes);
 	event AddPermissions(uint256[] ids, uint256[] actions);
 	event RemovePermissions(uint256[] ids, uint256[] actions);
+	event SetPermissions(uint256 indexed id, uint256[] addActions, uint256[] removeActions);
 
 	function isPermission(address owner, uint256 action) view external returns (bool);
 	function isPermissionFrom(uint256 id, uint256 action) view external returns (bool);
