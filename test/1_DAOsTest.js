@@ -1,5 +1,6 @@
 
 const somes = require('somes').default;
+const buffer = require('somes/buffer').default;
 const { assert } = require('chai');
 const App = require('./app');
 const DAO = artifacts.require("DAO.sol");
@@ -25,6 +26,7 @@ contract('DAOs', ([from]) => {
 				mission: `${name} mission`,
 				description: `${name} description`,
 				image: `https://smart-dao-home-rel.stars-mine.com/assets/logo.c5133168.png`,
+				extend: '0x' + buffer.from('{"poster": "https://img-blog.csdnimg.cn/20200502175449751.png"}').toString('hex'),
 			},
 			from, // operator
 			{ // InitMemberArgs
@@ -56,10 +58,11 @@ contract('DAOs', ([from]) => {
 			let name = `Test_Asset_Sales_DAO_${somes.random()}`;
 			await app.DAOs.deployAssetSalesDAO(
 			{ // InitDAOArgs
-				name, 
+				name,
 				mission: `${name} mission`,
 				description: `${name} description`,
 				image: `https://smart-dao-home-rel.stars-mine.com/assets/logo.c5133168.png`,
+				extend: '0x' + buffer.from('{"poster": "https://img-blog.csdnimg.cn/20200502175449751.png"}').toString('hex'),
 			},
 			from, // operator
 			{ // InitMemberArgs
@@ -110,6 +113,11 @@ contract('DAOs', ([from]) => {
 		it('get()', async()=>{
 			let addr = await app.DAOs.get(await app.DAO.name());
 			expect(addr).equal(app.DAO.address);
+		});
+
+		it('DAO.extend()', async()=>{
+			let extend = Buffer.from((await app.DAO.extend()).slice(2), 'hex');
+			console.log(JSON.parse(extend));
 		});
 
 		// it('Each All DAOs', async () => {

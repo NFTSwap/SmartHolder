@@ -11,13 +11,13 @@ contract DAO is IDAO, Module {
 	string             private  _name;
 	string             private  _mission;
 	EnumerableMap.UintToAddressMap private _modules;
-	string             private  _image;
-	uint256[49]        private  __; // reserved storage space
+	string             public  image;
+	bytes              public  extend; // external data
+	uint256[48]        private  __; // reserved storage space
 
 	function root() view external override returns (address) { return _root; }
 	function name() view external returns (string memory) { return _name; }
 	function mission() view external returns (string memory) { return _mission; }
-	function image() view external returns (string memory) { return _image; }
 	function member() view external override returns (IMember) { return IMember(_modules.get(Module_MEMBER_ID)); }
 	function ledger() view external override returns (ILedger) { return ILedger(_modules.get(Module_LEDGER_ID)); }
 	function asset() view external override returns (IAsset) { return IAsset(_modules.get(Module_ASSET_ID)); }
@@ -27,7 +27,7 @@ contract DAO is IDAO, Module {
 	}
 
 	function initDAO(
-		string memory name, string memory mission, string memory description,
+		string calldata name, string calldata mission, string calldata description,
 		address root, address operator, address member
 	) external {
 		initModule(address(this), description, operator);
@@ -44,17 +44,22 @@ contract DAO is IDAO, Module {
 		// emit SetModule(Module_MEMBER_ID, member);
 	}
 
-	function setImage(string memory value) external Check(Action_DAO_Settings) {
-		_image = value;
+	function setExtend(bytes calldata data) external Check(Action_DAO_Settings) {
+		extend = data;
+		emit Change(Change_Tag_DAO_Extend, 0);
+	}
+
+	function setImage(string calldata value) external Check(Action_DAO_Settings) {
+		image = value;
 		emit Change(Change_Tag_DAO_Image, 0);
 	}
 
-	function setMission(string memory value) external Check(Action_DAO_Settings) {
+	function setMission(string calldata value) external Check(Action_DAO_Settings) {
 		_mission = value;
 		emit Change(Change_Tag_DAO_Mission, 0);
 	}
 
-	function setMissionAndDesc(string memory mission, string memory desc) external Check(Action_DAO_Settings) {
+	function setMissionAndDesc(string calldata mission, string calldata desc) external Check(Action_DAO_Settings) {
 		_mission = mission;
 		_description = desc;
 		emit Change(Change_Tag_Description, 0);

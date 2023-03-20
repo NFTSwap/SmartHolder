@@ -26,13 +26,13 @@
       "blockNumber": 8265432
     },
     "DAO": {
-      "version": "3d922202a5daf9b5228676b13e4a5c0dc02a51347d099cf43e746f390ffd0f90",
-      "address": "0x21858aADd28753C65905b3D07095dC176ED3e023",
+      "version": "bc948fafa1b7a57b321cb60a444f99e928f369b3db20457608d94df88ce71e16",
+      "address": "0x160e59a3c024d6E58f23AE4CC06bdaD3E227cA98",
       "blockNumber": 8265432
     },
     "DAOs": {
-      "version": "fb9245b4fe188405669627239c845d4c60a327ca5292648f16119c3235e9cae0",
-      "address": "0x328284381EFA0370e70c546dd8bb83EAA8dAa127",
+      "version": "e7959715d4e2714b7e409b6d99b225b9cf9626f8f0e5b7bf632a3eb8380a0a77",
+      "address": "0x68201EafFC37DfA819475a1f6A41253Fbf0527Ce",
       "blockNumber": 8265432
     },
     "DAOsProxy": {

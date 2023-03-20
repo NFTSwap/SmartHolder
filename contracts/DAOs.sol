@@ -39,6 +39,7 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 		string mission;
 		string description;
 		string image;
+		bytes  extend;
 	}
 
 	struct InitMemberArgs {
@@ -106,6 +107,7 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 			member.setExecutor(memberArgs.executor);
 
 		host.setImage(daoArgs.image);
+		host.setExtend(daoArgs.extend);
 
 		emit Created(address(host));
 	}
