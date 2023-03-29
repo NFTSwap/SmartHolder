@@ -29,7 +29,7 @@ contract('VotePool', ([_,owner]) => {
 		});
 
 		it('vote() 2', async () => {
-			await vp.vote(id, 2, 1, false);
+			await vp.vote(id, 2, 2, true);
 			//console.log(await vp.getProposal(id));
 			assert(await DAO.description() == 'DAO Description vote 4', 'DAO.description() == DAO Description vote 4');
 		});
