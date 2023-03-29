@@ -56,12 +56,12 @@ contract('Member', ([from]) => {
 			await member.setExecutor(2);
 		});
 
-		it('addPermissions()', async () => {
-			await member.addPermissions([2], [0x59baef2a,0xd0a4ad96]);
+		it('setPermissions() add', async () => {
+			await member.setPermissions(2, [0x59baef2a,0xd0a4ad96], []);
 		});
 
-		it('removePermissions()', async () => {
-			await member.removePermissions([2], [0xd0a4ad96]);
+		it('setPermissions() remove', async () => {
+			await member.setPermissions(2, [], [0xd0a4ad96]);
 		});
 
 		it('addVotes()', async () => {
