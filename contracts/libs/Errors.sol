@@ -27,17 +27,17 @@ error AssetNonExistsInAssetShell(); // asset non exists
 error NeedToUnlockAssetFirst(); // You need to unlock the asset first
 error LockTokenIDEmptyInAssetShell(); // Lock cannot be empty in asset shell
 error InsufficientVotesInMember(); // not votes power enough in member
-error MemberNonExists();
-error MemberAlreadyExists();
-error MemberRequestJoinAlreadyExists();
+error MemberNonExists(); // member non exists
+error MemberAlreadyExists(); // member already exists
+error MemberRequestJoinAlreadyExists(); // already exists member join request
 error ProposalNonExistsInVotePool(); // proposal non exists
 error ProposalAlreadyExistsInVotePool(); // proposal already exists
 error ProposalDefaultLifespanLimitError(); // proposal lifespan not less than 12 hours
 error CreateProposalVotePassEateLimitError(); // proposal vote pass rate not less than 50%
 error CreateProposalLifespanLimitError(); // proposal lifespan not less than current setting lifespan days
 error CreateProposalLoopTimeLimitError(); // Loop time must be greater than 1 minute
-error VotesZero(); // Votes cannot be zero
-error ProposalClosed();
+error VotesZero(); // votes cannot be zero
+error ProposalClosed(); // proposal closed
 error VotingMemberNoMatch();// Voting Membership Mismatch
 error DuplicateVoteError(); // Cannot vote repeatedly
 error VoteInsufficientVotes(); // vote insufficient votes
