@@ -18,7 +18,7 @@ contract('VotePool', ([_,owner]) => {
 	context('Setting', () => {
 
 		it('create2()', async () => {
-			var data = web3.eth.abi.encodeFunctionCall(DAO.abi.find(e=>e.name=='setDescription'), ['DAO Description vote 2']);
+			var data = web3.eth.abi.encodeFunctionCall(DAO.abi.find(e=>e.name=='setDescription'), ['DAO Description vote 4']);
 			await vp.create2(id, [DAO.address], 0, 5001, 0, 0, 'Test pr', 'Test pr desc', 0, [data]);
 			assert(await vp.exists(id), 'vp.exists(id)');
 		});
@@ -29,8 +29,9 @@ contract('VotePool', ([_,owner]) => {
 		});
 
 		it('vote() 2', async () => {
-			await vp.vote(id, 2, 2, true);
-			assert(await DAO.description() == 'DAO Description vote 2', 'DAO.description() == DAO Description vote 2');
+			await vp.vote(id, 2, 1, false);
+			//console.log(await vp.getProposal(id));
+			assert(await DAO.description() == 'DAO Description vote 4', 'DAO.description() == DAO Description vote 4');
 		});
 
 	});
