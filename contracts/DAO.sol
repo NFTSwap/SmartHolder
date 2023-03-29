@@ -33,8 +33,8 @@ contract DAO is IDAO, Module {
 		initModule(address(this), description, operator);
 		_registerInterface(DAO_Type);
 
-		ERC165(root).checkInterface(VotePool_Type, "#DAO#initDAO root type not match");
-		ERC165(member).checkInterface(Member_Type, "#DAO#initDAO member type not match");
+		ERC165(root).checkInterface(VotePool_Type);
+		ERC165(member).checkInterface(Member_Type);
 
 		_root = root;
 		_name = name;
@@ -68,10 +68,12 @@ contract DAO is IDAO, Module {
 
 	function setModule(uint256 id, address addr) external Check(Action_DAO_SetModule) {
 		require(id != Module_MEMBER_ID, "#DAO#setModule Disable Updates members");
+
 		if (addr == address(0)) {
 			_modules.remove(id);
 		} else {
-			ERC165(addr).checkInterface(Module_Type, "#DAO#setModule type not match");
+			ERC165(addr).checkInterface(Module_Type);
+			
 			_modules.set(id, addr);
 		}
 		emit SetModule(id, addr);

@@ -33,12 +33,14 @@ contract Ledger is ILedger, Module {
 		receiveBalance();
 
 		uint256 curamount = address(this).balance;
-		require(curamount >= amount, "#Ledger#release insufficient balance");
+		// require(curamount >= amount, "#Ledger#release insufficient balance");
+		if (curamount < amount) revert InsufficientBalance();
 
 		uint256 votes = _host.member().votes();
 		uint256 unit = amount / votes;
 
-		require(unit != 0 , "#Ledger#release insufficient balance release");
+		// require(unit != 0 , "#Ledger#release insufficient balance release");
+		if (unit == 0) revert InsufficientBalance();
 
 		uint256 total = _host.member().total();
 
@@ -69,8 +71,11 @@ contract Ledger is ILedger, Module {
 		emit AssetIncome(token, tokenId, source, to, msg.value, price, saleType);
 	}
 
-	function withdraw(uint256 amount, address target, string memory description) external payable override Check(Action_Ledger_Withdraw) {
-		require(target != address(0), "#Ledger#withdraw receive assress not address(0)");
+	function withdraw(uint256 amount, address target, string memory description)
+		external payable override Check(Action_Ledger_Withdraw) 
+	{
+		//require(target != address(0), "#Ledger#withdraw receive assress not address(0)");
+		if (target == address(0)) revert AddressEmpty();
 		receiveBalance();
 		target.sendValue(amount);
 		emit Withdraw(target, amount, description);

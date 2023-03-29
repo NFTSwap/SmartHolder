@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
+import './Errors.sol';
 import './Initializable.sol';
 import './Interface.sol';
 
@@ -10,7 +11,7 @@ import './Interface.sol';
  * Contracts may inherit from this and call {_registerInterface} to declare
  * their support of an interface.
  */
-contract ERC165 is Initializable, IERC165, IERC165_1 {
+contract ERC165 is Initializable, IERC165, IERC1651 {
 	/*
 	 * bytes4(keccak256('supportsInterface(bytes4)')) == 0x01ffc9a7
 	 */
@@ -27,8 +28,9 @@ contract ERC165 is Initializable, IERC165, IERC165_1 {
 		_registerInterface(_INTERFACE_ID_ERC165);
 	}
 
-	function checkInterface(bytes4 interfaceId, string memory message) view external override {
-		require(supportsInterface(interfaceId), message);
+	function checkInterface(bytes4 interfaceId) view external override {
+		if (!supportsInterface(interfaceId))
+			revert CheckInterfaceNoMatch(interfaceId);
 	}
 
 	/**

@@ -1,19 +1,20 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import './Interface.sol';
-import './AddressExp.sol';
 import '../../openzeppelin/contracts/utils/math/SafeMath.sol';
 import '../../openzeppelin/contracts/utils/structs/EnumerableSet.sol';
 import '../../openzeppelin/contracts/utils/structs/EnumerableMap.sol';
-import '../../openzeppelin/contracts/utils/Strings.sol';
-import '../../openzeppelin/contracts/utils/Context.sol';
+
+import './Interface.sol';
+import './Address.sol';
+import './Strings.sol';
+import './Context.sol';
 
 /**
  * @title ERC721 Non-Fungible Token Standard basic implementation
  * @dev see https://eips.ethereum.org/EIPS/eip-721
  */
-abstract contract ERC721 is Context, IERC721_1 {
+abstract contract ERC721 is Context, IERC7211 {
 	using SafeMath for uint256;
 	using Address for address;
 	using EnumerableSet for EnumerableSet.UintSet;
@@ -100,18 +101,20 @@ abstract contract ERC721 is Context, IERC721_1 {
 		* @return uint256 representing the amount owned by the passed address
 		*/
 	function balanceOf(address owner) public view override returns (uint256) {
-		require(owner != address(0), "ERC721: balance query for the zero address");
-
+		// require(owner != address(0), "ERC721: balance query for the zero address");
 		return _holderTokens[owner].length();
 	}
 
 	/**
 		* @dev Gets the owner of the specified token ID.
 		* @param tokenId uint256 ID of the token to query the owner of
-		* @return address currently marked as the owner of the given token ID
+		* @return owner currently marked as the owner of the given token ID
 		*/
-	function ownerOf(uint256 tokenId) public view override returns (address) {
-		return _tokenOwners.get(tokenId, "ERC721: owner query for nonexistent token");
+	function ownerOf(uint256 tokenId) public view override returns (address owner) {
+		// return _tokenOwners.get(tokenId, "ERC721: owner query for nonexistent token");
+		bool success;
+		(success, owner) = _tokenOwners.tryGet(tokenId);
+		if (!success) revert TokenIDNonExistentInERC721();
 	}
 
 	/**
@@ -162,7 +165,7 @@ abstract contract ERC721 is Context, IERC721_1 {
 		* - `tokenId` must exist.
 		*/
 	function _tokenURI(uint256 tokenId) internal view virtual returns (string memory) {
-		require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
+		//if (!_exists(tokenId)) revert TokenIDNonExistentInERC721();
 
 		string memory uri = _tokenURIs[tokenId];
 
@@ -231,11 +234,14 @@ abstract contract ERC721 is Context, IERC721_1 {
 		*/
 	function approve(address to, uint256 tokenId) public virtual override {
 		address owner = ownerOf(tokenId);
-		require(to != owner, "ERC721: approval to current owner");
+		// require(to != owner, "ERC721: approval to current owner");
+		if (to == owner) revert ApprovalToOwnerInERC721();
 
-		require(_msgSender() == owner || isApprovedForAll(owner, _msgSender()),
-			"ERC721: approve caller is not owner nor approved for all"
-		);
+		//require(_msgSender() == owner || isApprovedForAll(owner, _msgSender()),
+		//	"ERC721: approve caller is not owner nor approved for all"
+		//);
+		if (_msgSender() != owner && !isApprovedForAll(owner, _msgSender()))
+			revert PermissionDeniedInERC721();
 
 		_approve(to, tokenId);
 	}
@@ -247,8 +253,7 @@ abstract contract ERC721 is Context, IERC721_1 {
 		* @return address currently approved for the given token ID
 		*/
 	function getApproved(uint256 tokenId) public view override returns (address) {
-		require(_exists(tokenId), "ERC721: approved query for nonexistent token");
-
+		// require(_exists(tokenId), "ERC721: approved query for nonexistent token");
 		return _tokenApprovals[tokenId];
 	}
 
@@ -259,8 +264,8 @@ abstract contract ERC721 is Context, IERC721_1 {
 		* @param approved representing the status of the approval to be set
 		*/
 	function setApprovalForAll(address operator, bool approved) public virtual override {
-		require(operator != _msgSender(), "ERC721: approve to caller");
-
+		// require(operator != _msgSender(), "ERC721: approve to caller");
+		if (operator == _msgSender()) revert ApproveAllToCallerInERC721();
 		_operatorApprovals[_msgSender()][operator] = approved;
 		emit ApprovalForAll(_msgSender(), operator, approved);
 	}
@@ -285,7 +290,8 @@ abstract contract ERC721 is Context, IERC721_1 {
 		*/
 	function transferFrom(address from, address to, uint256 tokenId) public virtual override {
 		//solhint-disable-next-line max-line-length
-		require(_havePermission(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
+		// require(_havePermission(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
+		if (!_havePermission(_msgSender(), tokenId)) revert PermissionDeniedInERC721();
 		_transfer(from, to, tokenId, "");
 		_afterTokenTransfer(from, to, tokenId, "");
 	}
@@ -318,7 +324,8 @@ abstract contract ERC721 is Context, IERC721_1 {
 		* @param _data bytes data to send along with a safe transfer check
 		*/
 	function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory _data) public virtual override {
-		require(_havePermission(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
+		// require(_havePermission(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
+		if (!_havePermission(_msgSender(), tokenId)) revert PermissionDeniedInERC721();
 		_safeTransfer(from, to, tokenId, _data);
 	}
 
@@ -336,7 +343,7 @@ abstract contract ERC721 is Context, IERC721_1 {
 		*/
 	function _safeTransfer(address from, address to, uint256 tokenId, bytes memory _data) internal virtual {
 		_transfer(from, to, tokenId, _data);
-		require(_checkOnERC721Received(from, to, tokenId, _data), "ERC721: transfer to non ERC721Receiver implementer");
+		_checkOnERC721Received(from, to, tokenId, _data);
 		_afterTokenTransfer(from, to, tokenId, _data);
 	}
 
@@ -357,7 +364,8 @@ abstract contract ERC721 is Context, IERC721_1 {
 		* is an operator of the owner, or is the owner of the token
 		*/
 	function _havePermission(address spender, uint256 tokenId) internal view virtual returns (bool) {
-		require(_exists(tokenId), "ERC721: operator query for nonexistent token");
+		// require(_exists(tokenId), "ERC721: operator query for nonexistent token");
+		if (!_exists(tokenId)) revert TokenIDNonExistentInERC721();
 		address owner = ownerOf(tokenId);
 		return (spender == owner || getApproved(tokenId) == spender || isApprovedForAll(owner, spender));
 	}
@@ -389,7 +397,7 @@ abstract contract ERC721 is Context, IERC721_1 {
 		*/
 	function _safeMint(address to, uint256 tokenId, bytes memory _data) internal virtual {
 		_mint(to, tokenId);
-		require(_checkOnERC721Received(address(0), to, tokenId, _data), "ERC721: transfer to non ERC721Receiver implementer");
+		_checkOnERC721Received(address(0), to, tokenId, _data);
 	}
 
 	/**
@@ -399,8 +407,10 @@ abstract contract ERC721 is Context, IERC721_1 {
 		* @param tokenId uint256 ID of the token to be minted
 		*/
 	function _mint(address to, uint256 tokenId) internal virtual {
-		require(to != address(0), "ERC721: mint to the zero address");
-		require(!_exists(tokenId), "ERC721: token already minted");
+		//require(!_exists(tokenId), "ERC721: token already minted");
+		if (_exists(tokenId)) revert TokenIDAlreadyMintedInERC721();
+		//require(to != address(0), "ERC721: mint to the zero address");
+		if (to == address(0)) revert AddressEmpty();
 
 		_beforeTokenTransfer(address(0), to, tokenId, "");
 
@@ -444,8 +454,10 @@ abstract contract ERC721 is Context, IERC721_1 {
 		* @param tokenId uint256 ID of the token to be transferred
 		*/
 	function _transfer(address from, address to, uint256 tokenId, bytes memory _data) internal virtual {
-		require(ownerOf(tokenId) == from, "ERC721: transfer of token that is not own");
-		require(to != address(0), "ERC721: transfer to the zero address");
+		// require(ownerOf(tokenId) == from, "ERC721: transfer of token that is not own");
+		if (ownerOf(tokenId) != from) revert TransferOfTokenIDThatIsNotOwnInERC721();
+		// require(to != address(0), "ERC721: transfer to the zero address");
+		if (to == address(0)) revert AddressEmpty();
 
 		_beforeTokenTransfer(from, to, tokenId, _data);
 
@@ -470,7 +482,8 @@ abstract contract ERC721 is Context, IERC721_1 {
 		* it and save gas.
 		*/
 	function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal virtual {
-		require(_exists(tokenId), "ERC721Metadata: URI set of nonexistent token");
+		// require(_exists(tokenId), "ERC721Metadata: URI set of nonexistent token");
+		if (!_exists(tokenId)) revert TokenIDNonExistentInERC721();
 		_tokenURIs[tokenId] = _tokenURI;
 	}
 
@@ -491,32 +504,35 @@ abstract contract ERC721 is Context, IERC721_1 {
 		* @param to target address that will receive the tokens
 		* @param tokenId uint256 ID of the token to be transferred
 		* @param _data bytes optional data to send along with the call
-		* @return bool whether the call correctly returned the expected magic value
 		*/
-	function _checkOnERC721Received(address from, address to, uint256 tokenId, bytes memory _data) private returns (bool) {
-		if (!to.isContract()) return true;
-		bytes memory data = abi.encodeWithSelector(
-			IERC721Receiver(to).onERC721Received.selector, _msgSender(), from, tokenId, _data
-		);
-		return checkCall(to, data, "ERC721: transfer to non ERC721Receiver implementer") == _ERC721_RECEIVED;
+	function _checkOnERC721Received(address from, address to, uint256 tokenId, bytes memory _data) private {
+		if (to.isContract()) {
+			// return true;
+			bytes memory data = abi.encodeWithSelector(
+				IERC721Receiver(to).onERC721Received.selector, _msgSender(), from, tokenId, _data
+			);
+			// return _call(to, data, "ERC721: transfer to non ERC721Receiver implementer") == _ERC721_RECEIVED;
+			if (_call(to, data) != _ERC721_RECEIVED)
+				revert NonERC721ReceiverImplementer();
+		}
 	}
 
-	function checkCall(address to, bytes memory data, string memory message) internal returns (bytes4) {
+	function _call(address to, bytes memory data) internal returns (bytes4) {
 		// solhint-disable-next-line avoid-low-level-calls
 		(bool success, bytes memory returndata) = to.call(data);
 
-		if (!success) {
-			if (returndata.length > 0) {
-				// solhint-disable-next-line no-inline-assembly
-				assembly {
-					let returndata_size := mload(returndata)
-					revert(add(32, returndata), returndata_size)
-				}
-			} else {
-				revert(message);
+		if (success) {
+			return abi.decode(returndata, (bytes4));
+		}
+
+		if (returndata.length > 0) {
+			// solhint-disable-next-line no-inline-assembly
+			assembly {
+				let returndata_size := mload(returndata)
+				revert(add(0x20, returndata), returndata_size)
 			}
 		} else {
-			return abi.decode(returndata, (bytes4));
+			revert("");
 		}
 	}
 

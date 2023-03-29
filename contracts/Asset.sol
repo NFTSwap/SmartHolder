@@ -1,18 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import '../openzeppelin/contracts/utils/Strings.sol';
-import './libs/StringsExp.sol';
+import './libs/Strings.sol';
 import './Module.sol';
 import './libs/ERC721.sol';
 
-contract ERC721_Module is Module, ERC721 {
+contract ERC721Module is Module, ERC721 {
 	function _registerInterface(bytes4 interfaceId) internal virtual override(ERC165,ERC721) {
 		ERC165._registerInterface(interfaceId);
 	}
 }
 
-contract AssetBase is ERC721_Module {
+contract AssetBase is ERC721Module {
 	using Strings for uint256;
 	using Strings for address;
 	using StringsExp for bytes;

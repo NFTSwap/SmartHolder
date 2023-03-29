@@ -4,22 +4,21 @@ pragma solidity 0.8.17;
 pragma experimental ABIEncoderV2;
 
 import './Asset.sol';
-import './libs/StringsExp.sol';
+import './libs/Strings.sol';
 import '../openzeppelin/contracts/utils/structs/EnumerableSet.sol';
-import '../openzeppelin/contracts/utils/Strings.sol';
 
-contract Member is IMember, ERC721_Module {
+contract Member is IMember, ERC721Module {
 	using EnumerableSet for EnumerableSet.UintSet;
 	using StringsExp for bytes;
 	using Strings for uint256;
 	using Strings for address;
 
-	struct Info0 {
+	struct Info_ {
 		Info                  info;
 		EnumerableSet.UintSet permissions; // permissions
 	}
 
-	mapping(uint256=>Info0) private  _infoMap; // member info, member id => member info
+	mapping(uint256=>Info_) private  _infoMap; // member info, member id => member info
 	EnumerableSet.UintSet   private  _infoList; // member table list
 	uint256                 private  _votes; // all vote total
 	uint256                 internal _executor; // executor
@@ -47,7 +46,7 @@ contract Member is IMember, ERC721_Module {
 	function mint(address owner, Info memory info, uint256[] memory permissions) private {
 		_mint(owner, info.id);
 
-		Info0 storage i0   = _infoMap[info.id];
+		Info_ storage i0   = _infoMap[info.id];
 		Info storage info_ = i0.info;
 		info_.id           = info.id;
 		info_.name         = info.name;
@@ -65,7 +64,7 @@ contract Member is IMember, ERC721_Module {
 	}
 
 	function remove(uint256 id) public {
-		require(isApprovedOrOwner(msg.sender, id) || isPermissionDAO(), "#Member#remove No permission");
+		if (!isApprovedOrOwner(msg.sender, id) && !isPermissionDAO()) revert PermissionDenied();
 		_burn(id);
 		_votes -= _infoMap[id].info.votes;
 		delete _infoMap[id];
@@ -98,11 +97,13 @@ contract Member is IMember, ERC721_Module {
 	 * @dev request join to DAO, create join vote proposal
 	 */
 	function requestJoin(address owner, Info memory info, uint256[] memory permissions) public returns (uint256 id) {
-		require(owner != address(0), "#Member#requestJoin mint to the zero address");
-		require(!_exists(info.id), "#Member#requestJoin token already minted");
+		if (owner == address(0)) revert AddressEmpty(); // mint to the zero address
+		if (_exists(info.id)) revert MemberAlreadyExists(); // token already minted
 
 		uint256 salt = block.number / 5000;
 		id = uint256(keccak256(abi.encodePacked("requestJoin", msg.sender.toHexString(), salt.toString())));
+
+		if (IVotePool(_host.root()).exists(id)) revert MemberRequestJoinAlreadyExists();
 
 		address[] memory target = new address[](1);
 		bytes[] memory data = new bytes[](1);
@@ -141,12 +142,13 @@ contract Member is IMember, ERC721_Module {
 	}
 
 	function getMemberInfo(uint256 id) view external override returns (Info memory) {
-		require(_exists(id), "#Member#info: info query for nonexistent member");
+		checkExists(id); // info query for nonexistent member
 		return _infoMap[id].info;
 	}
 
 	function setMemberInfo(uint256 id, string memory name, string memory description, string memory image) public {
-		require(ownerOf(id) == _msgSender(), "#Member#setMemberInfo: owner no match");
+		// require(ownerOf(id) == _msgSender(), "#Member#setMemberInfo: owner no match");
+		if (ownerOf(id) != _msgSender()) revert PermissionDenied();
 		Info storage info_ = _infoMap[id].info;
 		if (bytes(name).length != 0)        info_.name        = name;
 		if (bytes(description).length != 0) info_.description = description;
@@ -174,8 +176,12 @@ contract Member is IMember, ERC721_Module {
 		return _executor;
 	}
 
+	function checkExists(uint256 id) view internal {
+		if (!_exists(id)) revert MemberNonExists();
+	}
+
 	function setExecutor(uint256 id) public OnlyDAO {
-		require(_exists(id), "#Member#setExecutor: info query for nonexistent member");
+		checkExists(id); // info query for nonexistent member
 		_executor = id;
 		emit Change(Change_Tag_Member_Set_Executor, uint160(id));
 	}
@@ -195,7 +201,8 @@ contract Member is IMember, ERC721_Module {
 	}
 
 	function setPermissions(uint256 id, uint256[] memory addActions, uint256[] memory removeActions) external OnlyDAO {
-		require(_exists(id), "#Member#setPermissions: info query for nonexistent member");
+		checkExists(id); // check info query for nonexistent member
+
 		EnumerableSet.UintSet storage permissions = _infoMap[id].permissions;
 		for (uint256 j = 0; j < addActions.length; j++)
 			permissions.add(addActions[j]);
@@ -205,7 +212,8 @@ contract Member is IMember, ERC721_Module {
 	}
 
 	function addVotes(uint256 id, int32 votes) external OnlyDAO {
-		require(_exists(id), "#Member#setVotes: info query for nonexistent member");
+		checkExists(id); // check info query for nonexistent member
+
 		Info storage info = _infoMap[id].info;
 
 		info.votes += uint32(votes);
@@ -218,11 +226,13 @@ contract Member is IMember, ERC721_Module {
 	}
 
 	function transferVotes(uint256 from, uint256 to, uint32 votes) external OnlyDAO {
-		require(_exists(from), "#Member#transferVotes: info query for nonexistent member from");
-		require(_exists(to), "#Member#transferVotes: info query for nonexistent member to");
+		checkExists(from); // check info query for nonexistent member from
+		checkExists(to); // check info query for nonexistent member to
+
 		Info storage infoFrom = _infoMap[from].info;
 		Info storage infoTo = _infoMap[to].info;
-		require(infoFrom.votes >= votes, "#Member#transferVotes: not votes power enough");
+		// require(infoFrom.votes >= votes, "#Member#transferVotes: not votes power enough");
+		if (infoFrom.votes < votes) revert InsufficientVotesInMember();
 
 		infoFrom.votes -= uint32(votes);
 		infoTo.votes += uint32(votes);

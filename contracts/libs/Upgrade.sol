@@ -1,23 +1,29 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-// 所有需要实现升级的合约都应该继承此`Upgrade`合约,并且应该是首要第一个继承的父类
+/**
+	*@dev All contracts that need to implement upgrades should inherit this `Upgrade` contract, 
+	* and it should be the first parent class inherited
+	*/
 contract Upgrade {
 	address internal _impl; // impl address
 }
 
-// 这里的上下文是对外部暴露的合约实体只用来存储数据,实现的业务逻辑应该放到impl中
-// 调用此合约的任何方法都会被导向`fallback()`中,然后使用`delegatecall()`调用实际实现并把当前数据上下文传递给impl
+/**
+ * @dev The context here is that the externally exposed contract entities are only used to store data, 
+ * and the implemented business logic should be placed in the impl
+ * Any method that calls this contract will be directed to `fallback()`, 
+ * and then use `delegatecall()` to call the actual implementation and pass the current data context to impl
+ */
 contract ProxyStore is Upgrade {
-	// Layout Store 分配的大小应该是动态编译指定,需从原始合约读取存储大小
+	// The size allocated by Layout Store should be specified by dynamic compilation, 
+	// and the storage size needs to be read from the original contract
 
 	constructor(address impl) public {
-		// require(impl != address(0));
 		_impl = impl;
 	}
 
 	fallback() external payable {
-		//require(_impl != address(0), "Proxy call not implemented");
 		(bool suc, bytes memory _data) = _impl.delegatecall(msg.data);
 		assembly {
 			let len := mload(_data)

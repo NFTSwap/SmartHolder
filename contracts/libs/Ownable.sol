@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import '../../openzeppelin/contracts/utils/Context.sol';
+import './Errors.sol';
+import './Context.sol';
 /**
  * @dev Contract module which provides a basic access control mechanism, where
  * there is an account (an owner) that can be granted exclusive access to
@@ -39,7 +40,8 @@ abstract contract Ownable is Context {
 	 * @dev Throws if called by any account other than the owner.
 	 */
 	modifier onlyOwner() {
-		require(owner() == _msgSender(), "Ownable: caller is not the owner");
+		//require(owner() == _msgSender(), "Ownable: caller is not the owner");
+		if (owner() != _msgSender()) revert OnlyOwnerAvailable();
 		_;
 	}
 
@@ -60,7 +62,8 @@ abstract contract Ownable is Context {
 	 * Can only be called by the current owner.
 	 */
 	function transferOwnership(address newOwner) public virtual onlyOwner {
-		require(newOwner != address(0), "Ownable: new owner is the zero address");
+		//require(newOwner != address(0), "Ownable: new owner is the zero address");
+		if (newOwner == address(0)) revert AddressEmpty();
 		emit OwnershipTransferred(_owner, newOwner);
 		_owner = newOwner;
 	}

@@ -2,7 +2,7 @@
 pragma solidity 0.8.17;
 
 import './libs/Upgrade.sol';
-import './libs/AddressExp.sol';
+import './libs/Address.sol';
 import './libs/Constants.sol';
 import './libs/ERC165.sol';
 import './libs/Interface.sol';
@@ -18,7 +18,6 @@ contract Module is Upgrade, ERC165, PermissionCheck, IModule {
 	function initModule(address host, string memory description, address operator) internal {
 		initERC165();
 		_registerInterface(Module_Type);
-		//ERC165(host).checkInterface(DAO_Type, "#Module#initModule dao host type not match");
 		_host = IDAO(host);
 		_description = description;
 		_operator = operator;

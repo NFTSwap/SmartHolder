@@ -2,6 +2,7 @@
 pragma solidity 0.8.17;
 
 import '../../openzeppelin/contracts/utils/Address.sol';
+import './Errors.sol';
 
 library AddressExp {
 	//@dev Converts an address to address payable.
@@ -14,9 +15,11 @@ library AddressExp {
 	}
 
 	function sendValue(address recipient, uint256 amount) internal {
-		require(address(this).balance >= amount, "Address: insufficient balance");
+		if (address(this).balance < amount)
+			revert InsufficientBalance();
 		(bool success, ) = recipient.call{ value: amount }("");
-		require(success, "Address: unable to send value, recipient may have reverted");
+		if (!success)
+			revert SendValueFail();
 	}
 
 }

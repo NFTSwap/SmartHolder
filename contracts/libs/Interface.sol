@@ -5,27 +5,28 @@ pragma experimental ABIEncoderV2;
 
 import '../../openzeppelin/contracts/utils/introspection/IERC165.sol';
 import '../../openzeppelin/contracts/token/ERC721/IERC721.sol';
+import '../../openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
 import '../../openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol';
 import '../../openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol';
-import '../../openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
+import '../../openzeppelin/contracts/utils/math/SafeMath.sol';
 
 /**
- * @title IERC165_1 extend erc165
+ * @dev IERC1651 extend erc165
  */
-interface IERC165_1 {
-	function checkInterface(bytes4 interfaceId, string memory message) view external;
+interface IERC1651 is IERC165 {
+	function checkInterface(bytes4 interfaceId) view external;
 }
 
 /**
- * @title IERC721_1 extend erc721
+ * @dev IERC7211 extend erc721
  */
-interface IERC721_1 is IERC721, IERC721Metadata, IERC721Enumerable {
+interface IERC7211 is IERC721, IERC721Metadata, IERC721Enumerable {
 	function exists(uint256 tokenId) external view returns (bool);
 }
 
 // DAO interfaces
 
-interface IModule is IERC165, IERC165_1 {
+interface IModule is IERC1651 {
 	event Change(uint256 indexed tag, uint256 value);
 	function operator() view external returns (address);
 	function setDescription(string memory description) external;
@@ -33,7 +34,7 @@ interface IModule is IERC165, IERC165_1 {
 	function upgrade(address impl) external;
 }
 
-interface IAssetShell is IModule, IERC721_1, IERC721Receiver {
+interface IAssetShell is IModule, IERC7211, IERC721Receiver {
 	struct AssetID {
 		address token;
 		uint256 tokenId;
@@ -47,7 +48,7 @@ interface IAssetShell is IModule, IERC721_1, IERC721Receiver {
 	function assetMeta(uint256 tokenId) view external returns (AssetID memory);
 }
 
-interface IAsset is IModule, IERC721_1 {
+interface IAsset is IModule, IERC7211 {
 }
 
 interface ILedger is IModule {
@@ -67,7 +68,7 @@ interface ILedger is IModule {
 	) external payable;
 }
 
-interface IMember is IModule, IERC721_1 {
+interface IMember is IModule, IERC7211 {
 	struct Info {
 		uint256 id;
 		string name;
@@ -117,6 +118,7 @@ interface IVotePool {
 	event Close(uint256 indexed id);
 	event Execute(uint256 indexed id);
 
+	function exists(uint256 id) view external returns(bool);
 	function create(Proposal memory arg0) external;
 	function tryClose(uint256 id, bool tryExecute) external;
 }

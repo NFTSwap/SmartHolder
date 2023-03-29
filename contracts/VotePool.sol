@@ -8,8 +8,6 @@ import './libs/Constants.sol';
 import './libs/ERC165.sol';
 import './libs/Upgrade.sol';
 import './libs/Check.sol';
-import '../openzeppelin/contracts/utils/math/SafeMath.sol';
-import '../openzeppelin/contracts/utils/Address.sol';
 
 contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 	using Address for address;
@@ -37,7 +35,6 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 	function initVotePool(address host, string memory description, uint256 _lifespan) external {
 		initERC165();
 		_registerInterface(VotePool_Type);
-		//IDAO(host).checkInterface(DAO_Type, "#VotePool#initVotePool dao host type not match");
 		_host = IDAO(host);
 		_description = description;
 		setLifespan(_lifespan);
@@ -57,7 +54,8 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 	}
 
 	function setLifespan(uint256 _lifespan) private {
-		require(_lifespan >= 12 hours, "#VotePool#setLifespan proposal lifespan not less than 12 hours");
+		// require(_lifespan >= 12 hours, "#VotePool.setLifespan proposal lifespan not less than 12 hours");
+		if (_lifespan < 12 hours) revert ProposalDefaultLifespanLimitError();
 		lifespan = _lifespan;
 	}
 
@@ -72,11 +70,12 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 	 * @dev Gettings proposal object from id
 	 */
 	function getProposal(uint256 id) view public returns (Proposal memory) {
-		return _proposal(id);
+		return proposal(id);
 	}
 
-	function _proposal(uint256 id) view private returns (Proposal storage) {
-		require(exists(id), "#VotePool#proposal proposal not exists");
+	function proposal(uint256 id) view private returns (Proposal storage) {
+		// require(exists(id), "#VotePool#proposal proposal not exists");
+		if (!exists(id)) revert ProposalNonExistsInVotePool();
 		return _proposalMap[id];
 	}
 
@@ -96,14 +95,15 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 			checkFrom(arg0.originId, Action_VotePool_Create);
 		}
 
-		require(!exists(arg0.id), "#VotePool#create proposal already exists");
-		require(arg0.passRate > 5_000, "#VotePool#create proposal vote pass rate not less than 50%");
+		if (exists(arg0.id)) revert ProposalAlreadyExistsInVotePool();
+
+		if (arg0.passRate <= 5_000) revert CreateProposalVotePassEateLimitError();
 
 		if (arg0.lifespan != 0) {
-			require(arg0.lifespan >= lifespan, "#VotePool#create proposal lifespan not less than current setting lifespan days");
+			if (arg0.lifespan < lifespan) revert CreateProposalLifespanLimitError();
 		}
 		if (arg0.loopCount != 0) {
-			require(arg0.loopTime >= 1 minutes, "#VotePool#create Loop time must be greater than 1 minute");
+			if (arg0.loopTime < 1 minutes) revert CreateProposalLoopTimeLimitError(); 
 		}
 		Proposal storage obj = _proposalMap[arg0.id];
 
@@ -164,14 +164,14 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 	 * @dev Vote on the proposal
 	 */
 	function vote(uint256 id, uint256 member, int256 votes, bool tryExecute) external Check(Action_VotePool_Vote) {
-		Proposal storage obj = _proposal(id);
+		Proposal storage obj = proposal(id);
 		IMember.Info memory info = _host.member().getMemberInfo(member);
 
-		require(votes != 0, "#VotePool#vote parameter error, votes==0");
-		require(!obj.isClose, "#VotePool#vote Voting has been closed");
-		require(_host.member().ownerOf(member) == msg.sender, "#VotePool#vote No call permission");
-		require(_votes[id][member] == 0, "#VotePool#vote Cannot vote repeatedly");
-		require(abs(votes) <= info.votes, "#VotePool#vote Voting limit");
+		if (votes == 0) revert VotesZero();
+		if (obj.isClose) revert ProposalClosed();
+		if (_host.member().ownerOf(member) != msg.sender) revert VotingMemberNoMatch();
+		if (_votes[id][member] != 0) revert DuplicateVoteError();
+		if (abs(votes) > info.votes) revert VoteInsufficientVotes();
 
 		_votes[id][member] = votes;
 
@@ -190,8 +190,9 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 	* @dev try close proposal
 	*/
 	function tryClose(uint256 id, bool tryExecute) public override {
-		Proposal storage obj = _proposal(id);
-		require(!obj.isClose, "#VotePool#tryClose Voting has been closed");
+		Proposal storage obj = proposal(id);
+		// require(!obj.isClose, "#VotePool.tryClose Voting has been closed");
+		if (obj.isClose) revert ProposalClosed();
 
 		uint256 votes  = _host.member().votes();
 		uint256 passRate = obj.passRate;
@@ -222,13 +223,13 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 	 * @dev Execute proposal resolution
 	 */
 	function execute(uint256 id) public {
-		Proposal storage obj = _proposal(id);
+		Proposal storage obj = proposal(id);
 
-		require(obj.isAgree, "#VotePool#execute Proposal was not passed");
-		require(!obj.isExecuted, "#VotePool#execute Resolution has been implemented");
+		if (!obj.isAgree) revert ProposalNotPassed();
+		require(!obj.isExecuted, "#VotePool.execute Resolution has been implemented");
 
 		if (obj.loopCount != 0) {
-			require(obj.executeTime + obj.loopTime < block.timestamp, "#VotePool#execute Execution interval is too short");
+			require(obj.executeTime + obj.loopTime < block.timestamp, "#VotePool.execute Execution interval is too short");
 			if (obj.loopCount > 0) {
 				exec(obj);
 				obj.loopCount--;

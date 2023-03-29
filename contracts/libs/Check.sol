@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
+import './Errors.sol';
 import './Interface.sol';
 
 abstract contract PermissionCheck {
@@ -14,7 +15,8 @@ abstract contract PermissionCheck {
 		* @dev Throws if called by any account other than the owner.
 		*/
 	modifier OnlyDAO() {
-		require(isPermissionDAO(), "#PermissionCheck#Check caller does not have permission");
+		if (!isPermissionDAO())
+			revert PermissionDeniedForOnlyDAO();
 		_;
 	}
 
@@ -22,8 +24,10 @@ abstract contract PermissionCheck {
 	 * @dev check call Permission from action
 	 */
 	modifier Check(uint256 action) {
-		if (!isPermissionDAO())
-			require(_host.member().isPermission(msg.sender, action), "#PermissionCheck#Check caller does not have permission");
+		if (!isPermissionDAO()) {
+			if (!_host.member().isPermission(msg.sender, action))
+				revert PermissionDenied(); // caller does not have permission
+		}
 		_;
 	}
 
@@ -34,8 +38,11 @@ abstract contract PermissionCheck {
 
 	function checkFrom(uint256 memberId, uint256 action) view internal {
 		if (!isPermissionDAO()) {
-			require(_host.member().ownerOf(memberId) == msg.sender, "#PermissionCheck#checkFrom Member owner mismatch");
-			require(_host.member().isPermissionFrom(memberId, action), "#PermissionCheck#checkFrom Check caller does not have permission");
+			if (
+						_host.member().ownerOf(memberId) != msg.sender // Member owner mismatch
+					|| !_host.member().isPermissionFrom(memberId, action) // Check caller does not have permission
+				)
+				revert PermissionDenied();
 		}
 	}
 
