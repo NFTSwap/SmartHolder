@@ -47,12 +47,12 @@ contract AssetShell is AssetBase, IAssetShell {
 		uint256 id = convertTokenID(address(token), tokenId);
 		AssetData storage ad = _assetsData[id];
 
-		//address to;
-		//uint256 price;
-		(address to, uint256 price) = abi.decode(data, (address, uint256));
+		address to;
+		uint256 price;
+		(to, price) = abi.decode(data, (address, uint256));
 
-		require(ad.meta.token == address(0));//, "#AssetShell.onERC721Received mint of asset already exists");
-		require(from != address(this));//, "#AssetShell.onERC721Received from not for myself");
+		require(ad.meta.token == address(0), "");//, "#AssetShell.onERC721Received mint of asset already exists");
+		require(from != address(this), "");//, "#AssetShell.onERC721Received from not for myself");
 
 		ad.meta.token = address(token);
 		ad.meta.tokenId = tokenId;
