@@ -7,6 +7,13 @@ import '../openzeppelin/contracts/utils/structs/EnumerableMap.sol';
 contract DAO is IDAO, Module {
 	using EnumerableMap for EnumerableMap.UintToAddressMap;
 
+	struct BasicInformation {
+		string mission;
+		string description;
+		string image;
+		bytes  extend;
+	}
+
 	address            private  _root;
 	string             private  _name;
 	string             private  _mission;
@@ -64,6 +71,25 @@ contract DAO is IDAO, Module {
 		_description = desc;
 		emit Change(Change_Tag_Description, 0);
 		emit Change(Change_Tag_DAO_Mission, 0);
+	}
+
+	function setBasicInformation(BasicInformation calldata basic) external Check(Action_DAO_Settings) {
+		if (bytes(basic.mission).length > 0) {
+			_mission = basic.mission;
+			emit Change(Change_Tag_DAO_Mission, 0);
+		}
+		if (bytes(basic.description).length > 0) {
+			_description = basic.description;
+			emit Change(Change_Tag_Description, 0);
+		}
+		if (bytes(basic.image).length > 0) {
+			image = basic.image;
+			emit Change(Change_Tag_DAO_Image, 0);
+		}
+		if (basic.extend.length > 0) {
+			extend = basic.extend;
+			emit Change(Change_Tag_DAO_Extend, 0);
+		}
 	}
 
 	function setModule(uint256 id, address addr) external Check(Action_DAO_SetModule) {
