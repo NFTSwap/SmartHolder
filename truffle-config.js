@@ -60,7 +60,7 @@ module.exports = {
 			gas: 6721975,
 			network_id: 1337,
 		},
-		...cfg,
+		...cfg.networks,
 	},
 
 	// Set default mocha options here, use special reporters etc.

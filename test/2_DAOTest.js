@@ -6,6 +6,8 @@ contract('DAO', ([from]) => {
 	let app;
 	before(async () => app = await App.create());
 
+	//console.log('DAO from', from);
+
 	context('Settings', () => {
 		it('setDescription()', async()=>{
 			await app.DAO.setDescription('DAO Description')
