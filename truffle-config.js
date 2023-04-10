@@ -19,6 +19,11 @@
  */
 
 const Provider = require("./provider").Provider;
+try {
+  var cfg = require("./.truffle-config");
+} catch {
+  var cfg = {};
+}
 
 module.exports = {
   /**
@@ -52,18 +57,13 @@ module.exports = {
       ),
       production: true,
     },
-    // development: {
-    // 	host: "117.50.36.53",
-    // 	port: "38545",
-    // 	gas: 6721975,
-    // 	network_id: 64,
-    // 	from: '0x90f15922028b0fa3c5ea37b6351e5cd4fb8f9957',
-    // },
     development: {
       host: "127.0.0.1",
-      port: 8545,
-      network_id: "*",
+      port: "8545",
+      gas: 6721975,
+      network_id: 1337,
     },
+    ...cfg.networks,
   },
 
   // Set default mocha options here, use special reporters etc.

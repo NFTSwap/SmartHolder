@@ -9,6 +9,8 @@ contract('DAOs', ([from]) => {
 	let app;
 	before(async () => app = await App.create());
 
+	//console.log('DAOs from', from);
+
 	context('Deploy', ()=>{
 
 		it('deploy()', async()=>{
