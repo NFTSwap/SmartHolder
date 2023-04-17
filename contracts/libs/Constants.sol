@@ -17,6 +17,7 @@ uint256 constant Module_LEDGER_ID = 2;
 uint256 constant Module_ASSET_ID = 3;
 uint256 constant Module_ASSET_First_ID = 4;
 uint256 constant Module_ASSET_Second_ID = 5;
+uint256 constant Module_Share_ID = 6;
 
 // Departments Change tag
 uint256 constant Change_Tag_Common = 0;

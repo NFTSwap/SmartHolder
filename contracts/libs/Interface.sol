@@ -8,7 +8,10 @@ import '../../openzeppelin/contracts/token/ERC721/IERC721.sol';
 import '../../openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
 import '../../openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol';
 import '../../openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol';
+import '../../openzeppelin/contracts/token/ERC20/IERC20.sol';
+import '../../openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol';
 import '../../openzeppelin/contracts/utils/math/SafeMath.sol';
+import '../../openzeppelin/contracts/utils/structs/EnumerableMap.sol';
 
 /**
  * @dev IERC1651 extend erc165
@@ -22,6 +25,17 @@ interface IERC1651 is IERC165 {
  */
 interface IERC7211 is IERC721, IERC721Metadata, IERC721Enumerable {
 	function exists(uint256 tokenId) external view returns (bool);
+}
+
+/**
+ * @dev IERC201 extend ERC20
+ */
+interface IERC201 is IERC20, IERC20Metadata {
+	function indexAt(uint256 index) external view returns (address, uint256);
+	function length() external view returns (uint256);
+}
+
+interface IShare is IERC201 {
 }
 
 // DAO interfaces
@@ -129,6 +143,7 @@ interface IDAO is IModule {
 	function member() view external returns (IMember);
 	function ledger() view external returns (ILedger);
 	function asset() view external returns (IAsset);
+	function share() view external returns (IShare);
 	function module(uint256 id) view external returns (IModule);
 }
 

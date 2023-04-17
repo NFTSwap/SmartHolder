@@ -44,14 +44,18 @@ contract Ledger is ILedger, Module {
 
 		uint256 total = _host.member().total();
 
-		IMember.Info memory info;
+		if (address(_host.share()) != address(0)) {
+			// TODO ...
+		} else {
+			IMember.Info memory info;
 
-		for (uint256 i = 0; i < total; i++) {
-			info = _host.member().indexAt(i);
-			address owner = _host.member().ownerOf(info.id);
-			uint256 balance = info.votes * unit;
-			owner.sendValue(balance);
-			emit Release(info.id, owner, balance);
+			for (uint256 i = 0; i < total; i++) {
+				info = _host.member().indexAt(i);
+				address owner = _host.member().ownerOf(info.id);
+				uint256 balance = info.votes * unit;
+				owner.sendValue(balance);
+				emit Release(info.id, owner, balance);
+			}
 		}
 
 		emit ReleaseLog(msg.sender, amount, description);

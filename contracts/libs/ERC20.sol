@@ -3,10 +3,8 @@
 
 pragma solidity ~0.8.17;
 
-import '../../openzeppelin/contracts/token/ERC20/IERC20.sol';
-import '../../openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol';
-import '../../openzeppelin/contracts/utils/structs/EnumerableMap.sol';
 import './Context.sol';
+import './Interface.sol';
 
 /**
  * @dev Implementation of the {IERC20} interface.
@@ -33,7 +31,7 @@ import './Context.sol';
  * functions have been added to mitigate the well-known issues around setting
  * allowances. See {IERC20-approve}.
  */
-contract ERC20 is Context, IERC20, IERC20Metadata {
+contract ERC20 is Context, IERC201 {
 	using EnumerableMap for EnumerableMap.AddressToUintMap;
 
 	// mapping(address => uint256) private _balances;
@@ -110,14 +108,14 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
 	/**
 	 * @dev indexAt(index) get account and balance by index 
 	 */
-	function indexAt(uint256 index) public view returns (address, uint256) {
+	function indexAt(uint256 index) public view virtual override returns (address, uint256) {
 		return _balances.at(index);
 	}
 
 	/**
 	 * @dev length() account length
 	 */
-	function length() public view returns (uint256) {
+	function length() public view virtual override returns (uint256) {
 		return _balances.length();
 	}
 

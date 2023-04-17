@@ -1,10 +1,6 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ~0.8.17;
 
-import '../../openzeppelin/contracts/utils/math/SafeMath.sol';
-import '../../openzeppelin/contracts/utils/structs/EnumerableSet.sol';
-import '../../openzeppelin/contracts/utils/structs/EnumerableMap.sol';
-
 import './Interface.sol';
 import './Address.sol';
 import './Strings.sol';

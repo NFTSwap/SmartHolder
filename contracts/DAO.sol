@@ -28,6 +28,7 @@ contract DAO is IDAO, Module {
 	function member() view external override returns (IMember) { return IMember(_modules.get(Module_MEMBER_ID)); }
 	function ledger() view external override returns (ILedger) { return ILedger(_modules.get(Module_LEDGER_ID)); }
 	function asset() view external override returns (IAsset) { return IAsset(_modules.get(Module_ASSET_ID)); }
+	function share() view external override returns (IShare) { return IShare(_modules.get(Module_Share_ID)); }
 
 	function module(uint256 id) view external returns (IModule) {
 		return IModule(_modules.contains(id) ? _modules.get(id): address(0));
