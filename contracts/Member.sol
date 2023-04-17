@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.17;
+pragma solidity ~0.8.17;
 
 pragma experimental ABIEncoderV2;
 
@@ -80,14 +80,14 @@ contract Member is IMember, ERC721Module {
 
 	function createFrom(
 		address owner,       uint256 id,
-		uint32 votes,        uint256[] memory permissions,
+		uint32 votes_,        uint256[] memory permissions,
 		string memory name,  string memory description, string memory image
 	) external Check(Action_Member_Create)
 	{
 		Info memory info;
 		info.id = id;
 		info.name = name;
-		info.votes = votes;
+		info.votes = votes_;
 		info.image = image;
 		info.description = description;
 		mint(owner, info, permissions);

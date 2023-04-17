@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.17;
+pragma solidity ~0.8.17;
 
 /**
 	*@dev All contracts that need to implement upgrades should inherit this `Upgrade` contract, 
@@ -19,8 +19,8 @@ contract ProxyStore is Upgrade {
 	// The size allocated by Layout Store should be specified by dynamic compilation, 
 	// and the storage size needs to be read from the original contract
 
-	constructor(address impl) public {
-		_impl = impl;
+	constructor(address impl_) public {
+		_impl = impl_;
 	}
 
 	fallback() external payable {

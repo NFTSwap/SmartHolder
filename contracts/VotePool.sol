@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.17;
+pragma solidity ~0.8.17;
 
 pragma experimental ABIEncoderV2;
 
@@ -137,21 +137,21 @@ contract VotePool is Upgrade, ERC165, PermissionCheck, IVotePool {
 	 */
 	function create2(
 		uint256       id,          address[] memory target,
-		uint256       lifespan,    uint256 passRate,
+		uint256       lifespan_,    uint256 passRate,
 		int256        loopCount,   uint256 loopTime,
-		string memory name,        string memory description,
+		string memory name,        string memory description_,
 		uint256       originId,    bytes[] memory  data
 	) external {
 		Proposal memory pro;
 		pro.id          = id;
 		pro.originId    = originId; // member id
 		pro.target      = target;
-		pro.lifespan    = lifespan;
+		pro.lifespan    = lifespan_;
 		pro.passRate    = passRate;
 		pro.loopCount   = loopCount;
 		pro.loopTime    = loopTime;
 		pro.name        = name;
-		pro.description = description;
+		pro.description = description_;
 		pro.data        = data;
 		create(pro);
 	}

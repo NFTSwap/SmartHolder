@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity 0.8.17;
+pragma solidity ~0.8.17;
 
 // Module type
 bytes4 constant Module_Type = 0x6b27a068; // bytes4(keccak256('initDepartment(address,string,address)'))

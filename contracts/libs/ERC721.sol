@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity 0.8.17;
+pragma solidity ~0.8.17;
 
 import '../../openzeppelin/contracts/utils/math/SafeMath.sol';
 import '../../openzeppelin/contracts/utils/structs/EnumerableSet.sol';
@@ -85,9 +85,9 @@ abstract contract ERC721 is Context, IERC7211 {
 
 	function _registerInterface(bytes4 interfaceId) internal virtual;
 
-	function initERC721(string memory name, string memory symbol) internal {
-		_name = name;
-		_symbol = symbol;
+	function initERC721(string memory name_, string memory symbol_) internal {
+		_name = name_;
+		_symbol = symbol_;
 
 		// register the supported interfaces to conform to ERC721 via ERC165
 		_registerInterface(_INTERFACE_ID_ERC721);
@@ -481,10 +481,10 @@ abstract contract ERC721 is Context, IERC7211 {
 		* `https://api.myproject.com/token/<id>`), use {_setBaseURI} to store
 		* it and save gas.
 		*/
-	function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal virtual {
+	function _setTokenURI(uint256 tokenId, string memory tokenURI_) internal virtual {
 		// require(_exists(tokenId), "ERC721Metadata: URI set of nonexistent token");
 		if (!_exists(tokenId)) revert TokenIDNonExistentInERC721();
-		_tokenURIs[tokenId] = _tokenURI;
+		_tokenURIs[tokenId] = tokenURI_;
 	}
 
 	/**

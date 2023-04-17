@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.17;
+pragma solidity ~0.8.17;
 
 import './Module.sol';
 import '../openzeppelin/contracts/utils/structs/EnumerableMap.sol';
@@ -34,20 +34,20 @@ contract DAO is IDAO, Module {
 	}
 
 	function initDAO(
-		string calldata name, string calldata mission, string calldata description,
-		address root, address operator, address member
+		string calldata name_, string calldata mission_, string calldata description,
+		address root_, address operator, address member_
 	) external {
 		initModule(address(this), description, operator);
 		_registerInterface(DAO_Type);
 
-		ERC165(root).checkInterface(VotePool_Type);
-		ERC165(member).checkInterface(Member_Type);
+		ERC165(root_).checkInterface(VotePool_Type);
+		ERC165(member_).checkInterface(Member_Type);
 
-		_root = root;
-		_name = name;
-		_mission = mission;
+		_root = root_;
+		_name = name_;
+		_mission = mission_;
 
-		_modules.set(Module_MEMBER_ID, member);
+		_modules.set(Module_MEMBER_ID, member_);
 		// emit SetModule(Module_MEMBER_ID, member);
 	}
 
@@ -66,8 +66,8 @@ contract DAO is IDAO, Module {
 		emit Change(Change_Tag_DAO_Mission, 0);
 	}
 
-	function setMissionAndDesc(string calldata mission, string calldata desc) external Check(Action_DAO_Settings) {
-		_mission = mission;
+	function setMissionAndDesc(string calldata mission_, string calldata desc) external Check(Action_DAO_Settings) {
+		_mission = mission_;
 		_description = desc;
 		emit Change(Change_Tag_Description, 0);
 		emit Change(Change_Tag_DAO_Mission, 0);
