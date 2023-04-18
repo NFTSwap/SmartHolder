@@ -67,7 +67,8 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 		uint32  seller_fee_basis_points_first;
 		uint32  seller_fee_basis_points_second;
 		address fee_recipient;
-		string  contractURIPrefix;
+		string  base_contract_uri;
+		string  base_uri;
 	}
 
 	EnumerableMap.UintToAddressMap private  _DAOs; // global DAOs list
@@ -128,21 +129,23 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 		AssetShell  assetFirst  = AssetShell( payable(address(new AssetShellProxy(defaultIMPLs.AssetShell))));
 		AssetShell  assetSecond = AssetShell( payable(address(new AssetShellProxy(defaultIMPLs.AssetShell))));
 
-		AssetBase.InitContractURI memory uri;
+		Asset.InitContractURI memory uri;
 		uri.name                    = assetArgs.name;
 		uri.description             = assetArgs.description;
 		uri.image                   = assetArgs.image;
 		uri.external_link           = assetArgs.external_link;
-		uri.seller_fee_basis_points = assetArgs.seller_fee_basis_points_second;
+		uri.base_contract_uri       = assetArgs.base_contract_uri;
+		uri.base_uri                = assetArgs.base_uri;
 		uri.fee_recipient           = assetArgs.fee_recipient;
-		uri.contractURIPrefix       = assetArgs.contractURIPrefix;
+		//uri.seller_fee_basis_points = 0;
 
 		ledger.initLedger(address(host), ledgerArgs.description, address(0));
 		asset.initAsset(address(host), address(0), uri);
+
+		uri.seller_fee_basis_points = assetArgs.seller_fee_basis_points_second;
 		assetSecond.initAssetShell(address(host), address(0), IAssetShell.SaleType.kSecond, uri);
 
 		uri.seller_fee_basis_points = assetArgs.seller_fee_basis_points_first;
-
 		assetFirst.initAssetShell(address(host), address(0), IAssetShell.SaleType.kFirst, uri);
 
 		// set modules

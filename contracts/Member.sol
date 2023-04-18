@@ -3,11 +3,11 @@ pragma solidity ~0.8.17;
 
 pragma experimental ABIEncoderV2;
 
-import './Asset.sol';
+import './Module.sol';
+import './libs/ERC721.sol';
 import './libs/Strings.sol';
-import '../openzeppelin/contracts/utils/structs/EnumerableSet.sol';
 
-contract Member is IMember, ERC721Module {
+contract Member is Module, ERC721, IMember {
 	using EnumerableSet for EnumerableSet.UintSet;
 	using StringsExp for bytes;
 	using Strings for uint256;
@@ -30,6 +30,15 @@ contract Member is IMember, ERC721Module {
 		uint256[] permissions;
 	}
 
+	function _registerInterface721(bytes4 interfaceId) internal override {
+		ERC165._registerInterface(interfaceId);
+	}
+
+	// compatible with opensea
+	function contractURI() view public override returns (string memory uri) {
+		uri = _host.asset().contractURI();
+	}
+
 	function initMember(
 		address host, string memory name, string memory description,
 		string memory baseURI, address operator, MintMemberArgs[] memory members) external
@@ -47,11 +56,11 @@ contract Member is IMember, ERC721Module {
 		_mint(owner, info.id);
 
 		Info_ storage i0   = _infoMap[info.id];
-		Info storage info_ = i0.info;
+		Info  storage info_= i0.info;
 		info_.id           = info.id;
 		info_.name         = info.name;
 		info_.description  = info.description;
-		info_.image       = info.image;
+		info_.image        = info.image;
 		info_.votes        = info.votes == 0 ? 1: info.votes; // limit votes to 1
 
 		_votes += info_.votes;

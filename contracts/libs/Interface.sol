@@ -4,31 +4,43 @@ pragma solidity ~0.8.17;
 pragma experimental ABIEncoderV2;
 
 import '../../openzeppelin/contracts/utils/introspection/IERC165.sol';
-import '../../openzeppelin/contracts/token/ERC721/IERC721.sol';
+import '../../openzeppelin/contracts/token/ERC20/IERC20.sol'; // 20
+import '../../openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol';
+import '../../openzeppelin/contracts/token/ERC721/IERC721.sol'; // 721
 import '../../openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
 import '../../openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol';
 import '../../openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol';
-import '../../openzeppelin/contracts/token/ERC20/IERC20.sol';
-import '../../openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol';
+import "../../openzeppelin/contracts/token/ERC1155/IERC1155.sol"; // 1155
+import "../../openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
+import "../../openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol";
 import '../../openzeppelin/contracts/utils/math/SafeMath.sol';
 import '../../openzeppelin/contracts/utils/structs/EnumerableMap.sol';
 
 /**
- * @dev IERC7211 extend ERC721
- */
-interface IERC7211 is IERC721, IERC721Metadata, IERC721Enumerable {
-	function exists(uint256 tokenId) external view returns (bool);
-}
-
-/**
  * @dev IERC201 extend IERC20
  */
-interface IERC201 is IERC20, IERC20Metadata {
+interface IERC20_1 is IERC20, IERC20Metadata {
 	function indexAt(uint256 index) external view returns (address, uint256);
 	function totalOwners() external view returns (uint256);
 }
 
-interface IShare is IERC201 {
+/**
+ * @dev IERC7211 extend ERC721
+ */
+interface IERC721_1 is IERC721, IERC721Metadata, IERC721Enumerable {
+	function exists(uint256 tokenId) external view returns (bool);
+}
+
+/**
+ * @dev IERC11551 extend IERC1155
+ */
+interface IERC1155_1 is IERC1155, IERC1155MetadataURI {
+	function totalSupply(uint256 id) external view returns (uint256);
+	function exists(uint256 id) external view returns (bool);
+}
+
+interface IOpenseaContractURI {
+	function contractURI() external view returns (string memory);
 }
 
 // DAO interfaces
@@ -41,7 +53,7 @@ interface IModule is IERC165 {
 	function upgrade(address impl) external;
 }
 
-interface IAssetShell is IModule, IERC7211, IERC721Receiver {
+interface IAssetShell is IModule, IERC721_1, IERC721Receiver {
 	struct AssetID {
 		address token;
 		uint256 tokenId;
@@ -55,8 +67,8 @@ interface IAssetShell is IModule, IERC7211, IERC721Receiver {
 	function assetMeta(uint256 tokenId) view external returns (AssetID memory);
 }
 
-interface IAsset is IModule, IERC7211 {
-}
+interface IAsset is IModule, IERC1155_1, IOpenseaContractURI {}
+interface IShare is IERC20_1 {}
 
 interface ILedger is IModule {
 	event Receive(address indexed from, uint256 balance);
@@ -75,7 +87,7 @@ interface ILedger is IModule {
 	) external payable;
 }
 
-interface IMember is IModule, IERC7211 {
+interface IMember is IModule, IERC721_1, IOpenseaContractURI {
 	struct Info {
 		uint256 id;
 		string name;

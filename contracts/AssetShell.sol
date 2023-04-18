@@ -4,9 +4,10 @@ pragma solidity ~0.8.17;
 pragma experimental ABIEncoderV2;
 
 import './libs/Errors.sol';
+import './libs/ERC721.sol';
 import './Asset.sol';
 
-contract AssetShell is AssetBase, IAssetShell {
+contract AssetShell is AssetModule, ERC721, IAssetShell {
 	using Address for address;
 
 	bytes4 private constant _ERC721_RECEIVED = 0x150b7a02;
@@ -23,8 +24,15 @@ contract AssetShell is AssetBase, IAssetShell {
 	SaleType                      public  saleType; // is opensea first or second sale
 	uint256[16]                   private  __; // reserved storage space
 
+	function name() public view override(AssetModule,ERC721,IERC721Metadata)  returns (string memory) {
+		return AssetModule.name();
+	}
+	function _registerInterface721(bytes4 interfaceId) internal virtual override {
+		ERC165._registerInterface(interfaceId);
+	}
+
 	function initAssetShell(address host, address operator, SaleType _saleType, InitContractURI memory uri) external {
-		initAssetBase(host, operator, uri);
+		initAssetModule(host, operator, uri);
 		_registerInterface(AssetShell_Type);
 		_registerInterface(_ERC721_RECEIVED);
 		saleType = _saleType;

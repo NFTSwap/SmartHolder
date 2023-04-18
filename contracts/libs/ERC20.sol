@@ -31,7 +31,7 @@ import './Interface.sol';
  * functions have been added to mitigate the well-known issues around setting
  * allowances. See {IERC20-approve}.
  */
-contract ERC20 is Context, IERC201 {
+contract ERC20 is Context, IERC20_1 {
 	using EnumerableMap for EnumerableMap.AddressToUintMap;
 
 	// mapping(address => uint256) private _balances;

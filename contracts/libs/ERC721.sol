@@ -10,7 +10,7 @@ import './Context.sol';
  * @title ERC721 Non-Fungible Token Standard basic implementation
  * @dev see https://eips.ethereum.org/EIPS/eip-721
  */
-abstract contract ERC721 is Context, IERC7211 {
+abstract contract ERC721 is Context, IERC721_1 {
 	using SafeMath for uint256;
 	using Address for address;
 	using EnumerableSet for EnumerableSet.UintSet;
@@ -79,16 +79,16 @@ abstract contract ERC721 is Context, IERC7211 {
 		*/
 	bytes4 private constant _INTERFACE_ID_ERC721_ENUMERABLE = 0x780e9d63;
 
-	function _registerInterface(bytes4 interfaceId) internal virtual;
+	function _registerInterface721(bytes4 interfaceId) internal virtual;
 
 	function initERC721(string memory name_, string memory symbol_) internal {
 		_name = name_;
 		_symbol = symbol_;
 
 		// register the supported interfaces to conform to ERC721 via ERC165
-		_registerInterface(_INTERFACE_ID_ERC721);
-		_registerInterface(_INTERFACE_ID_ERC721_METADATA);
-		_registerInterface(_INTERFACE_ID_ERC721_ENUMERABLE);
+		_registerInterface721(_INTERFACE_ID_ERC721);
+		_registerInterface721(_INTERFACE_ID_ERC721_METADATA);
+		_registerInterface721(_INTERFACE_ID_ERC721_ENUMERABLE);
 	}
 
 	/**
@@ -117,7 +117,7 @@ abstract contract ERC721 is Context, IERC7211 {
 		* @dev Gets the token name.
 		* @return string representing the token name
 		*/
-	function name() public view override returns (string memory) {
+	function name() public view virtual override returns (string memory) {
 		return _name;
 	}
 
@@ -125,7 +125,7 @@ abstract contract ERC721 is Context, IERC7211 {
 		* @dev Gets the token symbol.
 		* @return string representing the token symbol
 		*/
-	function symbol() public view override returns (string memory) {
+	function symbol() public view virtual override returns (string memory) {
 		return _symbol;
 	}
 
@@ -559,7 +559,7 @@ abstract contract ERC721 is Context, IERC7211 {
 	function _afterTokenTransfer(address from, address to, uint256 tokenId, bytes memory _data) internal virtual {}
 
 	//@overwrite
-	function exists(uint256 id) view public returns (bool) {
+	function exists(uint256 id) view public override returns (bool) {
 		return _exists(id);
 	}
 

@@ -3,9 +3,6 @@
 
 pragma solidity ~0.8.17;
 
-import "../../openzeppelin/contracts/token/ERC1155/IERC1155.sol";
-import "../../openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
-import "../../openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol";
 import './Interface.sol';
 import './Address.sol';
 import './Strings.sol';
@@ -18,7 +15,7 @@ import './Context.sol';
  *
  * _Available since v3.1._
  */
-abstract contract ERC1155 is Context, IERC165, IERC1155, IERC1155MetadataURI {
+abstract contract ERC1155 is Context, IERC1155_1 {
 	using Address for address;
 
 	// Mapping from token ID to account balances
@@ -27,40 +24,75 @@ abstract contract ERC1155 is Context, IERC165, IERC1155, IERC1155MetadataURI {
 	// Mapping from account to operator approvals
 	mapping(address => mapping(address => bool)) private _operatorApprovals;
 
-	// Used as the URI for all token types by relying on ID substitution, e.g. https://token-cdn-domain/{id}.json
-	string private _uri;
+	// Optional base URI
+	string public baseURI;
+
+	// Optional mapping for token URIs
+	mapping(uint256 => string) internal _tokenURIs;
+	mapping(uint256 => uint256) private _totalSupply;
 
 	/**
-	 * @dev See {_setURI}.
+	 * @dev init ERC1155
 	 */
-	//constructor(string memory uri_) {
-	//	_setURI(uri_);
-	//}
+	function initERC1155(string memory baseURI_) internal {
+		baseURI = baseURI_;
+	}
+
+	/**
+		* @dev Total amount of tokens in with a given id.
+		*/
+	function totalSupply(uint256 id) public view virtual returns (uint256) {
+			return _totalSupply[id];
+	}
+
+	/**
+		* @dev Indicates whether any token exist with a given id, or not.
+		*/
+	function exists(uint256 id) public view virtual returns (bool) {
+			return ERC1155.totalSupply(id) > 0;
+	}
 
 	/**
 	 * @dev See {IERC165-supportsInterface}.
 	 */
-	function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+	function supportsInterface1155(bytes4 interfaceId) internal pure returns (bool) {
 		return
 			interfaceId == type(IERC1155).interfaceId ||
 			interfaceId == type(IERC1155MetadataURI).interfaceId
-			/* ||
-			super.supportsInterface(interfaceId);*/
 		;
 	}
 
 	/**
-	 * @dev See {IERC1155MetadataURI-uri}.
-	 *
-	 * This implementation returns the same URI for *all* token types. It relies
-	 * on the token type ID substitution mechanism
-	 * https://eips.ethereum.org/EIPS/eip-1155#metadata[defined in the EIP].
-	 *
-	 * Clients calling this function must replace the `\{id\}` substring with the
-	 * actual token type ID.
-	 */
-	function uri(uint256) public view virtual override returns (string memory) {
-		return _uri;
+		* @dev See {IERC1155MetadataURI-uri}.
+		*
+		* This implementation returns the concatenation of the `_baseURI`
+		* and the token-specific uri if the latter is set
+		*
+		* This enables the following behaviors:
+		*
+		* - if `_tokenURIs[tokenId]` is set, then the result is the concatenation
+		*   of `_baseURI` and `_tokenURIs[tokenId]` (keep in mind that `_baseURI`
+		*   is empty per default);
+		*
+		* - if `_tokenURIs[tokenId]` is NOT set then we fallback to `super.uri()`
+		*   which in most cases will contain `ERC1155._uri`;
+		*
+		* - if `_tokenURIs[tokenId]` is NOT set, and if the parents do not have a
+		*   uri value set, then the result is empty.
+		*/
+	function uri(uint256 tokenId) public view virtual override returns (string memory) {
+		string memory tokenURI = _tokenURIs[tokenId];
+
+		// If token URI is set, concatenate base URI and tokenURI (via abi.encodePacked).
+		return bytes(tokenURI).length > 0 ? string(abi.encodePacked(baseURI, tokenURI)): baseURI;
+	}
+
+	/**
+		* @dev Sets `tokenURI` as the tokenURI of `tokenId`.
+		*/
+	function _setURI(uint256 tokenId, string memory tokenURI) internal virtual {
+		_tokenURIs[tokenId] = tokenURI;
+		emit URI(uri(tokenId), tokenId);
 	}
 
 	/**
@@ -173,7 +205,7 @@ abstract contract ERC1155 is Context, IERC165, IERC1155, IERC1155MetadataURI {
 		uint256[] memory ids = _asSingletonArray(id);
 		uint256[] memory amounts = _asSingletonArray(amount);
 
-		_beforeTokenTransfer(operator, from, to, ids, amounts, data);
+		_beforeTokenTransfer0(operator, from, to, ids, amounts, data);
 
 		uint256 fromBalance = _balances[id][from];
 		require(fromBalance >= amount, "ERC1155: insufficient balance for transfer");
@@ -211,7 +243,7 @@ abstract contract ERC1155 is Context, IERC165, IERC1155, IERC1155MetadataURI {
 
 		address operator = _msgSender();
 
-		_beforeTokenTransfer(operator, from, to, ids, amounts, data);
+		_beforeTokenTransfer0(operator, from, to, ids, amounts, data);
 
 		for (uint256 i = 0; i < ids.length; ++i) {
 			uint256 id = ids[i];
@@ -230,29 +262,6 @@ abstract contract ERC1155 is Context, IERC165, IERC1155, IERC1155MetadataURI {
 		_afterTokenTransfer(operator, from, to, ids, amounts, data);
 
 		_doSafeBatchTransferAcceptanceCheck(operator, from, to, ids, amounts, data);
-	}
-
-	/**
-	 * @dev Sets a new URI for all token types, by relying on the token type ID
-	 * substitution mechanism
-	 * https://eips.ethereum.org/EIPS/eip-1155#metadata[defined in the EIP].
-	 *
-	 * By this mechanism, any occurrence of the `\{id\}` substring in either the
-	 * URI or any of the amounts in the JSON file at said URI will be replaced by
-	 * clients with the token type ID.
-	 *
-	 * For example, the `https://token-cdn-domain/\{id\}.json` URI would be
-	 * interpreted by clients as
-	 * `https://token-cdn-domain/000000000000000000000000000000000000000000000000000000000004cce0.json`
-	 * for token type ID 0x4cce0.
-	 *
-	 * See {uri}.
-	 *
-	 * Because these URIs cannot be meaningfully represented by the {URI} event,
-	 * this function emits no events.
-	 */
-	function _setURI(string memory newuri) internal virtual {
-		_uri = newuri;
 	}
 
 	/**
@@ -278,7 +287,7 @@ abstract contract ERC1155 is Context, IERC165, IERC1155, IERC1155MetadataURI {
 		uint256[] memory ids = _asSingletonArray(id);
 		uint256[] memory amounts = _asSingletonArray(amount);
 
-		_beforeTokenTransfer(operator, address(0), to, ids, amounts, data);
+		_beforeTokenTransfer0(operator, address(0), to, ids, amounts, data);
 
 		_balances[id][to] += amount;
 		emit TransferSingle(operator, address(0), to, id, amount);
@@ -310,7 +319,7 @@ abstract contract ERC1155 is Context, IERC165, IERC1155, IERC1155MetadataURI {
 
 		address operator = _msgSender();
 
-		_beforeTokenTransfer(operator, address(0), to, ids, amounts, data);
+		_beforeTokenTransfer0(operator, address(0), to, ids, amounts, data);
 
 		for (uint256 i = 0; i < ids.length; i++) {
 			_balances[ids[i]][to] += amounts[i];
@@ -344,7 +353,7 @@ abstract contract ERC1155 is Context, IERC165, IERC1155, IERC1155MetadataURI {
 		uint256[] memory ids = _asSingletonArray(id);
 		uint256[] memory amounts = _asSingletonArray(amount);
 
-		_beforeTokenTransfer(operator, from, address(0), ids, amounts, "");
+		_beforeTokenTransfer0(operator, from, address(0), ids, amounts, "");
 
 		uint256 fromBalance = _balances[id][from];
 		require(fromBalance >= amount, "ERC1155: burn amount exceeds balance");
@@ -376,7 +385,7 @@ abstract contract ERC1155 is Context, IERC165, IERC1155, IERC1155MetadataURI {
 
 		address operator = _msgSender();
 
-		_beforeTokenTransfer(operator, from, address(0), ids, amounts, "");
+		_beforeTokenTransfer0(operator, from, address(0), ids, amounts, "");
 
 		for (uint256 i = 0; i < ids.length; i++) {
 			uint256 id = ids[i];
@@ -407,6 +416,35 @@ abstract contract ERC1155 is Context, IERC165, IERC1155, IERC1155MetadataURI {
 		require(owner != operator, "ERC1155: setting approval status for self");
 		_operatorApprovals[owner][operator] = approved;
 		emit ApprovalForAll(owner, operator, approved);
+	}
+
+	function _beforeTokenTransfer0(
+		address operator,
+		address from,
+		address to,
+		uint256[] memory ids,
+		uint256[] memory amounts,
+		bytes memory data
+	) internal {
+		_beforeTokenTransfer(operator,from,to,ids,amounts,data);
+
+		if (from == address(0)) {
+			for (uint256 i = 0; i < ids.length; ++i) {
+				_totalSupply[ids[i]] += amounts[i];
+			}
+		}
+
+		if (to == address(0)) {
+			for (uint256 i = 0; i < ids.length; ++i) {
+				uint256 id = ids[i];
+				uint256 amount = amounts[i];
+				uint256 supply = _totalSupply[id];
+				require(supply >= amount, "ERC1155: burn amount exceeds totalSupply");
+				unchecked {
+					_totalSupply[id] = supply - amount;
+				}
+			}
+		}
 	}
 
 	/**

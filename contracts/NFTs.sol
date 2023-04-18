@@ -7,7 +7,7 @@ import './libs/ERC165.sol';
 contract NFTs is ERC165, ERC721 {
 
 	// @overwrite ---------------
-	function _registerInterface(bytes4 interfaceId) internal virtual override(ERC165,ERC721) {
+	function _registerInterface721(bytes4 interfaceId) internal virtual override {
 		ERC165._registerInterface(interfaceId);
 	}
 	// --------------------------
