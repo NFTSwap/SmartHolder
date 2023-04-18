@@ -6,7 +6,7 @@ import './Module.sol';
 import './libs/ERC20.sol';
 import './libs/Interface.sol';
 
-contract Share is Module, ERC20 {
+contract Share is Module, ERC20, IShare {
 	uint256[16] private  __; // reserved storage space
 
 	struct InitShare {

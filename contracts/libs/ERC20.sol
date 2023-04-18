@@ -78,7 +78,7 @@ contract ERC20 is Context, IERC201 {
 	 * For example, if `decimals` equals `2`, a balance of `505` tokens should
 	 * be displayed to a user as `5.05` (`505 / 10 ** 2`).
 	 *
-	 * Tokens usually opt for a value of 18, imitating the relationship between
+	 * Tokens usually opt for a value of 5, imitating the relationship between
 	 * Ether and Wei. This is the value {ERC20} uses, unless this function is
 	 * overridden;
 	 *
@@ -87,7 +87,7 @@ contract ERC20 is Context, IERC201 {
 	 * {IERC20-balanceOf} and {IERC20-transfer}.
 	 */
 	function decimals() public view virtual override returns (uint8) {
-		return 18;
+		return 5;
 	}
 
 	/**
@@ -113,9 +113,9 @@ contract ERC20 is Context, IERC201 {
 	}
 
 	/**
-	 * @dev length() account length
+	 * @dev totalOwners() account totalOwners
 	 */
-	function length() public view virtual override returns (uint256) {
+	function totalOwners() public view virtual override returns (uint256) {
 		return _balances.length();
 	}
 

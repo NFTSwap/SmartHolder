@@ -14,25 +14,18 @@ import '../../openzeppelin/contracts/utils/math/SafeMath.sol';
 import '../../openzeppelin/contracts/utils/structs/EnumerableMap.sol';
 
 /**
- * @dev IERC1651 extend erc165
- */
-interface IERC1651 is IERC165 {
-	function checkInterface(bytes4 interfaceId) view external;
-}
-
-/**
- * @dev IERC7211 extend erc721
+ * @dev IERC7211 extend ERC721
  */
 interface IERC7211 is IERC721, IERC721Metadata, IERC721Enumerable {
 	function exists(uint256 tokenId) external view returns (bool);
 }
 
 /**
- * @dev IERC201 extend ERC20
+ * @dev IERC201 extend IERC20
  */
 interface IERC201 is IERC20, IERC20Metadata {
 	function indexAt(uint256 index) external view returns (address, uint256);
-	function length() external view returns (uint256);
+	function totalOwners() external view returns (uint256);
 }
 
 interface IShare is IERC201 {
@@ -40,7 +33,7 @@ interface IShare is IERC201 {
 
 // DAO interfaces
 
-interface IModule is IERC1651 {
+interface IModule is IERC165 {
 	event Change(uint256 indexed tag, uint256 value);
 	function operator() view external returns (address);
 	function setDescription(string memory description) external;
