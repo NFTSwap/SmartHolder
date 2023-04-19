@@ -29,7 +29,7 @@ contract Ledger is ILedger, Module {
 		return address(this).balance;
 	}
 
-	function release(uint256 amount, string memory description) external payable Check(Action_Ledger_Withdraw) {
+	function release(uint256 amount, string memory description) external payable Check(Action_Ledger_Release) {
 		receiveBalance();
 
 		uint256 curamount = address(this).balance;

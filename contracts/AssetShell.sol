@@ -7,20 +7,28 @@ import './libs/Errors.sol';
 import './libs/ERC721.sol';
 import './Asset.sol';
 
-contract AssetShell is AssetModule, ERC721, IAssetShell {
+contract AssetShell is AssetModule, ERC1155, IAssetShell {
 	using Address for address;
 
-	bytes4 private constant _ERC721_RECEIVED = 0x150b7a02;
-	bytes4 private constant _INTERFACE_ID_ERC721 = 0x80ac58cd;
+	struct Locked {
+		uint256                     value;
+		mapping(address => uint256) previousOwners; // previous asset owner address => value
+	}
+
+	struct LockedID {
+		uint256 tokenId;
+		address owner;
+		address previousOwner;
+	}
 
 	struct AssetData {
 		AssetID meta; // asset meta data
 		uint256 minimumPrice; // Minimum transaction price of assets
-		address locked; // Previous asset owner address
+		mapping(address => Locked) locked; // owner => Locked
 	}
 
 	mapping(uint256 => AssetData) private _assetsData;   // tokenId => raw asset id
-	uint256                       private _lastLocked;
+	LockedID                      private _lastLocked;
 	SaleType                      public  saleType; // is opensea first or second sale
 	uint256[16]                   private  __; // reserved storage space
 
@@ -34,24 +42,24 @@ contract AssetShell is AssetModule, ERC721, IAssetShell {
 	function initAssetShell(address host, address operator, SaleType _saleType, InitContractURI memory uri) external {
 		initAssetModule(host, operator, uri);
 		_registerInterface(AssetShell_Type);
-		_registerInterface(_ERC721_RECEIVED);
 		saleType = _saleType;
 	}
 
-	function asERC721(address addr) view internal returns (IERC721) {
+	function asERC1155(address addr) view internal returns (IERC721) {
 		if (!addr.isContract()) revert NonContractAddress();
-		if (!IERC165(addr).supportsInterface(_INTERFACE_ID_ERC721))
-			revert CheckInterfaceNoMatch(_INTERFACE_ID_ERC721);
-		return IERC721(addr);
+		if (!IERC1155(addr).supportsInterface(type(IERC1155).interfaceId))
+			revert CheckInterfaceNoMatch(type(IERC1155).interfaceId);
+		return IERC1155(addr);
 	}
 
-	/**
-	 * @dev implement ERC721 asset receiving agreement
-	 */
-	function onERC721Received(
-		address operator, address from, uint256 tokenId, bytes memory data
-	) external override returns (bytes4) {
-		IERC721 token = asERC721(_msgSender());
+	function onERC1155Received(
+		address operator,
+		address from,
+		uint256 tokenId,
+		uint256 value,
+		bytes calldata data
+	) external returns (bytes4) {
+		IERC1155 token = asERC1155(_msgSender());
 		uint256 id = convertTokenID(address(token), tokenId);
 		AssetData storage ad = _assetsData[id];
 
@@ -59,8 +67,8 @@ contract AssetShell is AssetModule, ERC721, IAssetShell {
 		uint256 price;
 		(to, price) = abi.decode(data, (address, uint256));
 
-		require(ad.meta.token == address(0), "");//, "#AssetShell.onERC721Received mint of asset already exists");
-		require(from != address(this), "");//, "#AssetShell.onERC721Received from not for myself");
+		require(ad.meta.token == address(0), "");//, "#AssetShell.onERC1155Received mint of asset already exists");
+		require(from != address(this), "");//, "#AssetShell.onERC1155Received from not for myself");
 
 		ad.meta.token = address(token);
 		ad.meta.tokenId = tokenId;
@@ -68,7 +76,17 @@ contract AssetShell is AssetModule, ERC721, IAssetShell {
 
 		_mint(to, id);
 
-		return _ERC721_RECEIVED;
+		return 0xf23a6e61;
+	}
+
+	function onERC1155BatchReceived(
+		address operator,
+		address from,
+		uint256[] calldata ids,
+		uint256[] calldata values,
+		bytes calldata data
+	) external returns (bytes4) {
+		return 0xbc197c81;
 	}
 
 	/**
@@ -78,9 +96,9 @@ contract AssetShell is AssetModule, ERC721, IAssetShell {
 		return uint256(keccak256(abi.encodePacked(metaToken, metaTokenId)));
 	}
 
-	function _tokenURI(uint256 tokenId) internal view override returns (string memory) {
+	function uri(uint256 tokenId) public view virtual override(ERC1155,IERC1155MetadataURI) returns (string memory) {
 		AssetID memory meta = assetMeta(tokenId);
-		return IERC721Metadata(meta.token).tokenURI(meta.tokenId);
+		return IERC1155MetadataURI(meta.token).uri(meta.tokenId);
 	}
 
 	/**
@@ -96,20 +114,20 @@ contract AssetShell is AssetModule, ERC721, IAssetShell {
 	 * @dev withdraw() withdraw and unlock meta asset
 	 */
 	function withdraw(uint256 tokenId) external override Check(Action_Asset_Shell_Withdraw) {
-		AssetID storage meta = _assetsData[tokenId].meta;
-		// require(meta.token != address(0), "#AssetShell#withdraw withdraw of asset non exists");
-		if (meta.token == address(0)) revert AssetNonExistsInAssetShell();
-		withdrawTo(tokenId, ownerOf(tokenId), "");
+		// AssetID storage meta = _assetsData[tokenId].meta;
+		// // require(meta.token != address(0), "#AssetShell#withdraw withdraw of asset non exists");
+		// if (meta.token == address(0)) revert AssetNonExistsInAssetShell();
+		// withdrawTo(tokenId, ownerOf(tokenId), "");
 	}
 
 	/**
 	 * @dev withdrawTo() implement withdraw and unlock meta asset, internal method
 	 */
 	function withdrawTo(uint256 tokenId, address to, bytes memory data) internal {
-		AssetID storage meta = _assetsData[tokenId].meta;
-		IERC721(meta.token).safeTransferFrom(address(this), to, meta.tokenId, data);
-		delete _assetsData[tokenId]; // delete asset data
-		_burn(tokenId);
+		// AssetID storage meta = _assetsData[tokenId].meta;
+		// IERC721(meta.token).safeTransferFrom(address(this), to, meta.tokenId, data);
+		// delete _assetsData[tokenId]; // delete asset data
+		// _burn(tokenId);
 	}
 
 	/**
@@ -146,34 +164,45 @@ contract AssetShell is AssetModule, ERC721, IAssetShell {
 	/**
 	 * @dev unlock() receive eth transaction and unlock asset
 	 */
-	function unlock(uint256 tokenId) public payable {
+	function unlock(LockedID memory id) public payable {
 		// require(tokenId != 0, "#AssetShell#unlock locked tokenId != 0");
-		if (tokenId == 0) revert TokenIDEmpty();
+		if (id.tokenId == 0) revert TokenIDEmpty();
 		// require(msg.value != 0, "#AssetShell#unlock msg.value != 0"); // price
 		if (msg.value == 0) revert PayableAmountZero();
-
-		AssetData storage ad = _assetsData[tokenId];
 		// require(ad.locked != address(0), "#AssetShell#unlock Lock cannot be empty"); // price
-		if (ad.locked == address(0)) revert LockTokenIDEmptyInAssetShell();
+		if (id.owner == address(0)) revert LockTokenIDEmptyInAssetShell();
+		if (id.previousOwner == address(0)) revert LockTokenIDPreviousOwnerEmptyInAssetShell();
 
-		address to = ownerOf(tokenId);
+		AssetData storage ad = _assetsData[id.tokenId];
+		Locked storage locked = ad.locked[id.owner];
+		uint256 value = locked.previousOwners[id.previousOwner];
+		// require(value != 0);
+
+		address to = id.owner;//ownerOf(id.tokenId);
 		uint256 amount = msg.value * 10_000 / seller_fee_basis_points; // transfer price
+		uint256 price = ad.minimumPrice * value; // minimum price
 
 		// check transfer price
 		// require(amount >= ad.minimumPrice, "#AssetShell#unlock price >= minimum price"); // price
-		if (amount < ad.minimumPrice) revert PayableInsufficientAmount();
+		if (amount < price) revert PayableInsufficientAmount();
 
 		AssetID storage meta = ad.meta;
 		_host.ledger().assetIncome{value: msg.value}(meta.token, meta.tokenId, msg.sender, to, amount, saleType);
 
-		if (_lastLocked == tokenId)
-			_lastLocked = 0;
+		if (_lastLocked.tokenId == id.tokenId &&
+			_lastLocked.owner == id.owner && 
+			_lastLocked.previousOwner == id.previousOwner
+		) {
+			_lastLocked.tokenId = 0;
+		}
 
-		ad.locked = address(0); // unlock
+		// unlock
+		locked.value -= value;
+		delete locked.previousOwners[id.previousOwner];
 
 		if (saleType == SaleType.kFirst) {
 			bytes memory data = abi.encode(to, ad.minimumPrice);
-			withdrawTo(tokenId, address(_host.module(Module_ASSET_Second_ID)), data);
+			withdrawTo(id.tokenId, address(_host.module(Module_ASSET_Second_ID)), data);
 		}
 	}
 

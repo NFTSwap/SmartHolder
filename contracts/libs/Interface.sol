@@ -17,7 +17,7 @@ import '../../openzeppelin/contracts/utils/math/SafeMath.sol';
 import '../../openzeppelin/contracts/utils/structs/EnumerableMap.sol';
 
 /**
- * @dev IERC201 extend IERC20
+ * @dev IERC20_1 extend IERC20
  */
 interface IERC20_1 is IERC20, IERC20Metadata {
 	function indexAt(uint256 index) external view returns (address, uint256);
@@ -25,14 +25,14 @@ interface IERC20_1 is IERC20, IERC20Metadata {
 }
 
 /**
- * @dev IERC7211 extend ERC721
+ * @dev IERC721_1 extend ERC721
  */
 interface IERC721_1 is IERC721, IERC721Metadata, IERC721Enumerable {
 	function exists(uint256 tokenId) external view returns (bool);
 }
 
 /**
- * @dev IERC11551 extend IERC1155
+ * @dev IERC1155_1 extend IERC1155
  */
 interface IERC1155_1 is IERC1155, IERC1155MetadataURI {
 	function totalSupply(uint256 id) external view returns (uint256);
@@ -53,7 +53,7 @@ interface IModule is IERC165 {
 	function upgrade(address impl) external;
 }
 
-interface IAssetShell is IModule, IERC721_1, IERC721Receiver {
+interface IAssetShell is IModule, IERC1155_1, IERC1155Receiver {
 	struct AssetID {
 		address token;
 		uint256 tokenId;
@@ -63,7 +63,7 @@ interface IAssetShell is IModule, IERC721_1, IERC721Receiver {
 		kFirst,
 		kSecond
 	}
-	function withdraw(uint256 tokenId) external;
+	function withdraw(uint256 tokenId, address owner, uint256 amount) external;
 	function assetMeta(uint256 tokenId) view external returns (AssetID memory);
 }
 
@@ -148,6 +148,8 @@ interface IDAO is IModule {
 	function member() view external returns (IMember);
 	function ledger() view external returns (ILedger);
 	function asset() view external returns (IAsset);
+	function first() view external returns (IAssetShell);
+	function second() view external returns (IAssetShell);
 	function share() view external returns (IShare);
 	function module(uint256 id) view external returns (IModule);
 }

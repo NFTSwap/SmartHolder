@@ -90,9 +90,9 @@ contract Asset is AssetModule, ERC1155, IAsset {
 	}
 
 	/**
-	 * @dev make ERC721 NFT
+	 * @dev sefe mint asset
 	 */
-	function safeMint(address to, uint256 id, string memory _tokenURI, bytes calldata _data) public Check(Action_Asset_SafeMint) {
+	function safeMint(address to, uint256 id, string memory _tokenURI, bytes memory _data) public Check(Action_Asset_SafeMint) {
 		require(id % 2 == 0, "#Asset1155.safeMint ID must be an even number");
 		require(!exists(id), "#Asset1155.safeMint ID already exists");
 		_mint(to, id, 1, _data);
@@ -100,12 +100,19 @@ contract Asset is AssetModule, ERC1155, IAsset {
 	}
 
 	/**
-	 * @dev make ERC1155 NFTs
+	 * @dev make ERC721 NFT
 	 */
-	function makeNFTs(address to, uint256 id, uint256 amount, bytes calldata _data) public {
+	function makeNFT(address to, uint256 id, string memory _tokenURI, uint256 minPrice) public {
+		safeMint(address(_host.first()), id, _tokenURI, abi.encode(to, minPrice));
+	}
+
+	/**
+	 * @dev copy make ERC1155 NFTs
+	 */
+	function copyNFTs(address to, uint256 id, uint256 amount, uint256 minPrice) public {
 		require(id % 2 == 0, "#Asset1155.makeNFTs ID must be an even number");
 		require(balanceOf(_msgSender(), id) == 1, "#Asset1155.makeNFTs No permission to create NFTs");
-		_mint(to, id + 1, amount, _data);
+		_mint(address(_host.second()), id + 1, amount, abi.encode(to, minPrice));
 	}
 
 	function uri(uint256 id) public view virtual override(ERC1155,IERC1155MetadataURI) returns (string memory) {

@@ -26,6 +26,7 @@ error NonContractAddress(); // 0x4aa4cf51 non contract address
 error AssetNonExistsInAssetShell(); // 0x54ac7492 asset non exists
 error NeedToUnlockAssetFirst(); // 0xf31df50e You need to unlock the asset first
 error LockTokenIDEmptyInAssetShell(); // 0x21c67f49 Lock cannot be empty in asset shell
+error LockTokenIDPreviousOwnerEmptyInAssetShell(); // 0x21c67f49 Lock previous owner cannot be empty in asset shell
 error InsufficientVotesInMember(); // 0x252f4a32 not votes power enough in member
 error MemberNonExists(); // 0x7f5c5df9 member non exists
 error MemberAlreadyExists(); // 0xe0150952 member already exists

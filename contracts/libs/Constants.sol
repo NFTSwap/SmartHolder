@@ -42,5 +42,6 @@ uint256 constant Action_DAO_SetModule = 0x5d29163; // bytes4(keccak256('setModul
 uint256 constant Action_Asset_set_seller_fee_basis_points = 0x91eb3dee; // bytes4(keccak256('set_seller_fee_basis_points(uint32)'))
 uint256 constant Action_Asset_Shell_Withdraw = 0x2e1a7d4d; // bytes4(keccak256('withdraw(uint256)'))
 uint256 constant Action_Ledger_Withdraw = 0xf108a7d2; // bytes4(keccak256('withdraw(uint256,address,string)'))
+uint256 constant Action_Ledger_Release = 0xe0626f7e; // bytes4(keccak256('release(uint256,string)'))
 
 library Constants {}
