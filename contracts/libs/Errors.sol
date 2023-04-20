@@ -44,5 +44,6 @@ error DuplicateVoteError(); // 0x29a56ece Cannot vote repeatedly
 error VoteInsufficientVotes(); // 0xaccf9793 vote insufficient votes
 error VotingInProgress(); // 0x1182db35
 error ProposalNotPassed(); // 0xc8c93ba3 Proposal was not passed
+error MethodNotImplemented();
 
 library Errors {}

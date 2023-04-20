@@ -9,19 +9,14 @@ import './libs/Interface.sol';
 contract Share is Module, ERC20, IShare {
 	uint256[16] private  __; // reserved storage space
 
-	struct InitShare {
-		string name;
-		string symbol;
-		string description;
-	}
-
 	function initShare(
 		address host,
 		address operator,
-		InitShare calldata init
+		string memory name,
+		string memory symbol, string memory description
 	) external {
-		initModule(host, init.description, operator);
-		initERC20(init.name, init.symbol);
+		initModule(host, description, operator);
+		initERC20(name, symbol);
 
 		IMember m = IDAO(host).member();
 		uint256 total = m.total();

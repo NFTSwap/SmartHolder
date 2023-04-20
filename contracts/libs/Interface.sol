@@ -78,12 +78,14 @@ interface ILedger is IModule {
 	event Release(uint256 indexed member, address indexed to, uint256 balance);
 	event AssetIncome(
 		address indexed token, uint256 indexed tokenId,
-		address indexed source, address to, uint256 balance, uint256 price, IAssetShell.SaleType saleType
+		address indexed source, address to,
+		uint256 balance, uint256 price, uint256 count,
+		IAssetShell.SaleType saleType
 	);
 	function withdraw(uint256 amount, address target, string memory description) external payable;
 	function assetIncome(
 		address token, uint256 tokenId,
-		address source, address to, uint256 price, IAssetShell.SaleType saleType
+		address source, address to, uint256 price, uint256 count, IAssetShell.SaleType saleType
 	) external payable;
 }
 
