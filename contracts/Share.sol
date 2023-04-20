@@ -12,11 +12,12 @@ contract Share is Module, ERC20, IShare {
 	function initShare(
 		address host,
 		address operator,
-		string memory name,
-		string memory symbol, string memory description
+		string calldata name,
+		string calldata symbol, string calldata description
 	) external {
 		initModule(host, description, operator);
 		initERC20(name, symbol);
+		_registerInterface(Share_Type);
 
 		IMember m = IDAO(host).member();
 		uint256 total = m.total();

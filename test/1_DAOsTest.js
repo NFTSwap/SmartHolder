@@ -96,7 +96,8 @@ contract('DAOs', ([from]) => {
 				seller_fee_basis_points_first: 3000, // 30%
 				seller_fee_basis_points_second: 1000, // 10%
 				fee_recipient: '0x0000000000000000000000000000000000000000', // auto set
-				contractURIPrefix: 'https://smart-dao-rel.stars-mine.com/service-api/utils/printJSON',
+				base_contract_uri: 'https://smart-dao-rel.stars-mine.com/service-api/utils/printJSON',
+				base_uri: '',
 			});
 	
 			let addr = await app.DAOs.get(name);

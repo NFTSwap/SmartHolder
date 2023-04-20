@@ -13,6 +13,13 @@ contract DAO is IDAO, Module {
 		string image;
 		bytes  extend;
 	}
+	struct InitDAOArgs {
+		string name;
+		string mission;
+		string description;
+		string image;
+		bytes  extend;
+	}
 
 	address            private  _root;
 	string             private  _name;
@@ -20,7 +27,8 @@ contract DAO is IDAO, Module {
 	EnumerableMap.UintToAddressMap private _modules;
 	string             public  image;
 	bytes              public  extend; // external data
-	uint256[48]        private  __; // reserved storage space
+	IDAOs              public  daos;
+	uint256[47]        private  __; // reserved storage space
 
 	function root() view external override returns (address) { return _root; }
 	function name() view external returns (string memory) { return _name; }
@@ -37,18 +45,21 @@ contract DAO is IDAO, Module {
 	}
 
 	function initDAO(
-		string calldata name_, string calldata mission_, string calldata description,
+		IDAOs daos_, InitDAOArgs calldata args,
 		address root_, address operator, address member_
 	) external {
-		initModule(address(this), description, operator);
+		initModule(address(this), args.description, operator);
 		_registerInterface(DAO_Type);
 
 		ERC165(root_).checkInterface(VotePool_Type);
 		ERC165(member_).checkInterface(Member_Type);
 
+		daos = daos_;
 		_root = root_;
-		_name = name_;
-		_mission = mission_;
+		_name = args.name;
+		_mission = args.mission;
+		image = args.image;
+		extend = args.extend;
 
 		_modules.set(Module_MEMBER_ID, member_);
 		// emit SetModule(Module_MEMBER_ID, member);
@@ -95,17 +106,31 @@ contract DAO is IDAO, Module {
 		}
 	}
 
+	/**
+	 * @dev set new module
+	 */
 	function setModule(uint256 id, address addr) external Check(Action_DAO_SetModule) {
-		require(id != Module_MEMBER_ID, "#DAO#setModule Disable Updates members");
+		//require(id != Module_MEMBER_ID, "#DAO.setModule Disable Updates members");
+		//require(id != Module_Share_ID, "#DAO.setModule Disable Updates share");
+		require(_modules.get(id) == address(0), "#DAO.setModule module already exists");
 
-		if (addr == address(0)) {
-			_modules.remove(id);
-		} else {
-			ERC165(addr).checkInterface(Module_Type);
-			
-			_modules.set(id, addr);
-		}
+		ERC165(addr).checkInterface(Module_Type);
+		_modules.set(id, addr);
+
 		emit SetModule(id, addr);
+	}
+
+	/**
+	 * @dev enable share module
+	 */
+	function enableShare(string calldata symbol) public OnlyDAO {
+		require(_modules.get(Module_Share_ID) == address(0), "#DAO.enableShare Share module already exists");
+
+		address addr = daos.deployShare(this, address(0), _name, symbol, "");
+
+		_modules.set(Module_Share_ID, addr);
+
+		emit SetModule(Module_Share_ID, addr);
 	}
 
 }

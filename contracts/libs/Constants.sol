@@ -9,6 +9,7 @@ bytes4 constant DAO_Type = 0xc7b55336; // bytes4(keccak256('initDAO(string,addre
 bytes4 constant Ledger_Type = 0xf4c38e51; // bytes4(keccak256('initLedger(address,string,address)'))
 bytes4 constant Member_Type = 0x23fc76b9; // bytes4(keccak256('initMember(address,string,address)'))
 bytes4 constant VotePool_Type = 0x0ddf27bf; // bytes4(keccak256('initVotePool(address,string)'))
+bytes4 constant Share_Type = 0x4ea588b0; // bytes4(keccak256('initShare(address,string)'))
 
 // Module indexed id
 uint256 constant Module_DAO_ID = 0;

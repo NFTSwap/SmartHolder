@@ -80,6 +80,7 @@ module.exports = async function(deployer, networks, accounts) {
 	let Ledger = await deploy('Ledger', opts);
 	let Member = await deploy('Member', opts);
 	let VotePool = await deploy('VotePool', opts);
+	let Share = await deploy('Share', opts);
 	let DAO = await deploy('DAO', opts);
 	let DAOs = await deploy('DAOs', opts);
 	let DAOsProxy = await deploy('DAOsProxy', opts, [DAOs.address], async (deployed)=>{
@@ -100,12 +101,14 @@ module.exports = async function(deployer, networks, accounts) {
 	if (
 		defaultIMPLs.DAO != DAO.address           || defaultIMPLs.Member != Member.address ||
 		defaultIMPLs.VotePool != VotePool.address || defaultIMPLs.Ledger != Ledger.address ||
-		defaultIMPLs.Asset != Asset.address       || defaultIMPLs.AssetShell != AssetShell.address
+		defaultIMPLs.Asset != Asset.address       || defaultIMPLs.AssetShell != AssetShell.address ||
+		defaultIMPLs.Share != Share.address
 	) {
 		await DAOsObj.setDefaultIMPLs({
 			DAO: DAO.address,           Member: Member.address,
 			VotePool: VotePool.address, Ledger: Ledger.address,
 			Asset: Asset.address,       AssetShell: AssetShell.address,
+			Share: Share.address,
 		});
 		console.log('   call DAOsObj.setDefaultIMPLs()');
 	}

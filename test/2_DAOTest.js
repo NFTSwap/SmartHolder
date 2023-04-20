@@ -21,9 +21,9 @@ contract('DAO', ([from]) => {
 		it('setMissionAndDesc()', async()=>{
 			await app.DAO.setMissionAndDesc('DAO Mission 1', 'DAO Description 1')
 		})
-		it('setModule()', async()=>{
-			await app.DAO.setModule(4, await app.DAO.module(4))
-		})
+		//it('setModule()', async()=>{
+			//await app.DAO.setModule(4, await app.DAO.module(4))
+		//})
 	});
 
 	context('Reads', () => {

@@ -103,6 +103,7 @@ module.exports = async function(deployer) {
 	await genStore('Ledger', artifacts.require("Ledger.sol"), opts);
 	await genStore('Member', artifacts.require("Member.sol"), opts);
 	await genStore('VotePool', artifacts.require("VotePool.sol"), opts);
+	await genStore('Share', artifacts.require("Share.sol"), opts);
 	await genStore('DAO', artifacts.require("DAO.sol"), opts);
 
 	if (fs.existsSync(`${__dirname}/contracts/DAOs.sol`)) {

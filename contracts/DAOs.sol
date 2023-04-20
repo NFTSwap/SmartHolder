@@ -10,6 +10,7 @@ import './AssetShell.sol';
 import './Ledger.sol';
 import './Member.sol';
 import './VotePool.sol';
+import './Share.sol';
 // Proxy
 import './gen/DAOProxy.sol';
 import './gen/AssetProxy.sol';
@@ -17,6 +18,7 @@ import './gen/AssetShellProxy.sol';
 import './gen/LedgerProxy.sol';
 import './gen/MemberProxy.sol';
 import './gen/VotePoolProxy.sol';
+import './gen/ShareProxy.sol';
 
 /**
  * @title DAOs contract global DAOs manage
@@ -32,16 +34,8 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 		address   Ledger;
 		address   Asset;
 		address   AssetShell;
+		address   Share;
 	}
-
-	struct InitDAOArgs {
-		string name;
-		string mission;
-		string description;
-		string image;
-		bytes  extend;
-	}
-
 	struct InitMemberArgs {
 		string name;
 		string description;
@@ -87,7 +81,7 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 	 * @dev deploy() deploy common voting DAO
 	 */
 	function deploy(
-		InitDAOArgs      calldata    daoArgs,           address                      operator,
+		DAO.InitDAOArgs  calldata    daoArgs,           address                      operator,
 		InitMemberArgs   calldata    memberArgs,        InitVotePoolArgs calldata    votePoolArgs
 	) public returns (DAO host) {
 		uint256 id = uint256(keccak256(bytes(daoArgs.name)));
@@ -100,15 +94,12 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 
 		member.initMember(address(host), memberArgs.name, memberArgs.description, memberArgs.baseURI, address(0), memberArgs.members);
 		root.initVotePool(address(host), votePoolArgs.description, votePoolArgs.lifespan);
-		host.initDAO(daoArgs.name, daoArgs.mission, daoArgs.description, address(root), operator, address(member));
+		host.initDAO(this, daoArgs, address(root), operator, address(member));
 
 		_DAOs.set(id, address(host));
 
 		if (memberArgs.executor != 0)
 			member.setExecutor(memberArgs.executor);
-
-		host.setImage(daoArgs.image);
-		host.setExtend(daoArgs.extend);
 
 		emit Created(address(host));
 	}
@@ -117,7 +108,7 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 	 * @dev makeAssetSales() deploy asset sales DAO
 	 */
 	function deployAssetSalesDAO(
-		InitDAOArgs        calldata    daoArgs,           address                        operator,
+		DAO.InitDAOArgs    calldata    daoArgs,           address                        operator,
 		InitMemberArgs     calldata    memberArgs,        InitVotePoolArgs   calldata    votePoolArgs,
 		InitLedgerArgs     calldata    ledgerArgs,        InitAssetArgs      calldata    assetArgs
 	) public returns (DAO host) {
@@ -157,6 +148,15 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 		host.setOperator(operator); // change to raw operator
 	}
 
+	function deployShare(
+		IDAO host, address operator,
+		string calldata name,
+		string calldata symbol, string calldata description) public override returns (address) {
+		Share share = Share( address(new ShareProxy(defaultIMPLs.Share)));
+		share.initShare(address(host), operator, name, symbol, description);
+		return address(share);
+	}
+
 	/**
 	 * @dev length() Returns DAOs length
 	 */
@@ -192,7 +192,7 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 	/**
 	 * @dev upgrade(address) upgrade contracts
 	 */
-	function upgrade(address impl) public onlyOwner {
-		_impl = impl;
+	function upgrade(address impl_) public onlyOwner {
+		_impl = impl_;
 	}
 }

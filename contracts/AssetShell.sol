@@ -198,7 +198,9 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 		if (price < min_price) revert PayableInsufficientAmount();
 
 		AssetID storage meta = ad.meta;
-		_host.ledger().assetIncome{value: msg.value}(meta.token, meta.tokenId, msg.sender, to, price, value, saleType);
+		_host.ledger().assetIncome{value: msg.value}(
+			meta.token, meta.tokenId, msg.sender, id.previousOwner, to, price, value, saleType
+		);
 
 		if (_lastLocked.tokenId == id.tokenId &&
 			_lastLocked.owner == id.owner && 
