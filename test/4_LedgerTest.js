@@ -3,7 +3,7 @@ const { expect } = require('chai');
 const App = require('./app');
 const Ledger = artifacts.require('Ledger.sol');
 
-contract('Ledger', ([from]) => {
+contract('Ledger', ([from,to]) => {
 	let app, DAO, ledger;
 	before(async () =>{
 		app = await App.create();
@@ -20,7 +20,12 @@ contract('Ledger', ([from]) => {
 
 		it('assetIncome()', async () => {
 			let token = await DAO.asset();
-			await ledger.assetIncome(token, 1, from, from, '10000000000000000', 1, { value: '10000000000000000' });
+			// function assetIncome(
+			// 	address token,  uint256 tokenId,
+			// 	address source, address from, address to,
+			// 	uint256 price,  uint256 count, IAssetShell.SaleType saleType
+			// )
+			await ledger.assetIncome(token, 1, from, from, to, '10000000000000000', 1, 1, { value: '10000000000000000' });
 			expect(await ledger.getBalance()).to.bignumber.equal('20000000000000000');
 		});
 

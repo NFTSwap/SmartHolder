@@ -1,44 +1,49 @@
 {
   "goerli": {
     "Asset": {
-      "version": "4e8ee916d3249fac612ef62246a1c635a8fd8b2c202ab33f5fec4e5a58a85070",
-      "address": "0x39b92793b4B232d76F5f26598cDd4F5932a561AA",
-      "blockNumber": 8265431
+      "version": "9884c453533d94d4e3d6c59bdcdff9ef1acdf7e90bedd3469d13c364f581e38e",
+      "address": "0x3957362c7c29e694662e755bbf7364D8f6dB002d",
+      "blockNumber": 8860432
     },
     "AssetShell": {
-      "version": "4c74e6b2d06a1a7cff72d616afe1cf657cf86ca707dfddeb9f4271443974730e",
-      "address": "0xDa8abbf6F37B329063D0db89B2e5418BC8c24a99",
-      "blockNumber": 8265431
+      "version": "32f821e9e533f250c720a8fdce8c39c641b7ca8675386ff193c3889ace466b06",
+      "address": "0x76788f1A16a9cDa2F48041914C12b035A5b9062D",
+      "blockNumber": 8860435
     },
     "Ledger": {
-      "version": "f17ff8220b5f4cb4999fbebf550e51fe6589011542a903b62a95f756bec85ded",
-      "address": "0xd8d994D13180EaCF730DDB00bB2c865B68B6640A",
-      "blockNumber": 8265431
+      "version": "648a07cadb58a34e33b6d30efc03d77bfedc267f70b2f05b71db874cebe18b0c",
+      "address": "0x70395AD0BfF5c0C4E63e81757Cb3a0B0F39026A7",
+      "blockNumber": 8860437
     },
     "Member": {
-      "version": "34e91968dc9c159f68add27501bc20cca00af18854020c0023fc847426fde62e",
-      "address": "0x61a8aA6fa84518D286E7cE857cFf480155642376",
-      "blockNumber": 8265432
+      "version": "3a9cfe7d685c958bc82e0777e7e5e11bca4dd24a5ac77039774437ed864002a9",
+      "address": "0x49B921fEa305D3eFC7992959a7110663Ee8Cdb28",
+      "blockNumber": 8860438
     },
     "VotePool": {
       "version": "6ded15b8dc4326b457eeacf1c6b0a5a39dc89d87514372391228c5a1b9095b65",
-      "address": "0xD27cAA02408FB0B533CFd421E8f3224F8bfB20E1",
-      "blockNumber": 8265432
+      "address": "0xb8e376105608c8A15384916Ec78945e72F53Cc49",
+      "blockNumber": 8860441
+    },
+    "Share": {
+      "version": "16efc2ec64ae9a20d088bdbf936f927cba721d4a88f95cb23df8bbb771a80bed",
+      "address": "0x56dd5f3029a4504cEF6e0817fa0d1Eeb789ec99a",
+      "blockNumber": 8860443
     },
     "DAO": {
-      "version": "0976f15b846ebffbe134f0a417964731291a2009a862f279fe50ad13bba5f8bf",
-      "address": "0x5c62A079B883C3979B118d48189cDADfAB4f324D",
-      "blockNumber": 8265432
+      "version": "182adfb1f0fd6d53d865e5764e89ca30db12bd785fc11da0e4ad01ebfe31c115",
+      "address": "0x6b89fDEb79dba13D7B89b53Bf39F8b57c4E2FA62",
+      "blockNumber": 8860445
     },
     "DAOs": {
-      "version": "ce1d4d5b9fa62b75458ca6c13347b62e5385848aceb74169c583594e340e209d",
-      "address": "0x3C8A520D2eECd6A4dFF0FB712D26628DaC173109",
-      "blockNumber": 8265432
+      "version": "9242f34f6aaeab13e6a8d247ae9b0d3fb905e8b523cc041d1416a31db7afd8d8",
+      "address": "0xC10A373cF2efDb051d1361bEED51F14b948Ef9d4",
+      "blockNumber": 8860448
     },
     "DAOsProxy": {
       "version": "93b79a147f589ef2243f1351f34bb6a26915a39a93ad935346b107c7dc7d0988",
-      "address": "0x4237E9a558Ff18Bac731ca8491573C97BbF2a60e",
-      "blockNumber": 8248925
+      "address": "0x555309800BDDd188A5B51728d5611725d9bBad02",
+      "blockNumber": 8860453
     }
   }
 }

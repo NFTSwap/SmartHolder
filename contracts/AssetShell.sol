@@ -9,10 +9,11 @@ import './Asset.sol';
 
 contract AssetShell is AssetModule, ERC1155, IAssetShell {
 	using Address for address;
+	using EnumerableMap for EnumerableMap.AddressToUintMap;
 
 	struct Locked {
-		uint256                     value;
-		mapping(address => uint256) previousOwners; // previous asset owner address => value
+		uint256                        amount; // owner locked amount total for tokenId
+		EnumerableMap.AddressToUintMap values; // previous asset owner address => value
 	}
 
 	struct LockedID {
@@ -128,10 +129,21 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 	}
 
 	/**
-	 * @dev Returns whether the token is locked
+	 * @dev Returns the owner token locked amount and locked items length
 	 */
-	function lockedOf(uint256 tokenId, address owner) view public returns (uint256) {
-		return _assetsData[tokenId].locked[owner].value;
+	function lockedOf(uint256 tokenId, address owner) view public returns (uint256 amount, uint256 length) {
+		Locked storage locked = _assetsData[tokenId].locked[owner];
+		amount = locked.amount;
+		length = locked.values.length();
+	}
+
+	/**
+	 * @dev Returns the owner token locked amount and previous owner address
+	 */
+	function lockedAt(uint256 tokenId, address owner, uint256 index) view public 
+		returns (address previousOwner, uint256 amount) 
+	{
+		(previousOwner,amount) = _assetsData[tokenId].locked[owner].values.at(index);
 	}
 
 	/**
@@ -160,12 +172,12 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 
 			if (ad.minimumPrice != 0) {
 				if (from != address(0)) { // not mint
-					if (amount > balanceOf(from, id) - ad.locked[from].value) { // locaked
+					if (amount > balanceOf(from, id) - ad.locked[from].amount) { // locaked
 						revert NeedToUnlockAssetFirst();
 					}
 					if (to != address(0)) { // not burn
-						ad.locked[to].value += amount;
-						ad.locked[to].previousOwners[from] = amount;
+						ad.locked[to].amount += amount;
+						ad.locked[to].values.set(from, amount);
 						_lastLocked = LockedID(id,to,from);
 					}
 				}
@@ -187,7 +199,7 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 
 		AssetData storage ad = _assetsData[id.tokenId];
 		Locked storage locked = ad.locked[id.owner];
-		uint256 value = locked.previousOwners[id.previousOwner];
+		uint256 value = locked.values.get(id.previousOwner);
 
 		address to = id.owner;
 		uint256 price = msg.value * 10_000 / seller_fee_basis_points; // transfer price
@@ -210,8 +222,8 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 		}
 
 		// unlock
-		locked.value -= value;
-		delete locked.previousOwners[id.previousOwner];
+		locked.amount -= value;
+		locked.values.remove(id.previousOwner);
 
 		if (saleType == SaleType.kFirst) {
 			bytes memory data = abi.encode(to, ad.minimumPrice);
