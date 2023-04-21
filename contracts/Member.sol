@@ -146,6 +146,9 @@ contract Member is Module, ERC721, IMember {
 		uri = string(abi.encodePacked(baseURI(), a, b, c));
 	}
 
+	/**
+	 * @dev Returns all votes total
+	 */
 	function votes() view external override returns (uint256) {
 		return _votes;
 	}
@@ -177,6 +180,9 @@ contract Member is Module, ERC721, IMember {
 		return _havePermission(spender, id);
 	}
 
+	/**
+	 * @dev Returns members total
+	 */
 	function total() view public override returns (uint256) {
 		return _infoList.length();
 	}

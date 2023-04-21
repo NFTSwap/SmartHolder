@@ -5,13 +5,13 @@ const Asset = artifacts.require('Asset.sol');
 const AssetShell = artifacts.require('AssetShell.sol');
 
 contract('Asset', ([from,to]) => {
-	let app,DAO,asset,first,second, id;
+	let app,dao,asset,first,second, id;
 	before(async () => {
 		app = await App.create();
-		DAO = await app.getDAO();
-		asset = await Asset.at(await app.DAO.asset());
-		first = await AssetShell.at(await app.DAO.module(4));
-		second = await AssetShell.at(await app.DAO.module(5));
+		dao = await app.getDAO();
+		asset = await Asset.at(await dao.asset());
+		first = await AssetShell.at(await dao.module(4));
+		second = await AssetShell.at(await dao.module(5));
 	});
 
 	context('Settings', () => {
@@ -25,14 +25,15 @@ contract('Asset', ([from,to]) => {
 				// (to,price) = abi.decode(data, (address, uint256));
 				web3.eth.abi.encodeParameters(['address','uint256'], [from, '10000000000000000'/*min price 0.01 eth*/]),
 			);
+			//console.log('safeMint() first', (await asset.balanceOf(first.address, 0)).toNumber(), (await asset.totalSupply(0)).toNumber());
+			//console.log('safeMint() second', (await asset.balanceOf(second.address, 0)).toNumber());
 			id = '0x' + (await first.convertTokenID(asset.address, 0)).toString('hex');
 		});
 
+		// function makeNFT(address to, uint256 id, string memory _tokenURI, uint256 minPrice)
 		it('makeNFT()', async () => {
-			// function makeNFT(address to, uint256 id, string memory _tokenURI, uint256 minPrice)
 			await asset.makeNFT(
 				from,
-				//first.address, // lock to asset shell
 				2, // tokenId
 				'https://api.opensea.io/api/v1/metadata/\
 0x495f947276749ce646f68ac8c248420045cb7b5e/98992976673362451468029657158147997262089202412746295675220817174765200474113',
@@ -40,11 +41,33 @@ contract('Asset', ([from,to]) => {
 			);
 		});
 
+		// function copyNFTs(address to, uint256 id, uint256 amount, uint256 minPrice)
+		it('copyNFTs()', async () => {
+			await asset.copyNFTs(
+				from,
+				2, // tokenId
+				1000,
+				'1000000000000000'/*min price 0.001 eth*/
+			);
+			let id = '0x' + (await first.convertTokenID(asset.address, 3)).toString('hex');
+			assert((await second.balanceOf(from, id)).toNumber() == 1000);
+		});
+
 		it('withdraw()', async () => {
-			let id = await first.convertTokenID(asset.address, 2);
-			await first.withdraw(id, from, 2);
+			let id = '0x' + (await first.convertTokenID(asset.address, 2)).toString('hex');
+			//console.log('balanceOf()', id);
+			//console.log('balanceOf(from, id)', first.address, (await first.balanceOf(from, id)).toNumber(),id);
+			// function withdraw(uint256 tokenId, address owner, uint256 amount)
+			await first.withdraw(id, from, 1);
 			// assert(!await first.exists(id));
-			assert(await first.balanceOf(id, from) == 0);
+			//console.log('balanceOf(from, id) 1', (await first.balanceOf(from, id)).toNumber());
+			assert((await first.balanceOf(from, id)).toNumber() == 0);
+		});
+
+		it('withdraw() NFTs 1155', async () => {
+			let id = '0x' + (await second.convertTokenID(asset.address, 3)).toString('hex');
+			await second.withdraw(id, from, 9);
+			assert((await second.balanceOf(from, id)).toNumber() == 1000-9);
 		});
 
 	});
@@ -52,7 +75,8 @@ contract('Asset', ([from,to]) => {
 	context('Gettings', () => {
 
 		it('balanceOf()', async () => {
-			assert(await first.balanceOf(from, id) == 1);
+			//console.log('balanceOf()', (await first.balanceOf(to, id)).toNumber(), to);
+			assert((await first.balanceOf(from, id)).toNumber() == 1);
 		});
 
 		it('minimumPrice()', async () => {
@@ -70,16 +94,18 @@ contract('Asset', ([from,to]) => {
 	context('Transfer', () => {
 
 		it('safeTransferFrom()', async () => {
-			await first.methods.safeTransferFrom(from, to, id, 1, "");
+			console.log('safeTransferFrom()', id);
+			await first.safeTransferFrom(from, to, id, 1, "0x");
 		});
 
 		it('lockedOf()', async () => {
-			let {amount} = await first.lockedOf(id, to);
-			assert(amount == 1);
+			let of = await first.lockedOf(id, to);
+			//console.log('lockedOf() amount', of.amount.toNumber(), of.length.toNumber())
+			assert(of.amount.toNumber() == 1);
 		});
 
 		it('unlock()', async () => {
-			await first.unlock({tokenId:id,owner:to,previousOwner:from}, { value: 10000000000000001 * 0.3 });
+			await first.unlock({tokenId:id,owner:to,previous:from}, { value: 10000000000000001 * 0.3 });
 		});
 
 		it('exists()', async () => {
@@ -89,11 +115,11 @@ contract('Asset', ([from,to]) => {
 
 		it('safeTransferFrom()', async () => {
 			// transfer and unlock
-			await second.methods.safeTransferFrom(to, from, id, 1, "", {from: to});
+			await second.safeTransferFrom(to, from, id, 1, "0x", {from: to});
 		});
 
 		it('unlock() 2', async () => {
-			await second.unlock({tokenId:id,owner:from,previousOwner:to}, { value: 10000000000000001 * 0.1 });
+			await second.unlock({tokenId:id,owner:from,previous:to}, { value: 10000000000000001 * 0.1 });
 		});
 
 		it('lockedOf()', async () => {

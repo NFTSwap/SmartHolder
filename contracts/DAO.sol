@@ -33,15 +33,15 @@ contract DAO is IDAO, Module {
 	function root() view external override returns (address) { return _root; }
 	function name() view external returns (string memory) { return _name; }
 	function mission() view external returns (string memory) { return _mission; }
-	function member() view external override returns (IMember) { return IMember(_modules.get(Module_MEMBER_ID)); }
-	function ledger() view external override returns (ILedger) { return ILedger(_modules.get(Module_LEDGER_ID)); }
-	function asset() view external override returns (IAsset) { return IAsset(_modules.get(Module_ASSET_ID)); }
-	function first() view external override returns (IAssetShell) { return IAssetShell(_modules.get(Module_ASSET_First_ID)); }
-	function second() view external override returns (IAssetShell) { return IAssetShell(_modules.get(Module_ASSET_Second_ID)); }
-	function share() view external override returns (IShare) { return IShare(_modules.get(Module_Share_ID)); }
+	function member() view external override returns (IMember) { return IMember(module(Module_MEMBER_ID)); }
+	function ledger() view external override returns (ILedger) { return ILedger(module(Module_LEDGER_ID)); }
+	function asset() view external override returns (IAsset) { return IAsset(module(Module_ASSET_ID)); }
+	function first() view external override returns (IAssetShell) { return IAssetShell(module(Module_ASSET_First_ID)); }
+	function second() view external override returns (IAssetShell) { return IAssetShell(module(Module_ASSET_Second_ID)); }
+	function share() view external override returns (IShare) { return IShare(module(Module_Share_ID)); }
 
-	function module(uint256 id) view external returns (IModule) {
-		return IModule(_modules.contains(id) ? _modules.get(id): address(0));
+	function module(uint256 id) view public override returns (address) {
+		return address(uint160( uint256(_modules._inner._values[bytes32(id)])));
 	}
 
 	function initDAO(
@@ -112,7 +112,7 @@ contract DAO is IDAO, Module {
 	function setModule(uint256 id, address addr) external Check(Action_DAO_SetModule) {
 		//require(id != Module_MEMBER_ID, "#DAO.setModule Disable Updates members");
 		//require(id != Module_Share_ID, "#DAO.setModule Disable Updates share");
-		require(_modules.get(id) == address(0), "#DAO.setModule module already exists");
+		require(!_modules.contains(id), "#DAO.setModule module already exists");
 
 		ERC165(addr).checkInterface(Module_Type);
 		_modules.set(id, addr);
@@ -123,10 +123,10 @@ contract DAO is IDAO, Module {
 	/**
 	 * @dev enable share module
 	 */
-	function enableShare(string calldata symbol) public OnlyDAO {
-		require(_modules.get(Module_Share_ID) == address(0), "#DAO.enableShare Share module already exists");
+	function enableShare(uint256 totalSupply, uint256 maxSupply, string calldata symbol) public OnlyDAO {
+		require(!_modules.contains(Module_Share_ID), "#DAO.enableShare Share module already exists");
 
-		address addr = daos.deployShare(this, address(0), _name, symbol, "");
+		address addr = daos.deployShare(this, address(0), totalSupply, maxSupply, _name, symbol, "");
 
 		_modules.set(Module_Share_ID, addr);
 

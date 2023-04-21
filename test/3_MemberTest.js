@@ -4,10 +4,11 @@ const App = require('./app');
 const Member = artifacts.require('Member.sol');
 
 contract('Member', ([from]) => {
-	let app, member;
+	let app,dao,member;
 	before(async () =>{
 		app = await App.create();
-		member = await Member.at(await app.DAO.member());
+		dao = await app.getDAO();
+		member = await Member.at(await dao.member());
 	});
 
 	context("Settings", () => {
@@ -65,13 +66,17 @@ contract('Member', ([from]) => {
 		});
 
 		it('addVotes()', async () => {
-			await member.addVotes(2, 1); // votes 2
+			// 2 votes = 1
+			await member.addVotes(2, 1);
+			// 2 votes = 2
 		});
 
 		it('transferVotes()', async () => {
+			// 1 votes = 3
+			// 2 votes = 2
+			await member.transferVotes(1, 2, 1);
 			// 1 votes = 2
 			// 2 votes = 3
-			await member.transferVotes(1, 2, 1);
 		});
 
 		it('remove()', async () => {
@@ -83,14 +88,23 @@ contract('Member', ([from]) => {
 	context("Gettings", () => {
 
 		it('votes() get total', async () => {
-			// votes 1 + 2 + 3
+			// 0 votes = 1
+			// 1 votes = 2
+			// 2 votes = 3
 			assert(await member.votes() == 6);
 		});
 
 		it('getMemberInfo()', async () => {
+			// 1 votes = 2
 			let info = await member.getMemberInfo(1);
 			assert(info.votes == 2, 'info.votes == 2');
 			assert(info.name == 'Test 1 Change', 'info.name == Test 1 Change');
+		});
+
+		it('getMemberInfo() 2', async () => {
+			// 2 votes = 3
+			let info2 = await member.getMemberInfo(2);
+			assert(info2.votes == 3, 'info2.votes == 3');
 		});
 
 		it('indexAt()', async () => {

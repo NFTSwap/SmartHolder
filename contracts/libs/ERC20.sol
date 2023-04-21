@@ -97,12 +97,16 @@ contract ERC20 is Context, IERC20_1 {
 		return _totalSupply;
 	}
 
+	function get(address account) private view returns (uint256) {
+		return uint256(_balances._inner._values[bytes32(uint256(uint160(account)))]);
+	}
+
 	/**
 	 * @dev See {IERC20-balanceOf}.
 	 */
 	function balanceOf(address account) public view virtual override returns (uint256) {
 		//return _balances[account];
-		return _balances.get(account);
+		return get(account);
 	}
 
 	/**
@@ -251,7 +255,7 @@ contract ERC20 is Context, IERC20_1 {
 		_beforeTokenTransfer(from, to, amount);
 
 		//uint256 fromBalance = _balances[from];
-		uint256 fromBalance = _balances.get(from);
+		uint256 fromBalance = get(from);
 		require(fromBalance >= amount, "ERC20: transfer amount exceeds balance");
 		unchecked {
 			//_balances[from] = fromBalance - amount;
@@ -259,7 +263,7 @@ contract ERC20 is Context, IERC20_1 {
 			// Overflow not possible: the sum of all balances is capped by totalSupply, and the sum is preserved by
 			// decrementing then incrementing.
 			//_balances[to] += amount;
-			_balances.set(to, _balances.get(to) + amount);
+			_balances.set(to, get(to) + amount);
 		}
 
 		emit Transfer(from, to, amount);
@@ -285,7 +289,7 @@ contract ERC20 is Context, IERC20_1 {
 		unchecked {
 			// Overflow not possible: balance + amount is at most totalSupply + amount, which is checked above.
 			//_balances[account] += amount;
-			_balances.set(account, _balances.get(account) + amount);
+			_balances.set(account, get(account) + amount);
 		}
 		emit Transfer(address(0), account, amount);
 
@@ -309,7 +313,7 @@ contract ERC20 is Context, IERC20_1 {
 		_beforeTokenTransfer(account, address(0), amount);
 
 		// uint256 accountBalance = _balances[account];
-		uint256 accountBalance = _balances.get(account);
+		uint256 accountBalance = get(account);
 		require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
 		unchecked {
 			//_balances[account] = accountBalance - amount;

@@ -4,11 +4,11 @@ const App = require('./app');
 const Ledger = artifacts.require('Ledger.sol');
 
 contract('Ledger', ([from,to]) => {
-	let app, DAO, ledger;
+	let app, dao, ledger;
 	before(async () =>{
 		app = await App.create();
-		DAO = await app.getDAO();
-		ledger = await Ledger.at(await DAO.ledger());
+		dao = await app.getDAO();
+		ledger = await Ledger.at(await dao.ledger());
 	});
 
 	context('Settings', () => {
@@ -19,7 +19,7 @@ contract('Ledger', ([from,to]) => {
 		});
 
 		it('assetIncome()', async () => {
-			let token = await DAO.asset();
+			let token = await dao.asset();
 			// function assetIncome(
 			// 	address token,  uint256 tokenId,
 			// 	address source, address from, address to,

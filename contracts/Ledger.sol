@@ -34,7 +34,7 @@ contract Ledger is ILedger, Module {
 
 		uint256 curamount = address(this).balance;
 		// require(curamount >= amount, "#Ledger#release insufficient balance");
-		if (curamount < amount) revert InsufficientBalance();
+		if (curamount < amount) revert AmountMinimumLimit();
 
 		IShare s = _host.share();
 		IMember m = _host.member();
@@ -64,7 +64,7 @@ contract Ledger is ILedger, Module {
 			uint256 unit = amount / votes;
 
 			// require(unit != 0 , "#Ledger#release insufficient balance release");
-			if (unit == 0) revert InsufficientBalance();
+			if (unit == 0) revert AmountMinimumLimit();
 
 			uint256 total = m.total();
 			IMember.Info memory info;

@@ -3,62 +3,65 @@ const { expect, assert } = require('chai');
 const App = require('./app');
 
 contract('DAO', ([from]) => {
-	let app;
-	before(async () => app = await App.create());
+	let app,dao;
+	before(async () => {
+		app = await App.create();
+		dao = await app.getDAO();
+	});
 
 	//console.log('DAO from', from);
 
 	context('Settings', () => {
 		it('setDescription()', async()=>{
-			await app.DAO.setDescription('DAO Description')
+			await dao.setDescription('DAO Description')
 		})
 		it('setOperator()', async()=>{
-			await app.DAO.setOperator(from)
+			await dao.setOperator(from)
 		})
 		it('setMission()', async()=>{
-			await app.DAO.setMission('DAO Mission')
+			await dao.setMission('DAO Mission')
 		})
 		it('setMissionAndDesc()', async()=>{
-			await app.DAO.setMissionAndDesc('DAO Mission 1', 'DAO Description 1')
+			await dao.setMissionAndDesc('DAO Mission 1', 'DAO Description 1')
 		})
 		//it('setModule()', async()=>{
-			//await app.DAO.setModule(4, await app.DAO.module(4))
+			//await dao.setModule(4, await dao.module(4))
 		//})
 	});
 
 	context('Reads', () => {
 		it('impl()', async()=>{
-			//console.log(await app.DAO.impl());
+			//console.log(await dao.impl());
 			//onsole.log((await app.DAOs.defaultIMPLs()).DAO);
-			assert(await app.DAO.impl() == (await app.DAOs.defaultIMPLs()).DAO)
+			assert(await dao.impl() == (await app.DAOs.defaultIMPLs()).DAO)
 		})
 		it('operator()', async () => {
-			assert(await app.DAO.operator()==from)
+			assert(await dao.operator()==from)
 		})
 		it('description()', async () => {
-			assert(await app.DAO.description() == 'DAO Description 1')
+			assert(await dao.description() == 'DAO Description 1')
 		})
 		it('root()', async () => {
-			assert(await app.DAO.root() != '0x0000000000000000000000000000000000000000');
+			assert(await dao.root() != '0x0000000000000000000000000000000000000000');
 		})
 		it('name()', async () => {
-			assert((await app.DAO.name()).indexOf('Test_Asset_Sales_DAO_') == 0);
+			assert((await dao.name()).indexOf('Test_Asset_Sales_DAO_') == 0);
 		})
 		it('mission()', async () => {
-			assert(await app.DAO.mission() == 'DAO Mission 1');
+			assert(await dao.mission() == 'DAO Mission 1');
 		})
 		it('member()', async () => {
-			assert(await app.DAO.member() != '0x0000000000000000000000000000000000000000');
+			assert(await dao.member() != '0x0000000000000000000000000000000000000000');
 		})
 		it('ledger()', async () => {
-			assert(await app.DAO.ledger() != '0x0000000000000000000000000000000000000000');
+			assert(await dao.ledger() != '0x0000000000000000000000000000000000000000');
 		})
 		it('asset()', async () => {
-			assert(await app.DAO.asset() != '0x0000000000000000000000000000000000000000');
+			assert(await dao.asset() != '0x0000000000000000000000000000000000000000');
 		})
 		it('module()', async () => {
-			assert(await app.DAO.module(3) == await app.DAO.asset());
-			assert(await app.DAO.module(6) == '0x0000000000000000000000000000000000000000');
+			assert(await dao.module(3) == await dao.asset());
+			assert(await dao.module(6) == '0x0000000000000000000000000000000000000000');
 		})
 	});
 

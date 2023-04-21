@@ -153,13 +153,14 @@ interface IDAO is IModule {
 	function first() view external returns (IAssetShell);
 	function second() view external returns (IAssetShell);
 	function share() view external returns (IShare);
-	function module(uint256 id) view external returns (IModule);
+	function module(uint256 id) view external returns (address);
 }
 
 interface IDAOs {
 	event Created(address indexed dao);
 	function deployShare(
-		IDAO host, address operator, string calldata name,
-		string calldata symbol, string calldata description
+		IDAO host, address operator,
+		uint256 totalSupply, uint256 maxSupply,
+		string calldata name, string calldata symbol, string calldata description
 	) external returns (address);
 }

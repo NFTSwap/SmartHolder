@@ -6,24 +6,28 @@ const VotePool = artifacts.require('VotePool.sol');
 const Member = artifacts.require('Member.sol');
 
 contract('VotePool', ([_,owner]) => {
-	let app, DAO, vp, member;
+	let app, dao, vp, member;
 	before(async () =>{
 		app = await App.create();
-		DAO = await app.getDAO();
-		vp = await VotePool.at(await DAO.root());
-		member = await Member.at(await DAO.member());
+		dao = await app.getDAO();
+		vp = await VotePool.at(await dao.root());
+		member = await Member.at(await dao.member());
 	});
 	let id = '0x' + cryptoTx.getRandomValues(32).toString('hex');
 
 	context('Setting', () => {
 
 		it('create2()', async () => {
-			var data = web3.eth.abi.encodeFunctionCall(DAO.abi.find(e=>e.name=='setDescription'), ['DAO Description vote 4']);
-			await vp.create2(id, [DAO.address], 0, 5001, 0, 0, 'Test pr', 'Test pr desc', 0, [data]);
+			console.log('DAO address', dao.address);
+			console.log('VotePool vite id', id);
+	
+			var data = web3.eth.abi.encodeFunctionCall(dao.abi.find(e=>e.name=='setDescription'), ['DAO Description vote 4']);
+			await vp.create2(id, [dao.address], 0, 5001, 0, 0, 'Test pr', 'Test pr desc', 0, [data]);
 			assert(await vp.exists(id), 'vp.exists(id)');
 		});
 
 		// votes total = 6
+		// function vote(uint256 id, uint256 member, int256 votes, bool tryExecute)
 		it('vote() 1', async () => {
 			await vp.vote(id, 1, 2, true);
 		});
@@ -31,7 +35,7 @@ contract('VotePool', ([_,owner]) => {
 		it('vote() 2', async () => {
 			await vp.vote(id, 2, 2, true);
 			//console.log(await vp.getProposal(id));
-			assert(await DAO.description() == 'DAO Description vote 4', 'DAO.description() == DAO Description vote 4');
+			assert(await dao.description() == 'DAO Description vote 4', 'DAO.description() == DAO Description vote 4');
 		});
 
 	});

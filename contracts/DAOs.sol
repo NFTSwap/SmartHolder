@@ -86,7 +86,7 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 	) public returns (DAO host) {
 		uint256 id = uint256(keccak256(bytes(daoArgs.name)));
 
-		require(!_DAOs.contains(id), "#DAOs#deploy DAO with corresponding name already exists");
+		require(!_DAOs.contains(id), "#DAOs.deploy DAO with corresponding name already exists");
 
 		host          = DAO( address(new DAOProxy(defaultIMPLs.DAO)) );
 		Member member = Member( address(new MemberProxy(defaultIMPLs.Member)) );
@@ -150,10 +150,10 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 
 	function deployShare(
 		IDAO host, address operator,
-		string calldata name,
-		string calldata symbol, string calldata description) public override returns (address) {
+		uint256 totalSupply, uint256 maxSupply,
+		string calldata name, string calldata symbol, string calldata description) public override returns (address) {
 		Share share = Share( address(new ShareProxy(defaultIMPLs.Share)));
-		share.initShare(address(host), operator, name, symbol, description);
+		share.initShare(address(host), operator, totalSupply, maxSupply, name, symbol, description);
 		return address(share);
 	}
 

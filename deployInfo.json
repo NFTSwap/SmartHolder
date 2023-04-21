@@ -1,18 +1,18 @@
 {
   "goerli": {
     "Asset": {
-      "version": "9884c453533d94d4e3d6c59bdcdff9ef1acdf7e90bedd3469d13c364f581e38e",
-      "address": "0x3957362c7c29e694662e755bbf7364D8f6dB002d",
+      "version": "ae06a52fd8f0902d4f1531a4fdc64c42498fd65a85c012338aefe80818e16d02",
+      "address": "0xffB9977344315E4e06c405860331bA699679e44d",
       "blockNumber": 8860432
     },
     "AssetShell": {
-      "version": "32f821e9e533f250c720a8fdce8c39c641b7ca8675386ff193c3889ace466b06",
-      "address": "0x76788f1A16a9cDa2F48041914C12b035A5b9062D",
+      "version": "7e152a3841aff3062ea64dd7f59a28c4ac6b86402dbd86be01f090a30429ba65",
+      "address": "0x16F7BB53de3141ECCB93A38bD744911e517Da6D1",
       "blockNumber": 8860435
     },
     "Ledger": {
-      "version": "648a07cadb58a34e33b6d30efc03d77bfedc267f70b2f05b71db874cebe18b0c",
-      "address": "0x70395AD0BfF5c0C4E63e81757Cb3a0B0F39026A7",
+      "version": "28b335ab87c779d320ae7e95f17159aee7d0de806a87294627b6b1cf166693d1",
+      "address": "0xc7972f280F9bD2328d218c3d817e2522bC2F9fe5",
       "blockNumber": 8860437
     },
     "Member": {
@@ -26,18 +26,18 @@
       "blockNumber": 8860441
     },
     "Share": {
-      "version": "16efc2ec64ae9a20d088bdbf936f927cba721d4a88f95cb23df8bbb771a80bed",
-      "address": "0x56dd5f3029a4504cEF6e0817fa0d1Eeb789ec99a",
+      "version": "2a96de56c08ea87f1222f2ed452e2fd390788692324e251c87e7dca620055399",
+      "address": "0xd186C9f8987F4973f3bb841776081Da8fC0B72B5",
       "blockNumber": 8860443
     },
     "DAO": {
-      "version": "182adfb1f0fd6d53d865e5764e89ca30db12bd785fc11da0e4ad01ebfe31c115",
-      "address": "0x6b89fDEb79dba13D7B89b53Bf39F8b57c4E2FA62",
+      "version": "855d2847e4105fd73af2e8dad6427123386deafc1232ac90c0188da40a24533c",
+      "address": "0x73B7A7e649F7B922e4302d60B05Fb36cD1b8D5e7",
       "blockNumber": 8860445
     },
     "DAOs": {
-      "version": "9242f34f6aaeab13e6a8d247ae9b0d3fb905e8b523cc041d1416a31db7afd8d8",
-      "address": "0xC10A373cF2efDb051d1361bEED51F14b948Ef9d4",
+      "version": "dd1b0e2cff9094ab21d2239dded83329cb9ec36027c997dab7525956acbfa0d0",
+      "address": "0xb919A78a6a7c95B8d47d5113A09ED0d530BFBDC8",
       "blockNumber": 8860448
     },
     "DAOsProxy": {

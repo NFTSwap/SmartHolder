@@ -42,8 +42,13 @@ error ProposalClosed(); // 0x1446e503 proposal closed
 error VotingMemberNoMatch(); // 0x22dd3c54 Voting Membership Mismatch
 error DuplicateVoteError(); // 0x29a56ece Cannot vote repeatedly
 error VoteInsufficientVotes(); // 0xaccf9793 vote insufficient votes
-error VotingInProgress(); // 0x1182db35
+error VotingInProgress(); // 0x1182db35 voting in progress
 error ProposalNotPassed(); // 0xc8c93ba3 Proposal was not passed
-error MethodNotImplemented();
+error MethodNotImplemented(); // 0x29749743 method not implemented
+error MaximumSupplyLimitInShare(); // 0x9b4cee83 Exceeding the maximum supply limit
+error TokenIDMustEvenNumberInAsset(); // 0x5a708f03 token id must be an even number
+error NoPermissionToMintNFTs1155(); // 0x292c3a85 No permission to mint NFTs
+error TokenIDAlreadyExistsInAsset(); // 0x8791d6ee token id already exists
+error AmountMinimumLimit(); // 0xf76273e9 amount minimum limit
 
 library Errors {}

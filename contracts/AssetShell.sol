@@ -19,7 +19,7 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 	struct LockedID {
 		uint256 tokenId;
 		address owner;
-		address previousOwner;
+		address previous; // previous owner
 	}
 
 	struct AssetData {
@@ -141,9 +141,9 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 	 * @dev Returns the owner token locked amount and previous owner address
 	 */
 	function lockedAt(uint256 tokenId, address owner, uint256 index) view public 
-		returns (address previousOwner, uint256 amount) 
+		returns (address previous, uint256 amount) 
 	{
-		(previousOwner,amount) = _assetsData[tokenId].locked[owner].values.at(index);
+		(previous,amount) = _assetsData[tokenId].locked[owner].values.at(index);
 	}
 
 	/**
@@ -172,7 +172,7 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 
 			if (ad.minimumPrice != 0) {
 				if (from != address(0)) { // not mint
-					if (amount > balanceOf(from, id) - ad.locked[from].amount) { // locaked
+					if (balanceOf(from, id) < ad.locked[from].amount) { // locaked
 						revert NeedToUnlockAssetFirst();
 					}
 					if (to != address(0)) { // not burn
@@ -195,11 +195,11 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 		if (msg.value == 0) revert PayableAmountZero();
 		// require(ad.locked != address(0), "#AssetShell#unlock Lock cannot be empty"); // price
 		if (id.owner == address(0)) revert LockTokenIDEmptyInAssetShell();
-		if (id.previousOwner == address(0)) revert LockTokenIDPreviousOwnerEmptyInAssetShell();
+		if (id.previous == address(0)) revert LockTokenIDPreviousOwnerEmptyInAssetShell();
 
 		AssetData storage ad = _assetsData[id.tokenId];
 		Locked storage locked = ad.locked[id.owner];
-		uint256 value = locked.values.get(id.previousOwner);
+		uint256 value = locked.values.get(id.previous);
 
 		address to = id.owner;
 		uint256 price = msg.value * 10_000 / seller_fee_basis_points; // transfer price
@@ -211,19 +211,19 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 
 		AssetID storage meta = ad.meta;
 		_host.ledger().assetIncome{value: msg.value}(
-			meta.token, meta.tokenId, msg.sender, id.previousOwner, to, price, value, saleType
+			meta.token, meta.tokenId, msg.sender, id.previous, to, price, value, saleType
 		);
 
 		if (_lastLocked.tokenId == id.tokenId &&
 			_lastLocked.owner == id.owner && 
-			_lastLocked.previousOwner == id.previousOwner
+			_lastLocked.previous == id.previous
 		) {
 			_lastLocked.tokenId = 0;
 		}
 
 		// unlock
 		locked.amount -= value;
-		locked.values.remove(id.previousOwner);
+		locked.values.remove(id.previous);
 
 		if (saleType == SaleType.kFirst) {
 			bytes memory data = abi.encode(to, ad.minimumPrice);

@@ -93,8 +93,11 @@ contract Asset is AssetModule, ERC1155, IAsset {
 	 * @dev sefe mint asset
 	 */
 	function safeMint(address to, uint256 id, string memory _tokenURI, bytes memory _data) public Check(Action_Asset_SafeMint) {
-		require(id % 2 == 0, "#Asset1155.safeMint ID must be an even number");
-		require(!exists(id), "#Asset1155.safeMint ID already exists");
+		// require(id % 2 == 0, "#Asset1155.safeMint ID must be an even number");
+		if (id % 2 == 1) revert TokenIDMustEvenNumberInAsset();
+		//require(!exists(id), "#Asset1155.safeMint ID already exists");
+		if (exists(id)) revert TokenIDAlreadyExistsInAsset();
+
 		_mint(to, id, 1, _data);
 		_setURI(id, _tokenURI);
 	}
@@ -110,8 +113,17 @@ contract Asset is AssetModule, ERC1155, IAsset {
 	 * @dev copy make ERC1155 NFTs
 	 */
 	function copyNFTs(address to, uint256 id, uint256 amount, uint256 minPrice) public {
-		require(id % 2 == 0, "#Asset1155.makeNFTs ID must be an even number");
-		require(balanceOf(_msgSender(), id) == 1, "#Asset1155.makeNFTs No permission to create NFTs");
+		// require(id % 2 == 0, "#Asset1155.makeNFTs ID must be an even number");
+		if (id % 2 == 1) revert TokenIDMustEvenNumberInAsset();
+
+		if (balanceOf(_msgSender(), id) == 0) {
+			uint256 _id = uint256(keccak256(abi.encodePacked(address(this), id)));
+
+			if (_host.first().balanceOf(_msgSender(), _id) == 0)
+				//require(_host.second().balanceOf(_msgSender(), _id) == 1, "#Asset1155.copyNFTs No permission to create NFTs");
+				if (_host.second().balanceOf(_msgSender(), _id) == 0) revert NoPermissionToMintNFTs1155();
+		}
+
 		_mint(address(_host.second()), id + 1, amount, abi.encode(to, minPrice));
 	}
 
