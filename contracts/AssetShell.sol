@@ -95,6 +95,9 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 		return uint256(keccak256(abi.encodePacked(metaToken, metaTokenId)));
 	}
 
+	/**
+	 * @dev overwrite
+	 */
 	function uri(uint256 tokenId) public view virtual override(ERC1155,IERC1155MetadataURI) returns (string memory) {
 		AssetID memory meta = assetMeta(tokenId);
 		return IERC1155MetadataURI(meta.token).uri(meta.tokenId);

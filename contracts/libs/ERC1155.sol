@@ -42,7 +42,7 @@ abstract contract ERC1155 is Context, IERC1155_1 {
 		* @dev Total amount of tokens in with a given id.
 		*/
 	function totalSupply(uint256 id) public view virtual returns (uint256) {
-			return _totalSupply[id];
+		return _totalSupply[id];
 	}
 
 	/**
