@@ -99,7 +99,8 @@ contract Asset is AssetModule, ERC1155, IAsset {
 		if (exists(id)) revert TokenIDAlreadyExistsInAsset();
 
 		_mint(to, id, 1, _data);
-		_setURI(id, _tokenURI);
+		// _setURI(id, _tokenURI);
+		_tokenURIs[id] = _tokenURI;
 	}
 
 	/**
