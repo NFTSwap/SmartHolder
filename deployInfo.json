@@ -1,8 +1,8 @@
 {
   "goerli": {
     "Asset": {
-      "version": "ae06a52fd8f0902d4f1531a4fdc64c42498fd65a85c012338aefe80818e16d02",
-      "address": "0xffB9977344315E4e06c405860331bA699679e44d",
+      "version": "b2dfe1ff6e057f365aa587b58879eafdf3fcc78747f9abe32b823e83e0ce70bd",
+      "address": "0x4Aaa45E4B4FdE07c76E8EC6820801A41EeB3F537",
       "blockNumber": 8860432
     },
     "AssetShell": {
