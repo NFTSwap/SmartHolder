@@ -212,7 +212,7 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 		// require(amount >= ad.minimumPrice, "#AssetShell#unlock price >= minimum price"); // price
 		if (price < min_price) revert PayableInsufficientAmount();
 
-		// AssetID storage meta = ad.meta;
+		//AssetID storage meta = ad.meta;
 		_host.ledger().assetIncome{value: msg.value}(
 			address(this), id.tokenId, msg.sender, id.previous, to, price, value, saleType
 		);
