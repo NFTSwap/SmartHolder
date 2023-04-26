@@ -1,5 +1,5 @@
 
-NET     ?= goerli
+ENV     ?= goerli
 NODE    ?= node
 DEBUG   ?=
 
@@ -24,8 +24,8 @@ build:
 
 # Deploy or upgrade
 deploy: build
-	$(NODE) $(DEBUG) ./node_modules/.bin/truffle deploy --network $(NET)
+	$(NODE) $(DEBUG) ./node_modules/.bin/truffle deploy --network $(ENV)
 
 # Deploy contracts before testing
 test:
-	TEST=1 $(NODE) $(DEBUG)  ./node_modules/.bin/truffle test --network $(NET) --compile-none
+	TEST=1 $(NODE) $(DEBUG)  ./node_modules/.bin/truffle test --network $(ENV) --compile-none

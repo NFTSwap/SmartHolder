@@ -75,13 +75,13 @@ module.exports = async function(deployer, networks, accounts) {
 	let opts = { deployer, networks };
 
 	// deploy all impl
+	let DAO = await deploy('DAO', opts);
+	let Ledger = await deploy('Ledger', opts);
+	let Share = await deploy('Share', opts);
+	let VotePool = await deploy('VotePool', opts);
 	let Asset = await deploy('Asset', opts);
 	let AssetShell = await deploy('AssetShell', opts);
-	let Ledger = await deploy('Ledger', opts);
 	let Member = await deploy('Member', opts);
-	let VotePool = await deploy('VotePool', opts);
-	let Share = await deploy('Share', opts);
-	let DAO = await deploy('DAO', opts);
 	let DAOs = await deploy('DAOs', opts);
 	let DAOsProxy = await deploy('DAOsProxy', opts, [DAOs.address], async (deployed)=>{
 		await (await DAOs.Contract.at(deployed.address)).initDAOs();
