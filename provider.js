@@ -35,7 +35,9 @@ class ProviderBase {
 			let warp = (result)=>({ id: payload.id, jsonrpc: payload.jsonrpc, result });
 			try {
 				if (matic_gas) { // matic get gasPrice
-					this.matic_eth_gasPrice = '0x' + (await gas.matic()).toString(16);
+					let gasPrice = await gas.matic(1,1);
+					this.matic_eth_gasPrice = '0x' + gasPrice.toString(16);
+					// console.log('matic eth_gasPrice', gasPrice);
 					return warp(this.matic_eth_gasPrice);
 				}
 				//let url = this.url[somes.random(0, this.url.length-1)];
