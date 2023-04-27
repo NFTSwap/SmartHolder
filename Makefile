@@ -1,31 +1,27 @@
 
-ENV     ?= goerli
-NODE    ?= node
-DEBUG   ?=
-
 ifeq ($(DEBUG),1)
 	DEBUG = --inspect-brk=9230
 endif
+
+ENV     ?= goerli
+NODE    ?= node $(DEBUG)
+DEBUG   ?=
+TRUFFLE ?= $(NODE) ./node_modules/.bin/truffle
 
 .PHONY: build deploy test
 
 # Build all and proxy
 build:
-	if [ -f contracts/DAOs.sol ]; \
-		then mv contracts/DAOs.sol contracts/DAOs.sol.bk;\
-	fi
 	rm -rf build
-	npm run build
-	npm run build-proxy
-	mv contracts/DAOs.sol.bk contracts/DAOs.sol
-	npm run build
-	npm run build-proxy
-	npm run build
+	$(NODE)    gen-proxy.js --placeholder
+	$(TRUFFLE) compile --all
+	$(TRUFFLE) exec --network $(ENV) gen-proxy.js
+	$(TRUFFLE) compile --all
 
 # Deploy or upgrade
-deploy: build
-	$(NODE) $(DEBUG) ./node_modules/.bin/truffle deploy --network $(ENV)
+deploy:
+	$(TRUFFLE) deploy --network $(ENV)
 
 # Deploy contracts before testing
 test:
-	TEST=1 $(NODE) $(DEBUG)  ./node_modules/.bin/truffle test --network $(ENV) --compile-none
+	$(TRUFFLE) test --network $(ENV) --compile-none

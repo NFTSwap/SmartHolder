@@ -1,8 +1,6 @@
 
 const fs = require('fs');
 const deployImpl = require('@openzeppelin/truffle-upgrades/dist/utils/deploy-impl');
-const genProxy = require('../gen-proxy');
-const {GEN_PROXY,TEST} = process.env;
 
 function deployInfo() {
 	try {
@@ -66,12 +64,6 @@ async function deploy(name, opts, args = [], initializer = async ()=>{}) {
 }
 
 module.exports = async function(deployer, networks, accounts) {
-	if (TEST) return;
-	if (GEN_PROXY) {
-		await genProxy();
-		process.exit(0);
-	}
-
 	let opts = { deployer, networks };
 
 	// deploy all impl

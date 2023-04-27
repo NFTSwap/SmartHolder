@@ -5,7 +5,6 @@
 	"main": "",
 	"scripts": {
 		"build": "truffle compile --all",
-		"build-proxy": "GEN_PROXY=1 truffle deploy --network goerli",
 		"deploy": "truffle deploy --network goerli",
 		"test": "truffle test --network goerli --compile-none"
 	},
