@@ -25,7 +25,7 @@ try {
 	var cfg = {};
 }
 
-module.exports = {
+const truffle_config = {
 	/**
 	 * Networks define how you connect to your ethereum client and let you set the
 	 * defaults web3 uses to send transactions. If you don't specify one truffle
@@ -57,6 +57,7 @@ module.exports = {
 				// 'https://rpc-mainnet.maticvigil.com/v1/ef8f16191b474bb494f33283a81a38487e4dc245'
 			),
 			production: true,
+			gasPrice: process.env.GAS, // 400000000000
 		},
 		development: {
 			host: "127.0.0.1",
@@ -90,3 +91,6 @@ module.exports = {
 	},
 	// plugins: ["solidity-coverage"]
 };
+
+
+module.exports = truffle_config;

@@ -20,8 +20,8 @@ build:
 
 # Deploy or upgrade
 deploy:
-	$(TRUFFLE) deploy --network $(ENV)
+	GAS=$(shell node gas $(ENV)) $(TRUFFLE) deploy --network $(ENV)
 
 # Deploy contracts before testing
 test:
-	$(TRUFFLE) test --network $(ENV) --compile-none
+	GAS=$(shell node gas $(ENV)) $(TRUFFLE) test --network $(ENV) --compile-none

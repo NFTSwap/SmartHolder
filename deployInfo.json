@@ -45,5 +45,52 @@
       "address": "0x555309800BDDd188A5B51728d5611725d9bBad02",
       "blockNumber": 8860453
     }
+  },
+  "matic": {
+    "DAO": {
+      "version": "855d2847e4105fd73af2e8dad6427123386deafc1232ac90c0188da40a24533c",
+      "address": "0x511372CDB388772a26c63dC8f1Ac63040b46af2F",
+      "blockNumber": 42009323
+    },
+    "Ledger": {
+      "version": "28b335ab87c779d320ae7e95f17159aee7d0de806a87294627b6b1cf166693d1",
+      "address": "0x7bD4E68d2cD65Edaf45B3Ae7c656148FaD6E7027",
+      "blockNumber": 42010886
+    },
+    "Share": {
+      "version": "2a96de56c08ea87f1222f2ed452e2fd390788692324e251c87e7dca620055399",
+      "address": "0x1E3A34C47E6747836BE69b3aCa3e9622fb1B0d7B",
+      "blockNumber": 42010897
+    },
+    "VotePool": {
+      "version": "6ded15b8dc4326b457eeacf1c6b0a5a39dc89d87514372391228c5a1b9095b65",
+      "address": "0xD53fC943496a42839306ad92a36877a7e44D5aFB",
+      "blockNumber": 42010911
+    },
+    "Asset": {
+      "version": "b2dfe1ff6e057f365aa587b58879eafdf3fcc78747f9abe32b823e83e0ce70bd",
+      "address": "0x0919AaF666f106DFa2163Acef6aDaD06442a4CF9",
+      "blockNumber": 42010924
+    },
+    "AssetShell": {
+      "version": "25709d76d5e68c58dd2408345a26ef998583c60695a9db600a0081d8accd4dbe",
+      "address": "0xBC505089d1Ed6F28A3bacdBa5EAC4271ad06C3C5",
+      "blockNumber": 42010935
+    },
+    "Member": {
+      "version": "3a9cfe7d685c958bc82e0777e7e5e11bca4dd24a5ac77039774437ed864002a9",
+      "address": "0xD9CE30a15D74eE4961a6A1d2AB224A6d78eD5bCA",
+      "blockNumber": 42010947
+    },
+    "DAOs": {
+      "version": "dd1b0e2cff9094ab21d2239dded83329cb9ec36027c997dab7525956acbfa0d0",
+      "address": "0x6AC24E60569c57f75352575F82A90eE778d42f79",
+      "blockNumber": 42011358
+    },
+    "DAOsProxy": {
+      "version": "93b79a147f589ef2243f1351f34bb6a26915a39a93ad935346b107c7dc7d0988",
+      "address": "0x64A41DCbecEe0c92c1dC62c5ed7A350b52dEcc91",
+      "blockNumber": 42011377
+    }
   }
 }
