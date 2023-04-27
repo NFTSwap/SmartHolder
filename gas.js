@@ -1,7 +1,7 @@
 
 const req = require('somes/request').default;
 
-async function matic() {
+async function matic(test) {
 	let {data} = await req.get('https://gpoly.blockscan.com/gasapi.ashx?apikey=key&method=gasoracle');
 	// {
 	// 	"LastBlock": "42009802",
@@ -14,16 +14,16 @@ async function matic() {
 	// }
 	let {ProposeGasPrice: gasPrice} = JSON.parse(data + '').result;
 
-	return Number(gasPrice) * 1000000000;
+	return Number(gasPrice) * test ? 1500000000: 1000000000;
 }
 
 module.exports = {matic}
 
 if (require.main === module) {
-	const network = process.argv[2];
+	const [_,__,network,test] = process.argv[2];
 	(async function() {
 		if (network == 'matic') {
-			console.log(await matic());
+			console.log(await matic(test));
 		}
 	})();
 }
