@@ -24,4 +24,4 @@ deploy:
 
 # Deploy contracts before testing
 test:
-	GAS=$(shell node gas $(ENV) test) $(TRUFFLE) test --network $(ENV) --compile-none
+	$(TRUFFLE) test --network $(ENV) --compile-none

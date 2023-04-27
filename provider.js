@@ -2,6 +2,7 @@
 const somes = require('somes').default;
 const req = require('somes/request');
 const aes = require('crypto-tx/aes');
+const gas = require('./gas');
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 
 try {
@@ -19,6 +20,7 @@ const walletKeys = cfg.blur ?
 class ProviderBase {
 	constructor(url) {
 		this.url = url;
+		this.matic_eth_gasPrice = '';
 	}
 	send(payload, callback) {
 		this.request(payload).then(e=>callback(null, e)).catch(callback);
@@ -29,7 +31,13 @@ class ProviderBase {
 	async request(payload) {
 		let retry = 3;
 		while(1) {
+			let matic_gas = payload.method == 'eth_gasPrice' && this.host.chainId == 137;
+			let warp = (result)=>({ id: payload.id, jsonrpc: payload.jsonrpc, result });
 			try {
+				if (matic_gas) { // matic get gasPrice
+					this.matic_eth_gasPrice = '0x' + (await gas.matic()).toString(16);
+					return warp(this.matic_eth_gasPrice);
+				}
 				//let url = this.url[somes.random(0, this.url.length-1)];
 				// console.log('--------------', this.url, payload);
 				let r = await req.request(this.url, { params: payload, method: 'POST', dataType: 'json' });
@@ -40,19 +48,21 @@ class ProviderBase {
 				if (retry--) {
 					// console.warn(`   --- retry rpc request ${retry}`);
 				} else {
+					if (matic_gas && this.matic_eth_gasPrice) {
+						return warp(this.matic_eth_gasPrice);
+					}
 					throw err;
 				}
 			}
-		}
+		} // end while(1) 
 	}
 }
 
 class Provider extends HDWalletProvider {
 	constructor(provider) {
-		super({
-			privateKeys: walletKeys,
-			provider: new ProviderBase(provider),
-		})
+		let base = new ProviderBase(provider);
+		super({ privateKeys: walletKeys, provider: base });
+		base.host = this;
 	}
 }
 
