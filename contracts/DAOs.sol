@@ -67,7 +67,8 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 
 	EnumerableMap.UintToAddressMap private  _DAOs; // global DAOs list
 	DAOIMPLs                       public   defaultIMPLs; // default logic impl
-	uint256[50]                    private  __; // reserved storage space
+	address                        private  _operator;
+	uint256[49]                    private  __; // reserved storage space
 
 	function initDAOs() external initializer {
 		initOwnable();
@@ -75,6 +76,14 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 
 	function setDefaultIMPLs(DAOIMPLs memory IMPLs) public onlyOwner {
 		defaultIMPLs = IMPLs;
+	}
+
+	function operator() view public override returns (address) {
+		return _operator;
+	}
+
+	function setOperator(address operator) public onlyOwner {
+		_operator = operator;
 	}
 
 	/**

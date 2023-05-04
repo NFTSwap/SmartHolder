@@ -30,7 +30,7 @@ contract Member is Module, ERC721, IMember {
 		uint256[] permissions;
 	}
 
-	function _registerInterface721(bytes4 interfaceId) internal override {
+	function _registerInterfaceOf721(bytes4 interfaceId) internal override {
 		ERC165._registerInterface(interfaceId);
 	}
 

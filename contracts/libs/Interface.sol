@@ -146,6 +146,7 @@ interface IVotePool {
 
 interface IDAO is IModule {
 	event SetModule(uint256 indexed id, address addr);
+	function daos() view external returns (IDAOs);
 	function root() view external returns (address);
 	function member() view external returns (IMember);
 	function ledger() view external returns (ILedger);
@@ -163,4 +164,21 @@ interface IDAOs {
 		uint256 totalSupply, uint256 maxSupply,
 		string calldata name, string calldata symbol, string calldata description
 	) external returns (address);
+	function operator() view external returns (address);
+}
+
+interface IWETH { // WETH9
+	event Approval(address indexed src, address indexed guy, uint wad);
+	event Transfer(address indexed src, address indexed dst, uint wad);
+	event Deposit(address indexed dst, uint wad);
+	event Withdrawal(address indexed src, uint wad);
+
+	function balanceOf(address owner) external view returns (uint);
+	function allowance(address owner) external view returns (uint);
+	function deposit() external payable;
+	function withdraw(uint wad) external;
+	function totalSupply() external view;
+	function approve(address guy, uint wad) external returns (bool);
+	function transfer(address dst, uint wad) external returns (bool);
+	function transferFrom(address src, address dst, uint wad) external returns (bool);
 }

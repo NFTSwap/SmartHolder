@@ -27,9 +27,10 @@ contract DAO is IDAO, Module {
 	EnumerableMap.UintToAddressMap private _modules;
 	string             public  image;
 	bytes              public  extend; // external data
-	IDAOs              public  daos;
+	IDAOs              private  _daos;
 	uint256[47]        private  __; // reserved storage space
 
+	function daos() view public override returns (IDAOs) { return _daos; }
 	function root() view external override returns (address) { return _root; }
 	function name() view external returns (string memory) { return _name; }
 	function mission() view external returns (string memory) { return _mission; }
@@ -54,7 +55,7 @@ contract DAO is IDAO, Module {
 		ERC165(root_).checkInterface(VotePool_Type);
 		ERC165(member_).checkInterface(Member_Type);
 
-		daos = daos_;
+		_daos = daos_;
 		_root = root_;
 		_name = args.name;
 		_mission = args.mission;
@@ -126,7 +127,7 @@ contract DAO is IDAO, Module {
 	function enableShare(uint256 totalSupply, uint256 maxSupply, string calldata symbol) public OnlyDAO {
 		require(!_modules.contains(Module_Share_ID), "#DAO.enableShare Share module already exists");
 
-		address addr = daos.deployShare(this, address(0), totalSupply, maxSupply, _name, symbol, "");
+		address addr = _daos.deployShare(this, address(0), totalSupply, maxSupply, _name, symbol, "");
 
 		_modules.set(Module_Share_ID, addr);
 
