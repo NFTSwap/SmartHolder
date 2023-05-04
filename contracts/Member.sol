@@ -240,9 +240,9 @@ contract Member is Module, ERC721, IMember {
 			emit TransferVotes(id, 0, uint32(-votes));
 	}
 
-	function addVotesOfBatch(uint256[] calldata IDs, int32[] calldata VOTEs) public {
-		for (uint256 i = 0; i < IDs.length; i++) {
-			addVotes(IDs[i], VOTEs[i]);
+	function addVotesOfBatch(uint256[] calldata ids, int32[] calldata votes) public {
+		for (uint256 i = 0; i < ids.length; i++) {
+			addVotes(ids[i], votes[i]);
 		}
 	}
 

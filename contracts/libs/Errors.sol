@@ -50,5 +50,6 @@ error TokenIDMustEvenNumberInAsset(); // 0x5a708f03 token id must be an even num
 error NoPermissionToMintNFTs1155(); // 0x292c3a85 No permission to mint NFTs
 error TokenIDAlreadyExistsInAsset(); // 0x8791d6ee token id already exists
 error AmountMinimumLimit(); // 0xf76273e9 amount minimum limit
+error LockTokenIDValueEmptyInAssetShell(); // 0x42e0e2ca Lock value cannot be empty in asset shell
 
 library Errors {}

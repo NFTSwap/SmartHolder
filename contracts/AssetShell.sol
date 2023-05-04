@@ -193,16 +193,18 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 	 */
 	function unlock(LockedID memory id) public payable {
 		// require(tokenId != 0, "#AssetShell#unlock locked tokenId != 0");
-		if (id.tokenId == 0) revert TokenIDEmpty();
+		// if (id.tokenId == 0) revert TokenIDEmpty();
 		// require(msg.value != 0, "#AssetShell#unlock msg.value != 0"); // price
-		if (msg.value == 0) revert PayableAmountZero();
+		// if (msg.value == 0) revert PayableAmountZero();
 		// require(ad.locked != address(0), "#AssetShell#unlock Lock cannot be empty"); // price
-		if (id.owner == address(0)) revert LockTokenIDEmptyInAssetShell();
-		if (id.previous == address(0)) revert LockTokenIDPreviousOwnerEmptyInAssetShell();
+		// if (id.owner == address(0)) revert LockTokenIDEmptyInAssetShell();
+		// if (id.previous == address(0)) revert LockTokenIDPreviousOwnerEmptyInAssetShell();
 
 		AssetData storage ad = _assetsData[id.tokenId];
 		Locked storage locked = ad.locked[id.owner];
 		uint256 value = locked.values.get(id.previous);
+
+		if (value == 0) revert LockTokenIDValueEmptyInAssetShell();
 
 		address to = id.owner;
 		uint256 price = msg.value * 10_000 / seller_fee_basis_points; // transfer price
