@@ -270,7 +270,7 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 				unlock_(it.lock, it.payer, it.payValue);
 			} else {
 				IWETH(it.payBank).withdraw(it.payValue);
-				if (address(this).balance < it.payValue ) revert PayableInsufficientAmountERC20();
+				if (address(this).balance < it.payValue ) revert PayableInsufficientAmountWETH();
 				unlock_(it.lock, it.payer, it.payValue);
 			}
 		}
