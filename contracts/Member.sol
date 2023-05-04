@@ -226,7 +226,7 @@ contract Member is Module, ERC721, IMember {
 		emit SetPermissions(id, addActions, removeActions);
 	}
 
-	function addVotes(uint256 id, int32 votes) external OnlyDAO {
+	function addVotes(uint256 id, int32 votes) public OnlyDAO {
 		checkExists(id); // check info query for nonexistent member
 
 		Info storage info = _infoMap[id].info;
@@ -238,6 +238,12 @@ contract Member is Module, ERC721, IMember {
 			emit TransferVotes(0, id, uint32(votes));
 		else
 			emit TransferVotes(id, 0, uint32(-votes));
+	}
+
+	function addVotesOfBatch(uint256[] calldata IDs, int32[] calldata VOTEs) public {
+		for (uint256 i = 0; i < IDs.length; i++) {
+			addVotes(IDs[i], VOTEs[i]);
+		}
 	}
 
 	function transferVotes(uint256 from, uint256 to, uint32 votes) external OnlyDAO {
