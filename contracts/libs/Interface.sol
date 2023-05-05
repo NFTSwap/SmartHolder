@@ -167,11 +167,11 @@ interface IDAOs {
 	function operator() view external returns (address);
 }
 
-interface IWETH { // WETH9
+interface IWETH {
 	event Approval(address indexed src, address indexed guy, uint wad);
 	event Transfer(address indexed src, address indexed dst, uint wad);
 	event Deposit(address indexed dst, uint wad);
-	event Withdrawal(address indexed src, uint wad);
+	event Withdraw(address indexed src, uint wad);
 
 	function balanceOf(address owner) external view returns (uint);
 	function allowance(address owner) external view returns (uint);
