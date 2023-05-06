@@ -79,16 +79,16 @@ abstract contract ERC721 is Context, IERC721_1 {
 		*/
 	bytes4 private constant _INTERFACE_ID_ERC721_ENUMERABLE = 0x780e9d63;
 
-	function _registerInterfaceOf721(bytes4 interfaceId) internal virtual;
+	function _registerInterface721(bytes4 interfaceId) internal virtual;
 
 	function initERC721(string memory name_, string memory symbol_) internal {
 		_name = name_;
 		_symbol = symbol_;
 
 		// register the supported interfaces to conform to ERC721 via ERC165
-		_registerInterfaceOf721(_INTERFACE_ID_ERC721);
-		_registerInterfaceOf721(_INTERFACE_ID_ERC721_METADATA);
-		_registerInterfaceOf721(_INTERFACE_ID_ERC721_ENUMERABLE);
+		_registerInterface721(_INTERFACE_ID_ERC721);
+		_registerInterface721(_INTERFACE_ID_ERC721_METADATA);
+		_registerInterface721(_INTERFACE_ID_ERC721_ENUMERABLE);
 	}
 
 	/**
