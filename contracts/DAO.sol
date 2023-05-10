@@ -19,6 +19,7 @@ contract DAO is IDAO, Module {
 		string description;
 		string image;
 		bytes  extend;
+		address unlockOperator;
 	}
 
 	address            private  _root;
@@ -28,7 +29,8 @@ contract DAO is IDAO, Module {
 	string             public  image;
 	bytes              public  extend; // external data
 	IDAOs              private  _daos;
-	uint256[47]        private  __; // reserved storage space
+	address            private  _unlockOperator; // operator address for asset auto unlock
+	uint256[46]        private  __; // reserved storage space
 
 	function daos() view public override returns (IDAOs) { return _daos; }
 	function root() view external override returns (address) { return _root; }
@@ -40,6 +42,7 @@ contract DAO is IDAO, Module {
 	function first() view external override returns (IAssetShell) { return IAssetShell(module(Module_ASSET_First_ID)); }
 	function second() view external override returns (IAssetShell) { return IAssetShell(module(Module_ASSET_Second_ID)); }
 	function share() view external override returns (IShare) { return IShare(module(Module_Share_ID)); }
+	function unlockOperator() view public override returns (address) { return _unlockOperator; }
 
 	function module(uint256 id) view public override returns (address) {
 		return address(uint160( uint256(_modules._inner._values[bytes32(id)])));
@@ -61,9 +64,15 @@ contract DAO is IDAO, Module {
 		_mission = args.mission;
 		image = args.image;
 		extend = args.extend;
+		_unlockOperator = args.unlockOperator;
 
 		_modules.set(Module_MEMBER_ID, member_);
 		// emit SetModule(Module_MEMBER_ID, member);
+	}
+
+	function setUnlockOperator(address addr) external Check(Action_DAO_Settings) {
+		_unlockOperator = addr;
+		emit Change(Change_Tag_DAO_UnlockOperator, 0);
 	}
 
 	function setExtend(bytes calldata data) external Check(Action_DAO_Settings) {

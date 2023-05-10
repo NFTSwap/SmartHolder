@@ -155,6 +155,7 @@ interface IDAO is IModule {
 	function second() view external returns (IAssetShell);
 	function share() view external returns (IShare);
 	function module(uint256 id) view external returns (address);
+	function unlockOperator() view external returns (address);
 }
 
 interface IDAOs {
@@ -164,7 +165,6 @@ interface IDAOs {
 		uint256 totalSupply, uint256 maxSupply,
 		string calldata name, string calldata symbol, string calldata description
 	) external returns (address);
-	function operator() view external returns (address);
 }
 
 interface IWETH {

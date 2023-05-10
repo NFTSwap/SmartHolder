@@ -53,6 +53,7 @@ error AmountMinimumLimit(); // 0xf76273e9 amount minimum limit
 error LockTokenIDValueEmptyInAssetShell(); // 0x42e0e2ca Lock value cannot be empty in asset shell
 error NeedToUnlockAssetFirstForPreviousOwner(); // 0xe0caa311 You need to unlock the asset first
 error PayableInsufficientAmountWETH(); // 0x8629bf06 payable insufficient amount
-error PermissionDeniedForOnlyDAOsOperator(); // 0x02b463b6 permission denied for only daos operator
+error PermissionDeniedForOnlyUnlockOperator(); // 0x0ee27f94 permission denied for only dao unlock operator
+error MINTERC1155QuantityExceedsLimit(); // 0xad1fa1b0 mint ERC1155 asset quantity exceeds limit
 
 library Errors {}

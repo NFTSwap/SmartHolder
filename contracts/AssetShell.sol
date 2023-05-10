@@ -9,17 +9,21 @@ import './Asset.sol';
 
 contract AssetShell is AssetModule, ERC1155, IAssetShell {
 	using Address for address;
-	using EnumerableMap for EnumerableMap.AddressToUintMap;
-
-	struct Locked {
-		uint256                        count; // owner locked count total for tokenId
-		EnumerableMap.AddressToUintMap counts; // previous asset owner address => value
-	}
 
 	struct LockedID {
 		uint256 tokenId;
 		address owner;
 		address previous; // previous owner
+	}
+	struct LockedItem {
+		uint64 count;
+		uint64 blockNumber; // block number
+		uint64 index; // index for itemsKeys
+	}
+	struct Locked {
+		uint64                         total; // owner locked count total for tokenId
+		mapping(address => LockedItem) items; // previous asset owner address => value
+		address[]                      itemsKeys; // previous list
 	}
 
 	struct AssetData {
@@ -73,6 +77,9 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 		ad.meta.token = address(token);
 		ad.meta.tokenId = tokenId;
 
+		if (value > 0xffffffffffffffff) {
+			revert MINTERC1155QuantityExceedsLimit();
+		}
 		_mint(to, id, value, "");
 
 		return 0xf23a6e61;
@@ -85,6 +92,16 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 		uint256[] calldata values,
 		bytes calldata data
 	) external returns (bytes4) {
+		revert MethodNotImplemented();
+	}
+
+	function _safeBatchTransferFrom(
+		address from,
+		address to,
+		uint256[] memory ids,
+		uint256[] memory amounts,
+		bytes memory data) internal virtual override
+	{
 		revert MethodNotImplemented();
 	}
 
@@ -132,21 +149,30 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 	}
 
 	/**
-	 * @dev Returns the owner token locked count and locked items length
+	 * @dev Returns the owner token locked total count and locked items length
 	 */
-	function lockedOf(uint256 tokenId, address owner) view public returns (uint256 count, uint256 length) {
+	function lockedItems(uint256 tokenId, address owner) view public returns (uint256 items, uint64 total) {
 		Locked storage locked = _assetsData[tokenId].locked[owner];
-		count = locked.count;
-		length = locked.counts.length();
+		items = locked.itemsKeys.length;
+		total = locked.total;
+	}
+
+	/**
+	 * @dev Returns the owner token locked count for index
+	 */
+	function lockedAt(uint256 tokenId, address owner, uint256 index) view public 
+		returns (address previous, LockedItem memory item) 
+	{
+		Locked storage locked = _assetsData[tokenId].locked[owner];
+		previous = locked.itemsKeys[index];
+		item = locked.items[previous];
 	}
 
 	/**
 	 * @dev Returns the owner token locked count and previous owner address
 	 */
-	function lockedAt(uint256 tokenId, address owner, uint256 index) view public 
-		returns (address previous, uint256 count) 
-	{
-		(previous,count) = _assetsData[tokenId].locked[owner].counts.at(index);
+	function lockedOf(uint256 tokenId,address owner,address previous) view public returns (LockedItem memory item) {
+		item = _assetsData[tokenId].locked[owner].items[previous];
 	}
 
 	/**
@@ -171,20 +197,25 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 		for (uint256 i = 0; i < ids.length; i++) {
 			uint256 id = ids[i];
 			AssetData storage asset = _assetsData[id];
-			Locked storage locked = asset.locked[to];
 			uint256 count = counts[i];
 
 			if (asset.minimumPrice != 0) {
 				if (from != address(0)) { // not mint
-					if (balanceOf(from, id) < asset.locked[from].count) { // locaked
+					if (balanceOf(from, id) < asset.locked[from].total) { // locaked
 						revert NeedToUnlockAssetFirst();
 					}
 					if (to != address(0)) { // not burn
-						if (locked.counts.contains(from))
+						Locked storage locked = asset.locked[to]; // locked to
+						LockedItem storage item = locked.items[from];
+						if (item.count != 0)
 							revert NeedToUnlockAssetFirstForPreviousOwner();
 
-						locked.count += count;
-						locked.counts.set(from, count);
+						locked.total += uint64(count);
+						item.index = uint64(locked.itemsKeys.length);
+						item.count = uint64(count);
+						item.blockNumber = uint64(block.number);
+						locked.itemsKeys.push(from);
+
 						_lastLocked = LockedID(id,to,from);
 					}
 				}
@@ -206,13 +237,14 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 
 		AssetData storage asset  = _assetsData[lock.tokenId];
 		Locked    storage locked = asset.locked[lock.owner];
-		uint256           count  = locked.counts.get(lock.previous);
+		LockedItem storage item  = locked.items[lock.previous];
+		uint256 count = item.count;
 
-		if (count == 0) revert LockTokenIDValueEmptyInAssetShell();
+		if (item.count == 0) revert LockTokenIDValueEmptyInAssetShell();
 
 		address to = lock.owner;
 		uint256 price = value * 10_000 / seller_fee_basis_points; // transfer price
-		uint256 min_price = asset.minimumPrice * count; // minimum price
+		uint256 min_price = asset.minimumPrice * item.count; // minimum price
 
 		// check transfer price
 		// require(count >= ad.minimumPrice, "#AssetShell#unlock price >= minimum price"); // price
@@ -220,7 +252,7 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 
 		//AssetID storage meta = ad.meta;
 		_host.ledger().assetIncome{value: value}(
-			address(this), lock.tokenId, sender, lock.previous, to, price, count, saleType
+			address(this), lock.tokenId, sender, lock.previous, to, price, item.count, saleType
 		);
 
 		if (_lastLocked.tokenId == lock.tokenId &&
@@ -231,8 +263,12 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 		}
 
 		// unlock
-		locked.count -= count;
-		locked.counts.remove(lock.previous);
+		locked.total -= uint64(count);
+		// delete key data
+		if (item.index + 1 < locked.itemsKeys.length)
+			locked.itemsKeys[item.index] = locked.itemsKeys[locked.itemsKeys.length - 1];
+		locked.itemsKeys.pop(); // remove last key in keys
+		delete locked.items[lock.previous];
 
 		if (saleType == SaleType.kFirst) {
 			bytes memory data = abi.encode(to, asset.minimumPrice);
@@ -241,8 +277,7 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 	}
 
 	enum PayType {
-		kDefault, // default eth
-		kWETH
+		kDefault, kWETH // default eth
 	}
 
 	struct UnlockForOperator {
@@ -257,8 +292,8 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 	 * @dev unlockForOperator()
 	 */
 	function unlockForOperator(UnlockForOperator[] calldata data) public payable {
-		if (_host.daos().operator() != msg.sender) {
-			revert PermissionDeniedForOnlyDAOsOperator();
+		if (_host.unlockOperator() != msg.sender) {
+			revert PermissionDeniedForOnlyUnlockOperator();
 		}
 
 		uint256 value = msg.value;
