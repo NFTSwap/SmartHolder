@@ -29,6 +29,7 @@ contract('DAOs', ([from]) => {
 				description: `${name} description`,
 				image: `https://smart-dao-home-rel.stars-mine.com/assets/logo.c5133168.png`,
 				extend: '0x' + buffer.from('{"poster": "https://img-blog.csdnimg.cn/20200502175449751.png"}').toString('hex'),
+				unlockOperator: app.DAOs.address,
 			},
 			from, // operator
 			{ // InitMemberArgs
@@ -65,6 +66,7 @@ contract('DAOs', ([from]) => {
 				description: `${name} description`,
 				image: `https://smart-dao-home-rel.stars-mine.com/assets/logo.c5133168.png`,
 				extend: '0x' + buffer.from('{"poster": "https://img-blog.csdnimg.cn/20200502175449751.png"}').toString('hex'),
+				unlockOperator: app.DAOs.address,
 			},
 			from, // operator
 			{ // InitMemberArgs
