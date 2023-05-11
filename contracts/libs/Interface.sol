@@ -167,18 +167,9 @@ interface IDAOs {
 	) external returns (address);
 }
 
-interface IWETH {
-	event Approval(address indexed src, address indexed guy, uint wad);
-	event Transfer(address indexed src, address indexed dst, uint wad);
-	event Deposit(address indexed dst, uint wad);
-	event Withdraw(address indexed src, uint wad);
-
-	function balanceOf(address owner) external view returns (uint);
-	function allowance(address owner) external view returns (uint);
+interface IWETH is IERC20 {
+	event Deposit(address indexed dst, uint256 amount);
+	event Withdraw(address indexed src, uint256 amount);
 	function deposit() external payable;
-	function withdraw(uint wad) external;
-	function totalSupply() external view;
-	function approve(address guy, uint wad) external returns (bool);
-	function transfer(address dst, uint wad) external returns (bool);
-	function transferFrom(address src, address dst, uint wad) external returns (bool);
+	function withdraw(uint256 amount) external;
 }
