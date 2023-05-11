@@ -165,6 +165,7 @@ interface IDAOs {
 		uint256 totalSupply, uint256 maxSupply,
 		string calldata name, string calldata symbol, string calldata description
 	) external returns (address);
+	function operator() view external returns (address);
 }
 
 interface IWETH is IERC20 {

@@ -6,8 +6,8 @@
       "blockNumber": 8860432
     },
     "AssetShell": {
-      "version": "25709d76d5e68c58dd2408345a26ef998583c60695a9db600a0081d8accd4dbe",
-      "address": "0xAF131b43Fe0071d063886356b92F896f1c9e5b7B",
+      "version": "722d2d552464cde73ba5ff456d5c94fef555d8d7e60c8a3da409fa79b0262648",
+      "address": "0x9E816aD84651000283A1FD47d61a9F566F64A0A1",
       "blockNumber": 8860435
     },
     "Ledger": {
@@ -16,8 +16,8 @@
       "blockNumber": 8860437
     },
     "Member": {
-      "version": "3a9cfe7d685c958bc82e0777e7e5e11bca4dd24a5ac77039774437ed864002a9",
-      "address": "0x49B921fEa305D3eFC7992959a7110663Ee8Cdb28",
+      "version": "666d714924e866fab50001809a66ef5781051a247a3ed24e1bb27e5a5ab1cfe4",
+      "address": "0x44E45C773e1C7Fb88025D41ea623f8992560bF95",
       "blockNumber": 8860438
     },
     "VotePool": {
@@ -31,13 +31,13 @@
       "blockNumber": 8860443
     },
     "DAO": {
-      "version": "855d2847e4105fd73af2e8dad6427123386deafc1232ac90c0188da40a24533c",
-      "address": "0x73B7A7e649F7B922e4302d60B05Fb36cD1b8D5e7",
+      "version": "bd3aea4c1d4bf1f528cb5b4bc372f52ccfc3683b5e45924cdaa55c7806c440c6",
+      "address": "0x0be1aA5f852dAb55993223C8Cc889010A1B71f60",
       "blockNumber": 8860445
     },
     "DAOs": {
-      "version": "dd1b0e2cff9094ab21d2239dded83329cb9ec36027c997dab7525956acbfa0d0",
-      "address": "0xb919A78a6a7c95B8d47d5113A09ED0d530BFBDC8",
+      "version": "0af6f8435f4c674922595dc8cd5c9fcd6416e1e637cba9128dd41b34a7a4f642",
+      "address": "0x675ACA85A1b0A59792aA4a747B6A55CcB5873F17",
       "blockNumber": 8860448
     },
     "DAOsProxy": {

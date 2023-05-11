@@ -67,7 +67,8 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 
 	EnumerableMap.UintToAddressMap private  _DAOs; // global DAOs list
 	DAOIMPLs                       public   defaultIMPLs; // default logic impl
-	uint256[50]                    private  __; // reserved storage space
+	address                        private  _operator;
+	uint256[49]                    private  __; // reserved storage space
 
 	function initDAOs() external initializer {
 		initOwnable();
@@ -75,6 +76,14 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 
 	function setDefaultIMPLs(DAOIMPLs memory IMPLs) public onlyOwner {
 		defaultIMPLs = IMPLs;
+	}
+
+	function operator() view public override returns (address) {
+		return _operator;
+	}
+
+	function setOperator(address operator) public onlyOwner {
+		_operator = operator;
 	}
 
 	/**
@@ -197,7 +206,7 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 	}
 
 	/**
-	 * @dev Param unlockAssetForOperator for method unlockAssetForOperator()
+	 * @dev params unlockAssetForOperator for method unlockAssetForOperator()
 	 */
 	struct UnlockAssetForOperator {
 		address                        token;  // asset contract address
@@ -208,7 +217,9 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 	/**
 	 * @dev unlockAssetForOperator()
 	 */
-	function unlockAssetForOperator(UnlockAssetForOperator[] calldata data) public payable onlyOwner {
+	function unlockAssetForOperator(UnlockAssetForOperator[] calldata data) public payable {
+		require(_operator != _msgSender(), "#DAOs.unlockAssetForOperator() Permission denied for only operator");
+
 		for (uint32 i = 0; i < data.length; i++) {
 			AssetShell(payable(data[i].token)).unlockForOperator{value:data[i].value}(data[i].data);
 		}

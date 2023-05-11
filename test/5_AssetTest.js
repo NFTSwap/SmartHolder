@@ -98,10 +98,10 @@ contract('Asset', ([from,to]) => {
 			await first.safeTransferFrom(from, to, id, 1, "0x");
 		});
 
-		it('lockedOf()', async () => {
-			let of = await first.lockedOf(id, to);
-			//console.log('lockedOf() amount', of.amount.toNumber(), of.length.toNumber())
-			assert(of.amount.toNumber() == 1);
+		it('lockedItems()', async () => {
+			let items = await first.lockedItems(id, to);
+			//console.log('lockedItems() amount', items.total.toNumber(), of.items.toNumber())
+			assert(items.total.toNumber() == 1);
 		});
 
 		it('unlock()', async () => {
