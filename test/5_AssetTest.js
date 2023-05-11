@@ -122,9 +122,9 @@ contract('Asset', ([from,to]) => {
 			await second.unlock({tokenId:id,owner:from,previous:to}, { value: 10000000000000001 * 0.1 });
 		});
 
-		it('lockedOf()', async () => {
-			let {amount} = await second.lockedOf(id, from);
-			assert(amount == 0);
+		it('lockedItems()', async () => {
+			let {total} = await second.lockedItems(id, from);
+			assert(total == 0);
 		});
 	});
 
