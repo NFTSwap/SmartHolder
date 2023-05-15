@@ -210,7 +210,7 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 	 */
 	struct UnlockAssetForOperator {
 		address                        token;  // asset contract address
-		uint256                        value;
+		uint256                        value;  // total pay value
 		AssetShell.UnlockForOperator[] data;
 	}
 

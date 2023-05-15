@@ -277,15 +277,10 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 		}
 	}
 
-	enum PayType {
-		kDefault, kWETH // default eth
-	}
-
 	struct UnlockForOperator {
 		LockedID lock;
-		PayType  payType;
 		uint256  payValue; // value
-		address  payBank; // erc20 contract address
+		address  payBank; // erc20 contract address, weth
 		address  payer;   // opensea contract => sender
 	}
 
@@ -298,23 +293,15 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 	/**
 	 * @dev unlockForOperator()
 	 */
-	function unlockForOperator(UnlockForOperator[] calldata data) public payable _DisableReceiveUnlock {
+	function unlockForOperator(UnlockForOperator[] calldata data) public _DisableReceiveUnlock {
 		if (_host.unlockOperator() != msg.sender) {
 			revert PermissionDeniedForOnlyUnlockOperator();
 		}
-
-		uint256 value = msg.value;
 		for (uint256 i = 0; i < data.length; i++) {
 			UnlockForOperator memory it = data[i];
-			if (it.payType == PayType.kDefault) {
-				if (value < it.payValue) revert PayableInsufficientAmount();
-				value -= it.payValue;
-				unlock_(it.lock, it.payer, it.payValue);
-			} else {
-				IWETH(it.payBank).withdraw(it.payValue);
-				if (address(this).balance < it.payValue ) revert PayableInsufficientAmountWETH();
-				unlock_(it.lock, it.payer, it.payValue);
-			}
+			IWETH(it.payBank).withdraw(it.payValue);
+			if (address(this).balance < it.payValue ) revert PayableInsufficientAmountWETH();
+			unlock_(it.lock, it.payer, it.payValue);
 		}
 	}
 

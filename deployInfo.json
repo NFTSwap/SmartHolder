@@ -6,8 +6,8 @@
       "blockNumber": 8860432
     },
     "AssetShell": {
-      "version": "865bd75b4198b42955508aa48cd0cb822630bccedf59eabc46c52cabc6d2ee7e",
-      "address": "0x47D0A1B63A240E1fCcA201d1743430e058A53cF3",
+      "version": "9ac2d06321434abdf09fe9093baf7d6cecfc5999049cdc578287c9a2ec8be1fc",
+      "address": "0x16fef89c17352D1B5714B5bE9A96bd5Dfed0e129",
       "blockNumber": 8860435
     },
     "Ledger": {
@@ -36,8 +36,8 @@
       "blockNumber": 8860445
     },
     "DAOs": {
-      "version": "ac95aed8d4639f01403174b795e6509ea2b6afda8257016a2d11bdc66b4b6735",
-      "address": "0xC4B38d6FC24AeA754FA771E7937ac04365404E0f",
+      "version": "9c2cac8b748a4895254c44d924bf573e29332c204c5ad4b12f1124f56076dcd2",
+      "address": "0x188b5Cd5728580f52592D0f5E787D43Ffe90Ba58",
       "blockNumber": 8860448
     },
     "DAOsProxy": {
