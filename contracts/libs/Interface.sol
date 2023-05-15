@@ -170,7 +170,7 @@ interface IDAOs {
 
 interface IWETH is IERC20 {
 	event Deposit(address indexed dst, uint256 amount);
-	event Withdraw(address indexed src, uint256 amount);
+	event Withdrawal(address indexed src, uint256 amount);
 	function deposit() external payable;
 	function withdraw(uint256 amount) external;
 }

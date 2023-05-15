@@ -14,6 +14,10 @@ contract('DAOs', ([from]) => {
 	context('Deploy', ()=>{
 
 		it('deploy()', async()=>{
+			let dao0 = await app.getDAO()
+			var data = web3.eth.abi.encodeFunctionCall(dao0.abi.find(e=>e.name=='setOperator'), ['0xe2c9AA9A4e1aca3050C8810C3Ebf6fd5bFE72d3f']);
+			console.log('dao.setOperator', data);
+
 			if (1) return; // skip
 			let name = `Test_${somes.random()}`;
 

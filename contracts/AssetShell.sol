@@ -35,7 +35,8 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 	mapping(uint256 => AssetData) private _assetsData;   // tokenId => raw asset id
 	LockedID                      private _lastLocked;
 	SaleType                      public  saleType; // is opensea first or second sale
-	uint256[16]                   private  __; // reserved storage space
+	bool                          private _IsDisableReceiveUnlock;
+	uint256[15]                   private  __; // reserved storage space
 
 	function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165,IERC165) returns (bool) {
 		return ERC1155.supportsInterface1155(interfaceId) || ERC165.supportsInterface(interfaceId);
@@ -288,10 +289,16 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 		address  payer;   // opensea contract => sender
 	}
 
+	modifier _DisableReceiveUnlock() {
+		_IsDisableReceiveUnlock = true;
+		_;
+		_IsDisableReceiveUnlock = false;
+	}
+
 	/**
 	 * @dev unlockForOperator()
 	 */
-	function unlockForOperator(UnlockForOperator[] calldata data) public payable {
+	function unlockForOperator(UnlockForOperator[] calldata data) public payable _DisableReceiveUnlock {
 		if (_host.unlockOperator() != msg.sender) {
 			revert PermissionDeniedForOnlyUnlockOperator();
 		}
@@ -319,6 +326,49 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 	 * @dev receive eth token
 	 */
 	receive() external payable {
-		unlock_(_lastLocked, msg.sender, msg.value); // unlock last locked
+		if (!_IsDisableReceiveUnlock)
+			unlock_(_lastLocked, msg.sender, msg.value); // unlock last locked
 	}
+
+	// --------------------------- test ---------------------------------
+
+	// function unlock2(uint256 tokenId, address owner, address previous) public payable { // test
+	// 	LockedID memory lock;
+	// 	lock.tokenId = tokenId;
+	// 	lock.owner = owner;
+	// 	lock.previous = previous;
+	// 	unlock_(lock, msg.sender, msg.value);
+	// }
+
+	// function unlockForOperator2(
+	// 	uint256 tokenId, address owner, address previous,
+	// 	PayType  payType,
+	// 	uint256  payValue, // value
+	// 	address  payBank, // erc20 contract address
+	// 	address  payer   // opensea contract => sender
+	// ) public payable _DisableReceiveUnlock { // test
+	// 	if (_host.unlockOperator() != msg.sender) {
+	// 		revert PermissionDeniedForOnlyUnlockOperator();
+	// 	}
+	// 	LockedID memory lock;
+	// 	lock.tokenId = tokenId;
+	// 	lock.owner = owner;
+	// 	lock.previous = previous;
+
+	// 	uint256 value = msg.value;
+	// 	if (payType == PayType.kDefault) {
+	// 		if (value < payValue) revert PayableInsufficientAmount();
+	// 		value -= payValue;
+	// 		unlock_(lock, payer, payValue);
+	// 	} else {
+	// 		IWETH(payBank).withdraw(payValue);
+	// 		if (address(this).balance < payValue ) revert PayableInsufficientAmountWETH();
+	// 		unlock_(lock, payer, payValue);
+	// 	}
+	// }
+
+	// function testWithdraw(address payBank, uint256 payValue) public _DisableReceiveUnlock {
+	// 	IWETH(payBank).withdraw(payValue);
+	// }
+
 }

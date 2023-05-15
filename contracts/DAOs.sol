@@ -218,7 +218,7 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 	 * @dev unlockAssetForOperator()
 	 */
 	function unlockAssetForOperator(UnlockAssetForOperator[] calldata data) public payable {
-		require(_operator != _msgSender(), "#DAOs.unlockAssetForOperator() Permission denied for only operator");
+		require(_operator == _msgSender(), "#DAOs.unlockAssetForOperator() Permission denied for only operator");
 
 		for (uint32 i = 0; i < data.length; i++) {
 			AssetShell(payable(data[i].token)).unlockForOperator{value:data[i].value}(data[i].data);
