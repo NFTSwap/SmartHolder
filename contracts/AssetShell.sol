@@ -297,6 +297,7 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 		if (_host.unlockOperator() != msg.sender) {
 			revert PermissionDeniedForOnlyUnlockOperator();
 		}
+
 		for (uint256 i = 0; i < data.length; i++) {
 			UnlockForOperator memory it = data[i];
 			IWETH(it.payBank).withdraw(it.payValue);
