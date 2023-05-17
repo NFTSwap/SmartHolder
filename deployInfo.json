@@ -36,8 +36,8 @@
       "blockNumber": 8860445
     },
     "DAOs": {
-      "version": "9c2cac8b748a4895254c44d924bf573e29332c204c5ad4b12f1124f56076dcd2",
-      "address": "0x188b5Cd5728580f52592D0f5E787D43Ffe90Ba58",
+      "version": "95243c6a070fe8799325b83603e8e22240f7c3dc2023bcd00972a1fcff86b4f5",
+      "address": "0xa195084F74eE77a6B774a89AD7A93241C81964A9",
       "blockNumber": 8860448
     },
     "DAOsProxy": {
@@ -48,8 +48,8 @@
   },
   "matic": {
     "DAO": {
-      "version": "855d2847e4105fd73af2e8dad6427123386deafc1232ac90c0188da40a24533c",
-      "address": "0x511372CDB388772a26c63dC8f1Ac63040b46af2F",
+      "version": "bd3aea4c1d4bf1f528cb5b4bc372f52ccfc3683b5e45924cdaa55c7806c440c6",
+      "address": "0x03b9606B0c2e7e2E9fc5C7DEBe8bFd2D369Bf5d1",
       "blockNumber": 42009323
     },
     "Ledger": {
@@ -73,24 +73,24 @@
       "blockNumber": 42010924
     },
     "AssetShell": {
-      "version": "25709d76d5e68c58dd2408345a26ef998583c60695a9db600a0081d8accd4dbe",
-      "address": "0xBC505089d1Ed6F28A3bacdBa5EAC4271ad06C3C5",
+      "version": "9ac2d06321434abdf09fe9093baf7d6cecfc5999049cdc578287c9a2ec8be1fc",
+      "address": "0xC7C8Ef0c3150FF80180F085D56f6190A56C2aB32",
       "blockNumber": 42010935
     },
     "Member": {
-      "version": "3a9cfe7d685c958bc82e0777e7e5e11bca4dd24a5ac77039774437ed864002a9",
-      "address": "0xD9CE30a15D74eE4961a6A1d2AB224A6d78eD5bCA",
+      "version": "666d714924e866fab50001809a66ef5781051a247a3ed24e1bb27e5a5ab1cfe4",
+      "address": "0x852cBfdf3E091c4c018C406af8dd3822669c10A8",
       "blockNumber": 42010947
     },
     "DAOs": {
-      "version": "dd1b0e2cff9094ab21d2239dded83329cb9ec36027c997dab7525956acbfa0d0",
-      "address": "0x6AC24E60569c57f75352575F82A90eE778d42f79",
+      "version": "95243c6a070fe8799325b83603e8e22240f7c3dc2023bcd00972a1fcff86b4f5",
+      "address": "0x132C371067c11BBC73CeDa6103198Fa9DABD684b",
       "blockNumber": 42011358
     },
     "DAOsProxy": {
       "version": "93b79a147f589ef2243f1351f34bb6a26915a39a93ad935346b107c7dc7d0988",
-      "address": "0x64A41DCbecEe0c92c1dC62c5ed7A350b52dEcc91",
-      "blockNumber": 42011377
+      "address": "0x179596783388e24a9D4E1ef982bc0c9224C41F43",
+      "blockNumber": 42809871
     }
   }
 }
