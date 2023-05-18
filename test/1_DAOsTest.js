@@ -2,8 +2,10 @@
 const somes = require('somes').default;
 const buffer = require('somes/buffer').default;
 const { assert } = require('chai');
+const cryptoTx = require('crypto-tx');
 const App = require('./app');
 const DAO = artifacts.require("DAO.sol");
+const VotePool = artifacts.require('VotePool.sol');
 
 contract('DAOs', ([from]) => {
 	let app;
@@ -13,11 +15,30 @@ contract('DAOs', ([from]) => {
 
 	context('Deploy', ()=>{
 
-		it('deploy()', async()=>{
-			// let dao0 = await app.getDAO()
-			// var data = web3.eth.abi.encodeFunctionCall(dao0.abi.find(e=>e.name=='setOperator'), ['0xe2c9AA9A4e1aca3050C8810C3Ebf6fd5bFE72d3f']);
-			// console.log('dao.setOperator', data);
+		// it('VotePool', async()=>{
+		// 	let dao = await DAO.at('0x47c5e182b528eB7335972C1D6a69FccE308a2656');
+		// 	var data = web3.eth.abi.encodeFunctionCall(dao.abi.find(e=>e.name=='setOperator'), ['0xA953f151bD011A7492A22e1Cea26C8F811d2A4dC']);
+		// 	let vp = await VotePool.at(await dao.root());
+		// 	var data2 = web3.eth.abi.encodeParameter(vp.abi.find(e=>e.name=='create').inputs[0], {
+		// 		id: '0x' + cryptoTx.getRandomValues(32).toString('hex'),
+		// 		name: 'setOperator', description: 'setOperator', origin: from,
+		// 		originId: '0x5c927e6be76632ceba412ae9e26a433bd68183b109ec9692335f5371b828f81d',
+		// 		target: ['0x47c5e182b528eB7335972C1D6a69FccE308a2656'], data: [data],
+		// 		lifespan: 0, expiry: 0, passRate: 5001, loopCount: 0,
+		// 		loopTime: 0, voteTotal: 0, agreeTotal: 0, executeTime: 0,
+		// 		idx: 0, isAgree: false, isClose: false, isExecuted: false,
+		// 	});
+		// 	console.log('root.create', data2);
+		// 	await vp.create2(
+		// 		'0x' + cryptoTx.getRandomValues(32).toString('hex'), ['0x47c5e182b528eB7335972C1D6a69FccE308a2656'],
+		// 		0, 5001, 0, 0,
+		// 		'setOperator', 'setOperator to 0xA953f151bD011A7492A22e1Cea26C8F811d2A4dC',
+		// 		'0x5c927e6be76632ceba412ae9e26a433bd68183b109ec9692335f5371b828f81d', [data]);
+		// 	console.log('dao', dao.address);
+		// 	console.log('dao.setOperator', data);
+		// });
 
+		it('deploy()', async()=>{
 			if (1) return; // skip
 			let name = `Test_${somes.random()}`;
 
