@@ -20,21 +20,30 @@ contract Ledger is ILedger, Module {
 	}
 
 	function receiveBalance() internal {
-		if (msg.value != 0) {
+		if (msg.value != 0)
 			emit Receive(msg.sender, msg.value);
-		}
 	}
 
 	function getBalance() view public returns (uint256) {
 		return address(this).balance;
 	}
 
-	function release(uint256 amount, string memory description) external payable Check(Action_Ledger_Release) {
+	function release(uint256 amount, string memory description, IERC20 erc20) external payable Check(Action_Ledger_Release) {
 		receiveBalance();
 
-		uint256 curamount = address(this).balance;
-		// require(curamount >= amount, "#Ledger#release insufficient balance");
-		if (curamount < amount) revert AmountMinimumLimit();
+		bool isERC20 = address(erc20) != address(0);
+		uint256 cur_amount;
+
+		if (isERC20) { // is erc20
+			_host.first().withdrawERC20(erc20);
+			_host.second().withdrawERC20(erc20);
+			cur_amount = erc20.balanceOf(address(this));
+		} else {
+			cur_amount = getBalance();
+		}
+
+		// insufficient balance;
+		if (cur_amount < amount) revert AmountMinimumLimit();
 
 		IShare s = _host.share();
 		IMember m = _host.member();
@@ -48,22 +57,25 @@ contract Ledger is ILedger, Module {
 
 			uint256 owners = s.totalOwners();
 			address owner;
-			uint256 amount1;
+			uint256 share;
 
 			for (uint256 i = 0; i < owners; i++) {
-				(owner,amount1) = s.indexAt(i);
-				amount1 >>= 10; // 1/1024
-				if (amount1 != 0) {
-					uint256 balance = amount1 * unit;
-					owner.sendValue(balance);
-					emit Release(0, owner, balance);
+				(owner,share) = s.indexAt(i);
+				share >>= 10; // 1/1024
+				if (share != 0) {
+					uint256 balance = share * unit;
+					if (isERC20) {
+						erc20.transfer(owner, balance);
+					} else {
+						owner.sendValue(balance);
+					}
 				}
 			}
 		} else {
 			uint256 votes = m.votes();
 			uint256 unit = amount / votes;
 
-			// require(unit != 0 , "#Ledger#release insufficient balance release");
+			// insufficient balance release
 			if (unit == 0) revert AmountMinimumLimit();
 
 			uint256 total = m.total();
@@ -73,32 +85,35 @@ contract Ledger is ILedger, Module {
 				info = m.indexAt(i);
 				address owner = m.ownerOf(info.id);
 				uint256 balance = info.votes * unit;
-				owner.sendValue(balance);
-				emit Release(info.id, owner, balance);
+				if (isERC20) {
+					erc20.transfer(owner, balance);
+				} else {
+					owner.sendValue(balance);
+				}
 			}
 		}
 
-		emit ReleaseLog(msg.sender, amount, description);
+		emit ReleaseLog(msg.sender, amount, description, address(erc20));
 	}
 
 	function deposit(string memory name, string memory description) public payable {
-		if (msg.value == 0) return;
-		emit Deposit(msg.sender, msg.value, name, description);
+		if (msg.value != 0)
+			emit Deposit(msg.sender, msg.value, name, description);
 	}
 
 	function assetIncome(
 		address token,  uint256 tokenId,
 		address source, address from, address to,
-		uint256 price,  uint256 count, IAssetShell.SaleType saleType
+		uint256 price,  uint256 count, IAssetShell.SaleType saleType, uint256 amount, address erc20
 	) public payable override {
-		require(msg.value != 0, "#Ledger.assetIncome profit cannot be zero");
-		emit AssetIncome(token, tokenId, source, from, to, msg.value, price, count, saleType);
+		if (msg.sender != address(_host.first()) && msg.sender != address(_host.second())
+		) revert("#Ledger.assetIncome access denied");
+		emit AssetIncome(token, tokenId, source, from, to, amount, price, count, saleType, erc20);
 	}
 
 	function withdraw(uint256 amount, address target, string memory description)
 		external payable override Check(Action_Ledger_Withdraw) 
 	{
-		//require(target != address(0), "#Ledger#withdraw receive assress not address(0)");
 		if (target == address(0)) revert AddressEmpty();
 		receiveBalance();
 		target.sendValue(amount);

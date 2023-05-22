@@ -35,17 +35,21 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 	mapping(uint256 => AssetData) private _assetsData;   // tokenId => raw asset id
 	LockedID                      private _lastLocked;
 	SaleType                      public  saleType; // is opensea first or second sale
-	bool                          private _IsDisableReceiveUnlock;
-	uint256[15]                   private  __; // reserved storage space
+	bool                          public  isEnableLock;  // enable asset safe lock
+	uint256[16]                   private  __; // reserved storage space
 
 	function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165,IERC165) returns (bool) {
 		return ERC1155.supportsInterface1155(interfaceId) || ERC165.supportsInterface(interfaceId);
 	}
 
-	function initAssetShell(address host, address operator, SaleType _saleType, InitContractURI memory uri) external {
-		initAssetModule(host, operator, uri);
+	function initAssetShell(
+		address host, address operator,
+		SaleType saleType_, InitContractURI memory uri_, bool isEnableLock_
+	) external {
+		initAssetModule(host, operator, uri_);
 		_registerInterface(AssetShell_Type);
-		saleType = _saleType;
+		saleType = saleType_;
+		isEnableLock = isEnableLock_;
 	}
 
 	function asERC1155(address addr) view internal returns (IERC1155) {
@@ -225,17 +229,11 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 	}
 
 	/**
-	 * @dev unlock_() receive eth transaction and unlock asset
+	 * @dev _unlock() receive eth transaction and unlock asset
+	 * @param amount eth value amount
+	 * @param erc20 erc20 token for amount
 	 */
-	function unlock_(LockedID memory lock, address sender, uint256 value) private {
-		// require(tokenId != 0, "#AssetShell#unlock locked tokenId != 0");
-		// if (id.tokenId == 0) revert TokenIDEmpty();
-		// require(value != 0, "#AssetShell#unlock value != 0"); // price
-		// if (value == 0) revert PayableAmountZero();
-		// require(ad.locked != address(0), "#AssetShell#unlock Lock cannot be empty"); // price
-		// if (id.owner == address(0)) revert LockTokenIDEmptyInAssetShell();
-		// if (id.previous == address(0)) revert LockTokenIDPreviousOwnerEmptyInAssetShell();
-
+	function _unlock(LockedID memory lock, address sender, uint256 amount, address erc20) private {
 		AssetData storage asset  = _assetsData[lock.tokenId];
 		Locked    storage locked = asset.locked[lock.owner];
 		LockedItem storage item  = locked.items[lock.previous];
@@ -244,16 +242,16 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 		if (item.count == 0) revert LockTokenIDValueEmptyInAssetShell();
 
 		address to = lock.owner;
-		uint256 price = value * 10_000 / seller_fee_basis_points; // transfer price
+		uint256 price = amount * 10_000 / seller_fee_basis_points; // transfer price
 		uint256 min_price = asset.minimumPrice * item.count; // minimum price
 
-		// check transfer price
-		// require(count >= ad.minimumPrice, "#AssetShell#unlock price >= minimum price"); // price
+		// check transfer minimum price
 		if (price < min_price) revert PayableInsufficientAmount();
 
-		//AssetID storage meta = ad.meta;
+		uint256 value = erc20 == address(0) ? amount: 0;
+
 		_host.ledger().assetIncome{value: value}(
-			address(this), lock.tokenId, sender, lock.previous, to, price, item.count, saleType
+			address(this), lock.tokenId, sender, lock.previous, to, price, item.count, saleType, amount, erc20
 		);
 
 		if (_lastLocked.tokenId == lock.tokenId &&
@@ -284,41 +282,51 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 		address  payer;   // opensea contract => sender
 	}
 
-	modifier _DisableReceiveUnlock() {
-		_IsDisableReceiveUnlock = true;
-		_;
-		_IsDisableReceiveUnlock = false;
-	}
-
 	/**
 	 * @dev unlockForOperator()
 	 */
-	function unlockForOperator(UnlockForOperator[] calldata data) public _DisableReceiveUnlock {
+	function unlockForOperator(UnlockForOperator[] calldata data) public {
 		if (_host.unlockOperator() != msg.sender) {
 			revert PermissionDeniedForOnlyUnlockOperator();
 		}
 
 		for (uint256 i = 0; i < data.length; i++) {
 			UnlockForOperator memory it = data[i];
-			IWETH(it.payBank).withdraw(it.payValue);
-			if (address(this).balance < it.payValue ) revert PayableInsufficientAmountWETH();
-			unlock_(it.lock, it.payer, it.payValue);
+			_unlock(it.lock, it.payer, it.payValue, it.payBank);
 		}
 	}
 
+	/**
+	 * @dev unlock asset
+	 */
 	function unlock(LockedID memory lock) public payable {
-		unlock_(lock, msg.sender, msg.value);
+		_unlock(lock, msg.sender, msg.value, address(0));
 	}
 
 	/**
 	 * @dev receive eth token
 	 */
 	receive() external payable {
-		if (!_IsDisableReceiveUnlock)
-			unlock_(_lastLocked, msg.sender, msg.value); // unlock last locked
+		_unlock(_lastLocked, msg.sender, msg.value, address(0)); // unlock last locked
+	}
+
+	/**
+	 * @dev withdraw ERC20 token
+	 * @param erc20 address
+	 */
+	function withdrawERC20(IERC20 erc20) public override {
+		if (address(_host.ledger()) != msg.sender) revert("#AssetShell.withdrawERC20 access denied");
+		uint256 balance = erc20.balanceOf(address(this));
+		erc20.transfer(msg.sender, balance);
 	}
 
 	// --------------------------- test ---------------------------------
+
+	// modifier _DisableReceiveUnlock() {
+	// 	_IsDisableReceiveUnlock = true;
+	// 	_;
+	// 	_IsDisableReceiveUnlock = false;
+	// }
 
 	// function unlock2(uint256 tokenId, address owner, address previous) public payable { // test
 	// 	LockedID memory lock;
