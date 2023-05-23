@@ -49,24 +49,24 @@ contract DAO is IDAO, Module {
 	}
 
 	function initDAO(
-		IDAOs daos_, InitDAOArgs calldata args,
-		address root_, address operator, address member_
+		IDAOs daos, InitDAOArgs calldata args,
+		address root, address operator, address member
 	) external {
 		initModule(address(this), args.description, operator);
 		_registerInterface(DAO_Type);
 
-		ERC165(root_).checkInterface(VotePool_Type);
-		ERC165(member_).checkInterface(Member_Type);
+		ERC165(root).checkInterface(VotePool_Type);
+		ERC165(member).checkInterface(Member_Type);
 
-		_daos = daos_;
-		_root = root_;
+		_daos = daos;
+		_root = root;
 		_name = args.name;
 		_mission = args.mission;
 		image = args.image;
 		extend = args.extend;
 		_unlockOperator = args.unlockOperator;
 
-		_modules.set(Module_MEMBER_ID, member_);
+		_modules.set(Module_MEMBER_ID, member);
 		// emit SetModule(Module_MEMBER_ID, member);
 	}
 

@@ -40,7 +40,7 @@
       "address": "0xa195084F74eE77a6B774a89AD7A93241C81964A9",
       "blockNumber": 8860448
     },
-    "DAOsProxy": {
+    "DAOsProxy_": {
       "version": "93b79a147f589ef2243f1351f34bb6a26915a39a93ad935346b107c7dc7d0988",
       "address": "0x555309800BDDd188A5B51728d5611725d9bBad02",
       "blockNumber": 8860453
@@ -87,7 +87,7 @@
       "address": "0x132C371067c11BBC73CeDa6103198Fa9DABD684b",
       "blockNumber": 42011358
     },
-    "DAOsProxy": {
+    "DAOsProxy_": {
       "version": "93b79a147f589ef2243f1351f34bb6a26915a39a93ad935346b107c7dc7d0988",
       "address": "0x179596783388e24a9D4E1ef982bc0c9224C41F43",
       "blockNumber": 42809871

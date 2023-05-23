@@ -46,7 +46,7 @@ contract AssetModule is Module, IOpenseaContractURI {
 		return name_;
 	}
 
-	function initAssetModule(address host, address operator, InitContractURI memory uri) internal {
+	function initAssetModule(address host, address operator, InitContractURI calldata uri) internal {
 		initModule(host, uri.description, operator);
 		name_ = uri.name;
 		image = uri.image;
@@ -83,7 +83,7 @@ contract Asset is AssetModule, ERC1155, IAsset {
 		return ERC1155.supportsInterface1155(interfaceId) || ERC165.supportsInterface(interfaceId);
 	}
 
-	function initAsset(address host, address operator, InitContractURI memory uri) external {
+	function initAsset(address host, address operator, InitContractURI calldata uri) external {
 		initAssetModule(host, operator, uri);
 		initERC1155(uri.base_uri);
 		_registerInterface(Asset_Type);

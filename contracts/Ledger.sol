@@ -12,35 +12,69 @@ import './Module.sol';
 contract Ledger is ILedger, Module {
 	using AddressExp for address;
 
+	bool private _IsDisableReceiveLog;
+
 	uint256[16] private __; // reserved storage space
+
+	modifier _DisableReceiveLog() {
+		_IsDisableReceiveLog = true;
+		_;
+		_IsDisableReceiveLog = false;
+	}
+
+	receive() external payable {
+		receiveBalance();
+	}
+
+	fallback() external payable {
+		receiveBalance();
+	}
 
 	function initLedger(address host, string memory description, address operator) external {
 		initModule(host, description, operator);
 		_registerInterface(Ledger_Type);
 	}
 
-	function receiveBalance() internal {
-		if (msg.value != 0)
-			emit Receive(msg.sender, msg.value);
-	}
-
 	function getBalance() view public returns (uint256) {
 		return address(this).balance;
 	}
 
-	function release(uint256 amount, string memory description, IERC20 erc20) external payable Check(Action_Ledger_Release) {
-		receiveBalance();
+	function receiveBalance() internal {
+		if (msg.value != 0 && !_IsDisableReceiveLog)
+			emit Receive(msg.sender, msg.value);
+	}
+
+	function deposit(string memory name, string memory description) public payable {
+		if (msg.value != 0)
+			emit Deposit(msg.sender, msg.value, name, description);
+	}
+
+	function withdraw(IERC20 erc20, uint256 amount, address target, string memory description) public
+		Check(Action_Ledger_Withdraw)
+		_DisableReceiveLog
+	{
+		if (target == address(0)) revert AddressEmpty();
+
+		_host.first().withdrawBalance(erc20);
+		_host.second().withdrawBalance(erc20);
+
+		if (address(erc20) == address(0)) {
+			target.sendValue(amount);
+		} else {
+			erc20.transfer(target, amount);
+		}
+		emit Withdraw(address(erc20), target, amount, description);
+	}
+
+	function release(IERC20 erc20, uint256 amount, string memory description) external
+		Check(Action_Ledger_Release)
+		_DisableReceiveLog
+	{
+		_host.first().withdrawBalance(erc20);
+		_host.second().withdrawBalance(erc20);
 
 		bool isERC20 = address(erc20) != address(0);
-		uint256 cur_amount;
-
-		if (isERC20) { // is erc20
-			_host.first().withdrawERC20(erc20);
-			_host.second().withdrawERC20(erc20);
-			cur_amount = erc20.balanceOf(address(this));
-		} else {
-			cur_amount = getBalance();
-		}
+		uint256 cur_amount = isERC20 ? erc20.balanceOf(address(this)): getBalance();
 
 		// insufficient balance;
 		if (cur_amount < amount) revert AmountMinimumLimit();
@@ -63,12 +97,13 @@ contract Ledger is ILedger, Module {
 				(owner,share) = s.indexAt(i);
 				share >>= 10; // 1/1024
 				if (share != 0) {
-					uint256 balance = share * unit;
+					uint256 value = share * unit;
 					if (isERC20) {
-						erc20.transfer(owner, balance);
+						erc20.transfer(owner, value);
 					} else {
-						owner.sendValue(balance);
+						owner.sendValue(value);
 					}
+					emit Release(0, owner, address(erc20), value);
 				}
 			}
 		} else {
@@ -84,48 +119,17 @@ contract Ledger is ILedger, Module {
 			for (uint256 i = 0; i < total; i++) {
 				info = m.indexAt(i);
 				address owner = m.ownerOf(info.id);
-				uint256 balance = info.votes * unit;
+				uint256 value = info.votes * unit;
 				if (isERC20) {
-					erc20.transfer(owner, balance);
+					erc20.transfer(owner, value);
 				} else {
-					owner.sendValue(balance);
+					owner.sendValue(value);
 				}
+				emit Release(info.id, owner, address(erc20), value);
 			}
 		}
 
-		emit ReleaseLog(msg.sender, amount, description, address(erc20));
-	}
-
-	function deposit(string memory name, string memory description) public payable {
-		if (msg.value != 0)
-			emit Deposit(msg.sender, msg.value, name, description);
-	}
-
-	function assetIncome(
-		address token,  uint256 tokenId,
-		address source, address from, address to,
-		uint256 price,  uint256 count, IAssetShell.SaleType saleType, uint256 amount, address erc20
-	) public payable override {
-		if (msg.sender != address(_host.first()) && msg.sender != address(_host.second())
-		) revert("#Ledger.assetIncome access denied");
-		emit AssetIncome(token, tokenId, source, from, to, amount, price, count, saleType, erc20);
-	}
-
-	function withdraw(uint256 amount, address target, string memory description)
-		external payable override Check(Action_Ledger_Withdraw) 
-	{
-		if (target == address(0)) revert AddressEmpty();
-		receiveBalance();
-		target.sendValue(amount);
-		emit Withdraw(target, amount, description);
-	}
-
-	receive() external payable {
-		receiveBalance();
-	}
-
-	fallback() external payable {
-		receiveBalance();
+		emit ReleaseLog(msg.sender,  address(erc20), amount, description);
 	}
 
 }

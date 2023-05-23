@@ -63,9 +63,14 @@ interface IAssetShell is IModule, IERC1155_1, IERC1155Receiver {
 		kFirst,
 		kSecond
 	}
+	event Unlock(
+		uint256 indexed tokenId,
+		address indexed source, address indexed erc20,
+		address from, address to, uint256 amount, uint256 eth, uint256 price, uint256 count
+	);
 	function withdraw(uint256 tokenId, address owner, uint256 amount) external;
 	function assetMeta(uint256 tokenId) view external returns (AssetID memory);
-	function withdrawERC20(IERC20 erc20) external;
+	function withdrawBalance(IERC20 erc20) external;
 }
 
 interface IAsset is IModule, IERC1155_1, IOpenseaContractURI {}
@@ -74,22 +79,9 @@ interface IShare is IERC20_1 {}
 interface ILedger is IModule {
 	event Receive(address indexed from, uint256 amount);
 	event Deposit(address indexed from, uint256 amount, string name, string description);
-	event Withdraw(address indexed target, uint256 amount, string description);
-	// event Release(uint256 indexed member, address indexed to, uint256 amount);
-	event ReleaseLog(address indexed operator, uint256 amount, string log, address erc20);
-	event AssetIncome(
-		address indexed token, uint256 indexed tokenId,
-		address indexed source, address from, address to,
-		uint256 amount, uint256 price, uint256 count,
-		IAssetShell.SaleType saleType, address erc20 /* erc20 token for amount */
-	);
-	function withdraw(uint256 amount, address target, string memory description) external payable;
-	function assetIncome(
-		address token, uint256 tokenId,
-		address source, address from, address to, 
-		uint256 price,  uint256 count, IAssetShell.SaleType saleType,
-		uint256 amount, address erc20
-	) external payable;
+	event Withdraw(address indexed erc20, address indexed target, uint256 amount, string description);
+	event Release(uint256 indexed member, address indexed to, address indexed erc20, uint256 amount);
+	event ReleaseLog(address indexed operator, address indexed erc20, uint256 amount, string log);
 }
 
 interface IMember is IModule, IERC721_1, IOpenseaContractURI {
@@ -168,7 +160,6 @@ interface IDAOs {
 		uint256 totalSupply, uint256 maxSupply,
 		string calldata name, string calldata symbol, string calldata description
 	) external returns (address);
-	function operator() view external returns (address);
 }
 
 interface IWETH is IERC20 {
