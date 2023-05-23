@@ -198,10 +198,11 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 			uint256 count = counts[i];
 			AssetData storage asset = _assetsData[id];
 
+			if (balanceOf(from, id) < asset.locked[from].total) { // check locaked
+				revert NeedToUnlockAssetFirst();
+			}
+
 			if (isEnableLock) {
-				if (balanceOf(from, id) < asset.locked[from].total) { // locaked
-					revert NeedToUnlockAssetFirst();
-				}
 				if (to != address(0)) { // not burn
 					Locked storage locked = asset.locked[to]; // locked to
 					LockedItem storage item = locked.items[from];

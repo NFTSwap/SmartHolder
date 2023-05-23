@@ -46,7 +46,7 @@ const truffle_config = {
 			network_id: 5,
 			provider: new Provider(
 				'https://goerli.infura.io/v3/6b4f3897597e41d1adc12b7447c84767',
-				// 'https://eth-goerli.g.alchemy.com/v2/HQmL43x9rRAXLbBBY4rqi2ugNLBYU-Lc'
+				// 'https://eth-goerli.g.alchemy.com/v2/lwDFslNRvhCjzogUVLPtPzGIN4ZZDa8I',
 			),
 			production: false,
 		},

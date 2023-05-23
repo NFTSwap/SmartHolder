@@ -63,7 +63,7 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 		address fee_recipient;
 		string  base_contract_uri;
 		string  base_uri;
-		bool    enableLock; // enable asset lock protect
+		bool    enable_lock; // enable asset lock protect
 	}
 
 	EnumerableMap.UintToAddressMap private  _DAOs; // global DAOs list
@@ -135,10 +135,10 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 		asset.initAsset(address(host), address(0), uri);
 
 		uri.seller_fee_basis_points = assetArgs.seller_fee_basis_points_second;
-		assetSecond.initAssetShell(address(host), address(0), IAssetShell.SaleType.kSecond, uri, assetArgs.enableLock);
+		assetSecond.initAssetShell(address(host), address(0), IAssetShell.SaleType.kSecond, uri, assetArgs.enable_lock);
 
 		uri.seller_fee_basis_points = assetArgs.seller_fee_basis_points_first;
-		assetFirst.initAssetShell(address(host), address(0), IAssetShell.SaleType.kFirst, uri, assetArgs.enableLock);
+		assetFirst.initAssetShell(address(host), address(0), IAssetShell.SaleType.kFirst, uri, assetArgs.enable_lock);
 
 		// set modules
 		host.setModule(Module_LEDGER_ID, address(ledger));
