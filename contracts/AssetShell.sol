@@ -36,6 +36,8 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 	mapping(uint256 => AssetData) private _assetsData;   // tokenId => raw asset id
 	LockedID                      private _last; // last locked
 	SaleType                      public  saleType; // is opensea first or second sale
+	bool                          public  isEnableLock; // enable asset lock protect
+	bool                          private _IsAfterTokenTransfer;
 	uint256[16]                   private  __; // reserved storage space
 
 	function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165,IERC165) returns (bool) {
@@ -44,11 +46,13 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 
 	function initAssetShell(
 		address host, address operator,
-		SaleType saleType_, InitContractURI calldata uri
+		SaleType saleType_, InitContractURI calldata uri, bool _isEnableLock
 	) external {
 		initAssetModule(host, operator, uri);
 		_registerInterface(AssetShell_Type);
 		saleType = saleType_;
+		_IsAfterTokenTransfer = false;
+		isEnableLock = _isEnableLock;
 	}
 
 	function asERC1155(address addr) view internal returns (IERC1155) {
@@ -59,11 +63,7 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 	}
 
 	function onERC1155Received(
-		address operator,
-		address from,
-		uint256 tokenId,
-		uint256 value,
-		bytes calldata data
+		address operator, address from, uint256 tokenId, uint256 value, bytes calldata data
 	) external returns (bytes4) {
 		IERC1155 token = asERC1155(_msgSender());
 		// require(ad.meta.token == address(0), "#AssetShell.onERC1155Received mint of asset already exists");
@@ -90,23 +90,17 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 	}
 
 	function onERC1155BatchReceived(
-		address operator,
-		address from,
-		uint256[] calldata ids,
-		uint256[] calldata values,
-		bytes calldata data
+		address, address, uint256[] calldata, uint256[] calldata, bytes calldata
 	) external returns (bytes4) {
 		revert MethodNotImplemented();
 	}
 
-	function _safeBatchTransferFrom(
-		address from,
-		address to,
-		uint256[] memory ids,
-		uint256[] memory amounts,
-		bytes memory data) internal virtual override
-	{
-		revert MethodNotImplemented();
+	/**
+	 * @dev enableLock(bool) Setting is enable lock
+	 */
+	function enableLock(bool enable) public Check(Action_Asset_Shell_Enable_Lock) {
+		isEnableLock = enable;
+		_last.tokenId = 0; // remove last locked
 	}
 
 	/**
@@ -197,13 +191,14 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 		uint256[] memory counts,
 		bytes memory data
 	) internal virtual override {
+		if (from == address(0) || _IsAfterTokenTransfer) return; // mint or running
 
 		for (uint256 i = 0; i < ids.length; i++) {
 			uint256 id = ids[i];
 			uint256 count = counts[i];
 			AssetData storage asset = _assetsData[id];
 
-			if (/*asset.minimumPrice != 0 && */from != address(0)) { // not mint
+			if (isEnableLock) {
 				if (balanceOf(from, id) < asset.locked[from].total) { // locaked
 					revert NeedToUnlockAssetFirst();
 				}
@@ -220,6 +215,12 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 					locked.itemsKeys.push(from);
 
 					_last = LockedID(id,to,from);
+				}
+			} else {
+				if (saleType == SaleType.kFirst) {
+					_IsAfterTokenTransfer = true;
+					withdrawFrom(to, _host.module(Module_ASSET_Second_ID), id, count, abi.encode(to, asset.minimumPrice));
+					_IsAfterTokenTransfer = false;
 				}
 			}
 		}
@@ -262,7 +263,7 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 		delete locked.items[from];
 
 		if (saleType == SaleType.kFirst) {
-			withdrawFrom(to, address(_host.module(Module_ASSET_Second_ID)), tokenId, count, abi.encode(to, asset.minimumPrice));
+			withdrawFrom(to, _host.module(Module_ASSET_Second_ID), tokenId, count, abi.encode(to, asset.minimumPrice));
 		}
 	}
 
@@ -281,8 +282,8 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 	 */
 	function unlockForOperator(UnlockForOperator[] calldata data, bytes32 r, bytes32 s, uint8 v) public {
 		if (_host.unlockOperator() != msg.sender) {
-			address rec = ecrecover(keccak256(abi.encode(data)), v, r, s);
-			if (_host.unlockOperator() != rec) {
+			address addr = ecrecover(keccak256(abi.encode(data)), v, r, s);
+			if (_host.unlockOperator() != addr) {
 				revert PermissionDeniedForOnlyUnlockOperator();
 			}
 		}
@@ -303,7 +304,16 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 	 * @dev receive eth token
 	 */
 	receive() external payable {
-		_unlock(_last.tokenId, _last.from, _last.to, msg.sender, address(0), msg.value, msg.value); // unlock last locked
+		if (isEnableLock)
+			// 这里会触发Unlock事件,表示完成一次资产转移交易
+			// This will trigger the Unlock event, indicating the completion of an asset transfer transaction
+			_unlock(_last.tokenId, _last.from, _last.to, msg.sender, address(0), msg.value, msg.value); // unlock last locked
+		else
+			// 接收同时如果有一个资产转移,表示这是一资产转换交易
+			// 同样在目标ERC20中接收到代币也适用这个逻辑,比如收到WETH或桥接ERC20代币
+			// If there is an asset transfer while receiving, it indicates that this is an asset conversion transaction
+			// This logic also applies to receiving tokens in the target ERC20, such as receiving WETH or bridging ERC20 tokens
+			emit Receive(msg.sender, msg.value);
 	}
 
 	/**
@@ -322,52 +332,5 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 				erc20.transfer(msg.sender, balance);
 		}
 	}
-
-	// --------------------------- test ---------------------------------
-
-	// modifier _DisableReceiveUnlock() {
-	// 	_IsDisableReceiveUnlock = true;
-	// 	_;
-	// 	_IsDisableReceiveUnlock = false;
-	// }
-
-	// function unlock2(uint256 tokenId, address owner, address previous) public payable { // test
-	// 	LockedID memory lock;
-	// 	lock.tokenId = tokenId;
-	// 	lock.owner = owner;
-	// 	lock.previous = previous;
-	// 	unlock_(lock, msg.sender, msg.value);
-	// }
-
-	// function unlockForOperator2(
-	// 	uint256 tokenId, address owner, address previous,
-	// 	PayType  payType,
-	// 	uint256  payValue, // value
-	// 	address  payBank, // erc20 contract address
-	// 	address  payer   // opensea contract => sender
-	// ) public payable _DisableReceiveUnlock { // test
-	// 	if (_host.unlockOperator() != msg.sender) {
-	// 		revert PermissionDeniedForOnlyUnlockOperator();
-	// 	}
-	// 	LockedID memory lock;
-	// 	lock.tokenId = tokenId;
-	// 	lock.owner = owner;
-	// 	lock.previous = previous;
-
-	// 	uint256 value = msg.value;
-	// 	if (payType == PayType.kDefault) {
-	// 		if (value < payValue) revert PayableInsufficientAmount();
-	// 		value -= payValue;
-	// 		unlock_(lock, payer, payValue);
-	// 	} else {
-	// 		IWETH(payBank).withdraw(payValue);
-	// 		if (address(this).balance < payValue ) revert PayableInsufficientAmountWETH();
-	// 		unlock_(lock, payer, payValue);
-	// 	}
-	// }
-
-	// function testWithdraw(address payBank, uint256 payValue) public _DisableReceiveUnlock {
-	// 	IWETH(payBank).withdraw(payValue);
-	// }
 
 }

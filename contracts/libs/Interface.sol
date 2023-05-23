@@ -68,6 +68,7 @@ interface IAssetShell is IModule, IERC1155_1, IERC1155Receiver {
 		address indexed source, address indexed erc20,
 		address from, address to, uint256 amount, uint256 eth, uint256 price, uint256 count
 	);
+	event Receive(address indexed sender, uint256 amount);
 	function withdraw(uint256 tokenId, address owner, uint256 amount) external;
 	function assetMeta(uint256 tokenId) view external returns (AssetID memory);
 	function withdrawBalance(IERC20 erc20) external;

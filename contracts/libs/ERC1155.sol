@@ -173,11 +173,12 @@ abstract contract ERC1155 is Context, IERC1155_1 {
 		uint256[] memory amounts,
 		bytes memory data
 	) public virtual override {
-		require(
+		/*require(
 			from == _msgSender() || isApprovedForAll(from, _msgSender()),
 			"ERC1155: caller is not token owner or approved"
 		);
-		_safeBatchTransferFrom(from, to, ids, amounts, data);
+		_safeBatchTransferFrom(from, to, ids, amounts, data);*/
+		revert MethodNotImplemented();
 	}
 
 	/**
@@ -216,9 +217,12 @@ abstract contract ERC1155 is Context, IERC1155_1 {
 
 		emit TransferSingle(operator, from, to, id, amount);
 
+		uint256 balance = _balances[id][to];
+
 		_afterTokenTransfer(operator, from, to, ids, amounts, data);
 
-		_doSafeTransferAcceptanceCheck(operator, from, to, id, amount, data);
+		if (_balances[id][to] == balance)
+			_doSafeTransferAcceptanceCheck(operator, from, to, id, amount, data);
 	}
 
 	/**
@@ -231,6 +235,7 @@ abstract contract ERC1155 is Context, IERC1155_1 {
 	 * - If `to` refers to a smart contract, it must implement {IERC1155Receiver-onERC1155BatchReceived} and return the
 	 * acceptance magic value.
 	 */
+	/*
 	function _safeBatchTransferFrom(
 		address from,
 		address to,
@@ -262,7 +267,7 @@ abstract contract ERC1155 is Context, IERC1155_1 {
 		_afterTokenTransfer(operator, from, to, ids, amounts, data);
 
 		_doSafeBatchTransferAcceptanceCheck(operator, from, to, ids, amounts, data);
-	}
+	}*/
 
 	/**
 	 * @dev Creates `amount` tokens of token type `id`, and assigns them to `to`.
@@ -308,6 +313,7 @@ abstract contract ERC1155 is Context, IERC1155_1 {
 	 * - If `to` refers to a smart contract, it must implement {IERC1155Receiver-onERC1155BatchReceived} and return the
 	 * acceptance magic value.
 	 */
+	/*
 	function _mintBatch(
 		address to,
 		uint256[] memory ids,
@@ -330,7 +336,7 @@ abstract contract ERC1155 is Context, IERC1155_1 {
 		_afterTokenTransfer(operator, address(0), to, ids, amounts, data);
 
 		_doSafeBatchTransferAcceptanceCheck(operator, address(0), to, ids, amounts, data);
-	}
+	}*/
 
 	/**
 	 * @dev Destroys `amount` tokens of token type `id` from `from`
@@ -375,6 +381,7 @@ abstract contract ERC1155 is Context, IERC1155_1 {
 	 *
 	 * - `ids` and `amounts` must have the same length.
 	 */
+	/*
 	function _burnBatch(
 		address from,
 		uint256[] memory ids,
@@ -401,7 +408,7 @@ abstract contract ERC1155 is Context, IERC1155_1 {
 		emit TransferBatch(operator, from, address(0), ids, amounts);
 
 		_afterTokenTransfer(operator, from, address(0), ids, amounts, "");
-	}
+	}*/
 
 	/**
 	 * @dev Approve `operator` to operate on all of `owner` tokens
@@ -526,6 +533,7 @@ abstract contract ERC1155 is Context, IERC1155_1 {
 		}
 	}
 
+	/*
 	function _doSafeBatchTransferAcceptanceCheck(
 		address operator,
 		address from,
@@ -547,7 +555,7 @@ abstract contract ERC1155 is Context, IERC1155_1 {
 				revert("ERC1155: transfer to non-ERC1155Receiver implementer");
 			}
 		}
-	}
+	}*/
 
 	function _asSingletonArray(uint256 element) private pure returns (uint256[] memory) {
 		uint256[] memory array = new uint256[](1);
