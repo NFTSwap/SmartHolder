@@ -125,7 +125,7 @@ contract('DAOs', ([from]) => {
 				fee_recipient: '0x0000000000000000000000000000000000000000', // auto set
 				base_contract_uri: 'https://smart-dao-rel.stars-mine.com/service-api/utils/printJSON',
 				base_uri: '',
-				enable_lock: false,
+				enable_lock: true,
 			});
 	
 			let addr = await app.DAOs.get(name);

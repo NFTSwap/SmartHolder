@@ -42,7 +42,8 @@ class ProviderBase {
 				}
 				//let url = this.url[somes.random(0, this.url.length-1)];
 				// console.log('--------------', this.url, payload);
-				let r = await req.request(this.url, { params: payload, method: 'POST', dataType: 'json' });
+				// console.log('cfg.proxy', cfg.proxy, payload);
+				let r = await req.request(this.url, { params: payload, method: 'POST', dataType: 'json', proxy: cfg.proxy });
 				let data = JSON.parse(r.data.toString('utf-8'));
 				// console.log('--------------', data)
 				return data;
@@ -56,7 +57,7 @@ class ProviderBase {
 					throw err;
 				}
 			}
-		} // end while(1) 
+		} // end while(1)
 	}
 }
 

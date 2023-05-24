@@ -1,13 +1,13 @@
 {
   "goerli": {
     "Asset": {
-      "version": "794de7eaeccd4af694faf22bc7185dcc935432f18ae409b664ee04800c83fdeb",
-      "address": "0x9cF22185ED2C8Fe9739459ef7Ba76b308dA1E31A",
+      "version": "d1f1611b6dd1708ed6ac5572410737f9be19fd3258cae323ab0e23a47c828ad7",
+      "address": "0x33A1Dc64E38d2f26BE67bb153d07e497E274E418",
       "blockNumber": 8860432
     },
     "AssetShell": {
-      "version": "3590dbc5f68d1b1f9cc32545ab311f35138d48da0197f1c174b317f47e0cc10b",
-      "address": "0x39531fB0F94654d471cbF4C636d954B657f395b7",
+      "version": "31db44fce2b9d2fc920969b1c2f0d0019456211691931f6c9ca548ab1e457de9",
+      "address": "0xfC59dF476E151f518AdF9641c45932d1C1CE3445",
       "blockNumber": 8860435
     },
     "Ledger": {
@@ -36,8 +36,8 @@
       "blockNumber": 8860445
     },
     "DAOs": {
-      "version": "9877310ecb64e66618be1f56c0d02e8adc70c10be1049a0afe62191972f5e8ca",
-      "address": "0x1536366f8027F941EF056442733E123c00D96362",
+      "version": "1850ea8550902b1c969e80337a97433cd8d8c5752d0f5b1fe1d2374d76253ebf",
+      "address": "0xE7a556F530f8CE8D7a0b929BE64F530F29A2453f",
       "blockNumber": 8860448
     },
     "DAOsProxy_": {
