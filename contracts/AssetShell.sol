@@ -244,10 +244,11 @@ contract AssetShell is AssetModule, ERC1155, IAssetShell {
 
 		if (count == 0) revert LockTokenIDValueEmptyInAssetShell();
 
-		uint256 price = eth * 10_000 / seller_fee_basis_points; // transfer price
+		uint256 price_eth = eth * 10_000 / seller_fee_basis_points; // transfer eth price
+		uint256 price = amount * 10_000 / seller_fee_basis_points; // transfer price
 
 		// check transfer minimum price
-		if (price < asset.minimumPrice * count) revert PayableInsufficientAmount();
+		if (price_eth < asset.minimumPrice * count) revert PayableInsufficientAmount();
 
 		emit Unlock(tokenId, source, erc20, from, to, amount, eth, price, count);
 
