@@ -58,8 +58,8 @@
       "blockNumber": 42009323
     },
     "Ledger": {
-      "version": "28b335ab87c779d320ae7e95f17159aee7d0de806a87294627b6b1cf166693d1",
-      "address": "0x7bD4E68d2cD65Edaf45B3Ae7c656148FaD6E7027",
+      "version": "2fbc0e55310ec71cdd528ef2ffe10a1373a19fd6df2bc9f1d26c33aa9b5b8b03",
+      "address": "0x3C8A520D2eECd6A4dFF0FB712D26628DaC173109",
       "blockNumber": 42010886
     },
     "Share": {
@@ -73,13 +73,13 @@
       "blockNumber": 42010911
     },
     "Asset": {
-      "version": "b2dfe1ff6e057f365aa587b58879eafdf3fcc78747f9abe32b823e83e0ce70bd",
-      "address": "0x0919AaF666f106DFa2163Acef6aDaD06442a4CF9",
+      "version": "d1f1611b6dd1708ed6ac5572410737f9be19fd3258cae323ab0e23a47c828ad7",
+      "address": "0x7Df71901F1affb17676d553aA1386FFe0d7F0d5c",
       "blockNumber": 42010924
     },
     "AssetShell": {
-      "version": "9ac2d06321434abdf09fe9093baf7d6cecfc5999049cdc578287c9a2ec8be1fc",
-      "address": "0xC7C8Ef0c3150FF80180F085D56f6190A56C2aB32",
+      "version": "113b24326cf5c1753530d8ee782118507c14c4acacebc4322a473ff4548dce54",
+      "address": "0x37d307B45cf0D6402Ec17bFe1d4e62E934CeB333",
       "blockNumber": 42010935
     },
     "Member": {
@@ -88,14 +88,19 @@
       "blockNumber": 42010947
     },
     "DAOs": {
-      "version": "95243c6a070fe8799325b83603e8e22240f7c3dc2023bcd00972a1fcff86b4f5",
-      "address": "0x132C371067c11BBC73CeDa6103198Fa9DABD684b",
+      "version": "1850ea8550902b1c969e80337a97433cd8d8c5752d0f5b1fe1d2374d76253ebf",
+      "address": "0x6bae5Cd5AB5f05FcDe6ec5c925db815331538Bf7",
       "blockNumber": 42011358
     },
     "DAOsProxy_": {
       "version": "93b79a147f589ef2243f1351f34bb6a26915a39a93ad935346b107c7dc7d0988",
       "address": "0x179596783388e24a9D4E1ef982bc0c9224C41F43",
       "blockNumber": 42809871
+    },
+    "DAOsProxy": {
+      "version": "93b79a147f589ef2243f1351f34bb6a26915a39a93ad935346b107c7dc7d0988",
+      "address": "0xa209a92D0230018b8016b6d7cCDa1E219a0174E1",
+      "blockNumber": 43124495
     }
   }
 }
