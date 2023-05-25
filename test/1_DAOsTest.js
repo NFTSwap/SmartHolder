@@ -52,8 +52,8 @@ contract('DAOs', ([from]) => {
 				name, 
 				mission: `${name} mission`,
 				description: `${name} description`,
-				image: `https://smart-dao-home-rel.stars-mine.com/assets/logo.c5133168.png`,
-				extend: '0x' + buffer.from('{"poster": "https://img-blog.csdnimg.cn/20200502175449751.png"}').toString('hex'),
+				image: `https://smart-dao-res.stars-mine.com/FtETTzirbnawlTEVb5x7qDcnVyRL`,
+				extend: '0x' + buffer.from('{"poster": "https://smart-dao-res.stars-mine.com/FvCDcP23jHCCRbAJY_x3yK0c7vSx"}').toString('hex'),
 				unlockOperator: app.DAOs.address,
 			},
 			from, // operator
@@ -67,7 +67,7 @@ contract('DAOs', ([from]) => {
 						id: 0,
 						name: 'Test',
 						description: 'Test',
-						image: 'https://picx.zhimg.com/v2-72e9fd76f8d5b941acb976826ff2ba90_l.jpg?source=32738c0c',
+						image: 'https://avatars.githubusercontent.com/u/1221969?v=4',
 						votes: 1,
 					},
 					permissions: [0xdc6b0b72, 0x678ea396],
@@ -89,8 +89,8 @@ contract('DAOs', ([from]) => {
 				name,
 				mission: `${name} mission`,
 				description: `${name} description`,
-				image: `https://smart-dao-home-rel.stars-mine.com/assets/logo.c5133168.png`,
-				extend: '0x' + buffer.from('{"poster": "https://img-blog.csdnimg.cn/20200502175449751.png"}').toString('hex'),
+				image: `https://smart-dao-res.stars-mine.com/FtETTzirbnawlTEVb5x7qDcnVyRL`,
+				extend: '0x' + buffer.from('{"poster": "https://smart-dao-res.stars-mine.com/FvCDcP23jHCCRbAJY_x3yK0c7vSx"}').toString('hex'),
 				unlockOperator: app.DAOs.address,
 			},
 			from, // operator
@@ -104,7 +104,7 @@ contract('DAOs', ([from]) => {
 						id: 0,
 						name: 'Test',
 						description: 'Test',
-						image: 'https://picx.zhimg.com/v2-72e9fd76f8d5b941acb976826ff2ba90_l.jpg?source=32738c0c',
+						image: 'https://avatars.githubusercontent.com/u/1221969?v=4',
 						votes: 1,
 					},
 					permissions: [0xdc6b0b72, 0x678ea396],
@@ -118,7 +118,7 @@ contract('DAOs', ([from]) => {
 			}, { // InitAssetArgs
 				name: name, // string  name;
 				description: 'Asset description',
-				image: 'https://smart-dao-home-rel.stars-mine.com/assets/logo.c5133168.png',
+				image: 'https://smart-dao-res.stars-mine.com/FvCDcP23jHCCRbAJY_x3yK0c7vSx',
 				external_link: 'https://smart-dao-home-rel.stars-mine.com/',
 				seller_fee_basis_points_first: 3000, // 30%
 				seller_fee_basis_points_second: 1000, // 10%
