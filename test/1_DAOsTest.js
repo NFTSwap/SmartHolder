@@ -13,7 +13,7 @@ contract('DAOs', ([from]) => {
 
 	//console.log('DAOs from', from);
 
-	context('Deploy', ()=>{
+	context('Deploy', (from,to)=>{
 
 		// it('VotePool', async()=>{
 		// 	let dao = await DAO.at('0x47c5e182b528eB7335972C1D6a69FccE308a2656');
@@ -54,7 +54,7 @@ contract('DAOs', ([from]) => {
 				description: `${name} description`,
 				image: `https://smart-dao-res.stars-mine.com/FtETTzirbnawlTEVb5x7qDcnVyRL`,
 				extend: '0x' + buffer.from('{"poster": "https://smart-dao-res.stars-mine.com/FvCDcP23jHCCRbAJY_x3yK0c7vSx"}').toString('hex'),
-				unlockOperator: app.DAOs.address,
+				unlockOperator: to,
 			},
 			from, // operator
 			{ // InitMemberArgs
@@ -91,7 +91,7 @@ contract('DAOs', ([from]) => {
 				description: `${name} description`,
 				image: `https://smart-dao-res.stars-mine.com/FtETTzirbnawlTEVb5x7qDcnVyRL`,
 				extend: '0x' + buffer.from('{"poster": "https://smart-dao-res.stars-mine.com/FvCDcP23jHCCRbAJY_x3yK0c7vSx"}').toString('hex'),
-				unlockOperator: app.DAOs.address,
+				unlockOperator: to,
 			},
 			from, // operator
 			{ // InitMemberArgs
