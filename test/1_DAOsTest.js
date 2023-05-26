@@ -2,18 +2,18 @@
 const somes = require('somes').default;
 const buffer = require('somes/buffer').default;
 const { assert } = require('chai');
-const cryptoTx = require('crypto-tx');
 const App = require('./app');
 const DAO = artifacts.require("DAO.sol");
-const VotePool = artifacts.require('VotePool.sol');
+// const VotePool = artifacts.require('VotePool.sol');
+// const cryptoTx = require('crypto-tx');
 
-contract('DAOs', ([from]) => {
+contract('DAOs', ([from,to]) => {
 	let app;
 	before(async () => app = await App.create());
 
 	//console.log('DAOs from', from);
 
-	context('Deploy', (from,to)=>{
+	context('Deploy', ()=>{
 
 		// it('VotePool', async()=>{
 		// 	let dao = await DAO.at('0x47c5e182b528eB7335972C1D6a69FccE308a2656');

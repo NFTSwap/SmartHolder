@@ -21,3 +21,4 @@ contracts/ContextProxy*
 contracts/gen
 .config.js
 .truffle-config.js
+tests

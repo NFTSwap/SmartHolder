@@ -34,7 +34,7 @@ contract('Share', ([from,to]) => {
 		});
 
 		it('VotePool.release()', async () => {
-			await ledger.release('10000000000000000', 'Test Share Release');
+			await ledger.release('0x0000000000000000000000000000000000000000', '10000000000000000', 'Test Share Release');
 		});
 
 	});

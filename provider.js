@@ -29,7 +29,7 @@ class ProviderBase {
 		this.request(payload).then(e=>callback(null, e)).catch(callback);
 	}
 	async request(payload) {
-		let retry = 3;
+		let retry = 10;
 		while(1) {
 			let matic_gas = payload.method == 'eth_gasPrice' && this.host.chainId == 137;
 			let warp = (result)=>({ id: payload.id, jsonrpc: payload.jsonrpc, result });
