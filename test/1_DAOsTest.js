@@ -97,7 +97,7 @@ contract('DAOs', ([from,to]) => {
 			{ // InitMemberArgs
 				name: 'Member',
 				description: 'Member description',
-				baseURI: 'https://smart-dao-rel.stars-mine.com/service-api/utils/printJSON',
+				baseURI: 'https://dao.smartholder.jp/service-api/utils/printJSON',
 				members: [{
 					owner: from,
 					info: {
@@ -120,10 +120,10 @@ contract('DAOs', ([from,to]) => {
 				description: 'Asset description',
 				image: 'https://smart-dao-res.stars-mine.com/FvCDcP23jHCCRbAJY_x3yK0c7vSx',
 				external_link: 'https://smart-dao-home-rel.stars-mine.com/',
-				seller_fee_basis_points_first: 3000, // 30%
+				seller_fee_basis_points_first: 5000, // 50%
 				seller_fee_basis_points_second: 1000, // 10%
 				fee_recipient: '0x0000000000000000000000000000000000000000', // auto set
-				base_contract_uri: 'https://smart-dao-rel.stars-mine.com/service-api/utils/printJSON',
+				base_contract_uri: 'https://dao.smartholder.jp/service-api/utils/printJSON',
 				base_uri: '',
 				enable_lock: true,
 			});
