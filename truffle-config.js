@@ -48,7 +48,21 @@ const truffle_config = {
 				// 'https://goerli.infura.io/v3/6b4f3897597e41d1adc12b7447c84767',
 				'https://eth-goerli.g.alchemy.com/v2/lwDFslNRvhCjzogUVLPtPzGIN4ZZDa8I',
 			),
-			production: false,
+			production: true,
+		},
+		arbitrum_goerli: {
+			network_id: 421613,
+			provider: new Provider(
+				'https://arbitrum-goerli.infura.io/v3/6b4f3897597e41d1adc12b7447c84767',
+			),
+			production: true,
+		},
+		avalanche_fuji: {
+			network_id: 43113,
+			provider: new Provider(
+				'https://avalanche-fuji.infura.io/v3/7ad9cba561d24867a0d9c4c78e0a8941',
+			),
+			production: true,
 		},
 		matic: {
 			network_id: 137,
@@ -58,6 +72,20 @@ const truffle_config = {
 			),
 			production: true,
 			gasPrice: process.env.GAS, // 400000000000
+		},
+		arbitrum: {
+			network_id: 42161,
+			provider: new Provider(
+				'https://arbitrum-mainnet.infura.io/v3/6b4f3897597e41d1adc12b7447c84767',
+			),
+			production: true,
+		},
+		avalanche: {
+			network_id: 43114,
+			provider: new Provider(
+				'https://avalanche-mainnet.infura.io/v3/7ad9cba561d24867a0d9c4c78e0a8941',
+			),
+			production: true,
 		},
 		development: {
 			host: "127.0.0.1",
