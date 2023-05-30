@@ -105,7 +105,7 @@ contract('Asset', ([from,to]) => {
 		});
 
 		it('unlock()', async () => {
-			await first.unlock({tokenId:id,from,to}, { value: 10000000000000001 * 0.3 });
+			await first.unlock({tokenId:id,from,to}, { value: 10000000000000001 * 0.5 });
 		});
 
 		it('exists()', async () => {
