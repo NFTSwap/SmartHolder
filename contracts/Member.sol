@@ -231,8 +231,13 @@ contract Member is Module, ERC721, IMember {
 
 		Info storage info = _infoMap[id].info;
 
-		info.votes += uint32(votes);
-		_votes += uint32(votes);
+		_votes = uint256(int256(_votes) + votes);
+
+		votes += int32(info.votes);
+
+		require(votes >= 0, "#Member.addVotes votes value overflow");
+
+		info.votes = uint32(votes);
 
 		if (votes > 0)
 			emit TransferVotes(0, id, uint32(votes));
