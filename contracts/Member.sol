@@ -230,14 +230,11 @@ contract Member is Module, ERC721, IMember {
 		checkExists(id); // check info query for nonexistent member
 
 		Info storage info = _infoMap[id].info;
+		int32 v = int32(info.votes) + votes;
+		require(v >= 0, "#Member.addVotes votes value overflow");
 
+		info.votes = uint32(v);
 		_votes = uint256(int256(_votes) + votes);
-
-		votes += int32(info.votes);
-
-		require(votes >= 0, "#Member.addVotes votes value overflow");
-
-		info.votes = uint32(votes);
 
 		if (votes > 0)
 			emit TransferVotes(0, id, uint32(votes));
