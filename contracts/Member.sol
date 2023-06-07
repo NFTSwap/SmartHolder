@@ -226,23 +226,25 @@ contract Member is Module, ERC721, IMember {
 		emit SetPermissions(id, addActions, removeActions);
 	}
 
-	function addVotes(uint256 id, int32 votes) public OnlyDAO {
+	function addVotes(uint256 id, int256 votes) public OnlyDAO {
 		checkExists(id); // check info query for nonexistent member
 
 		Info storage info = _infoMap[id].info;
-		int32 v = int32(info.votes) + votes;
+		int32 votes0 = int32(votes);
+
+		int32 v = int32(info.votes) + votes0;
 		require(v >= 0, "#Member.addVotes votes value overflow");
 
 		info.votes = uint32(v);
-		_votes = uint256(int256(_votes) + votes);
+		_votes = uint256(int256(_votes) + votes0);
 
 		if (votes > 0)
-			emit TransferVotes(0, id, uint32(votes));
+			emit TransferVotes(0, id, uint32(votes0));
 		else
-			emit TransferVotes(id, 0, uint32(-votes));
+			emit TransferVotes(id, 0, uint32(-votes0));
 	}
 
-	function addVotesOfBatch(uint256[] calldata ids, int32[] calldata votes) public {
+	function addVotesOfBatch(uint256[] calldata ids, int256[] calldata votes) public {
 		for (uint256 i = 0; i < ids.length; i++) {
 			addVotes(ids[i], votes[i]);
 		}

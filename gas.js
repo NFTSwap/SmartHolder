@@ -1,8 +1,19 @@
 
 const req = require('somes/request').default;
+const buffer = require('somes/buffer').default;
+
+try {
+	var cfg = require('./.config');
+} catch { var cfg = {} }
 
 async function matic(scale,fast) {
-	let {data} = await req.get('https://gpoly.blockscan.com/gasapi.ashx?apikey=key&method=gasoracle');
+	let url = 'https://gpoly.blockscan.com/gasapi.ashx?apikey=key&method=gasoracle';
+
+	if (cfg.shsProxy) {
+		var {data} = await req.get(`${cfg.shsProxy}?pathname=${buffer.from(url).toString('base58')}`);
+	} else {
+		var {data} = await req.get(url);
+	}
 	// {
 	// 	"LastBlock": "42009802",
 	// 	"SafeGasPrice": "503.4",
@@ -14,7 +25,7 @@ async function matic(scale,fast) {
 	// }
 	let {ProposeGasPrice,FastGasPrice} = JSON.parse(data + '').result;
 
-	return Number(fast?FastGasPrice:ProposeGasPrice) * 1000000000 * (scale?Number(scale)||1:1);
+	return parseInt(fast?FastGasPrice:ProposeGasPrice) * 1000000000 * (scale?Number(scale)||1:1);
 }
 
 module.exports = {matic}

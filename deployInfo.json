@@ -83,6 +83,11 @@
       "blockNumber": 42010935
     },
     "Member": {
+      "version": "e61a86b4aa312c6842afe8a755ab0b60a7f8c42def47cb5a9b58720ee1d8a80b",
+      "address": "0xF7AEC70aC72c9021112Edf4a90fC74A813699B0F",
+      "blockNumber": 42010947
+    },
+    "Member_": {
       "version": "666d714924e866fab50001809a66ef5781051a247a3ed24e1bb27e5a5ab1cfe4",
       "address": "0x852cBfdf3E091c4c018C406af8dd3822669c10A8",
       "blockNumber": 42010947
