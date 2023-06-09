@@ -97,7 +97,7 @@
       "address": "0x6bae5Cd5AB5f05FcDe6ec5c925db815331538Bf7",
       "blockNumber": 42011358
     },
-    "DAOsProxy_": {
+    "DAOsProxy_0": {
       "version": "93b79a147f589ef2243f1351f34bb6a26915a39a93ad935346b107c7dc7d0988",
       "address": "0x179596783388e24a9D4E1ef982bc0c9224C41F43",
       "blockNumber": 42809871
@@ -106,6 +106,11 @@
       "version": "93b79a147f589ef2243f1351f34bb6a26915a39a93ad935346b107c7dc7d0988",
       "address": "0xa209a92D0230018b8016b6d7cCDa1E219a0174E1",
       "blockNumber": 43124495
+    },
+    "DAOsProxy_prod": {
+      "version": "93b79a147f589ef2243f1351f34bb6a26915a39a93ad935346b107c7dc7d0988",
+      "address": "0xFa11c046B3DCFa717a2238fb74Cdba6F915969dC",
+      "blockNumber": 43708086
     }
   },
   "arbitrum_goerli": {
