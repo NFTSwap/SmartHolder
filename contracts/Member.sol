@@ -22,7 +22,8 @@ contract Member is Module, ERC721, IMember {
 	EnumerableSet.UintSet   private  _infoList; // member table list
 	uint256                 private  _votes; // all vote total
 	uint256                 internal _executor; // executor
-	uint256[16]             private  __; // reserved storage space
+	uint256                 public   requestJoinLifespan; // 申请加入成员提案生命周期
+	uint256[15]             private  __; // reserved storage space
 
 	struct MintMemberArgs {
 		address   owner;
@@ -47,6 +48,8 @@ contract Member is Module, ERC721, IMember {
 		initERC721(name, name);
 		_registerInterface(Member_Type);
 		_setBaseURI(baseURI);
+
+		requestJoinLifespan = 7 days;
 
 		for (uint256 i = 0; i < members.length; i++)
 			mint(members[i].owner, members[i].info, members[i].permissions);
@@ -103,6 +106,13 @@ contract Member is Module, ERC721, IMember {
 	}
 
 	/**
+	 * @dev set request join liftspan
+	 */
+	function setRequestJoinLifespan(uint256 lifespan) public OnlyDAO {
+		requestJoinLifespan = lifespan;
+	}
+
+	/**
 	 * @dev request join to DAO, create join vote proposal
 	 */
 	function requestJoin(address owner, Info memory info, uint256[] memory permissions) public returns (uint256 id) {
@@ -124,7 +134,7 @@ contract Member is Module, ERC721, IMember {
 		pro.id          = id;
 		pro.originId    = 0; // member id
 		pro.target      = target;
-		pro.lifespan    = 0;
+		pro.lifespan    = requestJoinLifespan;
 		pro.passRate    = 5001;
 		pro.loopCount   = 0;
 		pro.loopTime    = 0;

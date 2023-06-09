@@ -40,7 +40,7 @@
       "address": "0xE7a556F530f8CE8D7a0b929BE64F530F29A2453f",
       "blockNumber": 8860448
     },
-    "DAOsProxy_": {
+    "DAOsProxy_0": {
       "version": "93b79a147f589ef2243f1351f34bb6a26915a39a93ad935346b107c7dc7d0988",
       "address": "0x555309800BDDd188A5B51728d5611725d9bBad02",
       "blockNumber": 8860453
@@ -83,26 +83,16 @@
       "blockNumber": 42010935
     },
     "Member": {
-      "version": "e61a86b4aa312c6842afe8a755ab0b60a7f8c42def47cb5a9b58720ee1d8a80b",
-      "address": "0xF7AEC70aC72c9021112Edf4a90fC74A813699B0F",
-      "blockNumber": 42010947
-    },
-    "Member_": {
-      "version": "666d714924e866fab50001809a66ef5781051a247a3ed24e1bb27e5a5ab1cfe4",
-      "address": "0x852cBfdf3E091c4c018C406af8dd3822669c10A8",
+      "version": "4f24fcd99705c94325bfcfebb60d4a391ac1e1b25115f7ad0613c804471d4eb4",
+      "address": "0x8D163ab93AF9ddd5256Dcb1B98f988c609381D0d",
       "blockNumber": 42010947
     },
     "DAOs": {
-      "version": "1850ea8550902b1c969e80337a97433cd8d8c5752d0f5b1fe1d2374d76253ebf",
-      "address": "0x6bae5Cd5AB5f05FcDe6ec5c925db815331538Bf7",
+      "version": "b7d648a8705958de61ca8dfe7f1050397fb84883baf13c508870f460ac655541",
+      "address": "0x30A584F21Ae623E999E21CB4CcC9CF1F56e06fB2",
       "blockNumber": 42011358
     },
     "DAOsProxy_0": {
-      "version": "93b79a147f589ef2243f1351f34bb6a26915a39a93ad935346b107c7dc7d0988",
-      "address": "0x179596783388e24a9D4E1ef982bc0c9224C41F43",
-      "blockNumber": 42809871
-    },
-    "DAOsProxy": {
       "version": "93b79a147f589ef2243f1351f34bb6a26915a39a93ad935346b107c7dc7d0988",
       "address": "0xa209a92D0230018b8016b6d7cCDa1E219a0174E1",
       "blockNumber": 43124495
