@@ -41,6 +41,8 @@ interface IERC1155_1 is IERC1155, IERC1155MetadataURI {
 
 interface IOpenseaContractURI {
 	function contractURI() external view returns (string memory);
+	function baseContractURI() external view returns (string memory);
+	function externalLink() external view returns (string memory);
 }
 
 // DAO interfaces
@@ -143,6 +145,8 @@ interface IVotePool {
 interface IDAO is IModule {
 	event SetModule(uint256 indexed id, address addr);
 	function daos() view external returns (IDAOs);
+	function name() view external returns (string memory);
+	function logo() view external returns (string memory);
 	function root() view external returns (address);
 	function member() view external returns (IMember);
 	function ledger() view external returns (ILedger);

@@ -12,6 +12,7 @@ contract AssetModule is Module, IOpenseaContractURI {
 
 	struct InitContractURI {
 		string  name;
+		string  name_suffix;
 		string  description;
 		string  image;
 		string  external_link;
@@ -48,7 +49,7 @@ contract AssetModule is Module, IOpenseaContractURI {
 
 	function initAssetModule(address host, address operator, InitContractURI calldata uri) internal {
 		initModule(host, uri.description, operator);
-		name_ = uri.name;
+		name_ = string(abi.encodePacked(uri.name, uri.name_suffix));
 		image = uri.image;
 		external_link = uri.external_link;
 		fee_recipient = uri.fee_recipient == address(0) ? address(this): uri.fee_recipient;
@@ -57,13 +58,21 @@ contract AssetModule is Module, IOpenseaContractURI {
 	}
 
 	function contractURI() view public override returns (string memory uri) {
-		bytes memory a = abi.encodePacked("?name=0xs",                      bytes(name_).toHexString());
-		bytes memory b = abi.encodePacked("&description=0xs",               bytes(_description).toHexString());
-		bytes memory c = abi.encodePacked("&image=0xs",                     bytes(image).toHexString());
-		bytes memory d = abi.encodePacked("&external_link=0xs",             bytes(external_link).toHexString());
-		bytes memory e = abi.encodePacked("&seller_fee_basis_points=",      uint256(seller_fee_basis_points).toString());
-		bytes memory f = abi.encodePacked("&fee_recipient=",                fee_recipient.toHexString());
+		bytes memory a = abi.encodePacked("?name=0xs",                 bytes(name_).toHexString());
+		bytes memory b = abi.encodePacked("&description=0xs",          bytes(_description).toHexString());
+		bytes memory c = abi.encodePacked("&image=0xs",                bytes(image).toHexString());
+		bytes memory d = abi.encodePacked("&external_link=0xs",        bytes(external_link).toHexString());
+		bytes memory e = abi.encodePacked("&seller_fee_basis_points=", uint256(seller_fee_basis_points).toString());
+		bytes memory f = abi.encodePacked("&fee_recipient=",           fee_recipient.toHexString());
 		uri = string(abi.encodePacked(base_contract_uri, a, b, c, d, e, f));
+	}
+
+	function baseContractURI() public view override returns (string memory uri) {
+		uri = base_contract_uri;
+	}
+
+	function externalLink() public view override returns (string memory uri) {
+		uri = external_link;
 	}
 
 	function set_seller_fee_basis_points(uint32 value) external Check(Action_Asset_set_seller_fee_basis_points) {

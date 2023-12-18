@@ -36,7 +36,12 @@ contract Member is Module, ERC721, IMember {
 
 	// compatible with opensea
 	function contractURI() view public override returns (string memory uri) {
-		uri = _host.asset().contractURI();
+		bytes memory a = abi.encodePacked("?name=0xs",          bytes(name()).toHexString());
+		bytes memory b = abi.encodePacked("&description=0xs",   bytes(_description).toHexString());
+		bytes memory c = abi.encodePacked("&image=0xs",         bytes(_host.logo()).toHexString());
+		bytes memory d = abi.encodePacked("&external_link=0xs", bytes(_host.asset().externalLink()).toHexString());
+		bytes memory e = abi.encodePacked("&seller_fee_basis_points=0&fee_recipient=0x0");
+		uri = string(abi.encodePacked(_host.asset().baseContractURI(), a, b, c, d, e));
 	}
 
 	function initMember(

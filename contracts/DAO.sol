@@ -17,7 +17,7 @@ contract DAO is IDAO, Module {
 		string name;
 		string mission;
 		string description;
-		string image;
+		string image; // logo image
 		bytes  extend;
 		address unlockOperator;
 	}
@@ -34,7 +34,8 @@ contract DAO is IDAO, Module {
 
 	function daos() view public override returns (IDAOs) { return _daos; }
 	function root() view external override returns (address) { return _root; }
-	function name() view external returns (string memory) { return _name; }
+	function name() view external override returns (string memory) { return _name; }
+	function logo() view external override returns (string memory) { return image; }
 	function mission() view external returns (string memory) { return _mission; }
 	function member() view external override returns (IMember) { return IMember(module(Module_MEMBER_ID)); }
 	function ledger() view external override returns (ILedger) { return ILedger(module(Module_LEDGER_ID)); }

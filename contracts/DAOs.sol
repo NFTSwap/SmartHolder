@@ -122,21 +122,24 @@ contract DAOs is Upgrade, Initializable, Ownable, IDAOs {
 		AssetShell  assetSecond = AssetShell( payable(address(new AssetShellProxy(defaultIMPLs.AssetShell))));
 
 		Asset.InitContractURI memory uri;
-		uri.name                    = assetArgs.name;
-		uri.description             = assetArgs.description;
-		uri.image                   = assetArgs.image;
-		uri.external_link           = assetArgs.external_link;
-		uri.base_contract_uri       = assetArgs.base_contract_uri;
-		uri.base_uri                = assetArgs.base_uri;
-		uri.fee_recipient           = assetArgs.fee_recipient;
+		uri.name              = assetArgs.name;
+		uri.name_suffix       = "-Raw";
+		uri.description       = assetArgs.description;
+		uri.image             = assetArgs.image;
+		uri.external_link     = assetArgs.external_link;
+		uri.base_contract_uri = assetArgs.base_contract_uri;
+		uri.base_uri          = assetArgs.base_uri;
+		uri.fee_recipient     = assetArgs.fee_recipient;
 		//uri.seller_fee_basis_points = 0;
 
 		ledger.initLedger(address(host), ledgerArgs.description, address(0));
 		asset.initAsset(address(host), address(0), uri);
 
+		uri.name_suffix = "-Asset";
 		uri.seller_fee_basis_points = assetArgs.seller_fee_basis_points_second;
 		assetSecond.initAssetShell(address(host), address(0), IAssetShell.SaleType.kSecond, uri, assetArgs.enable_lock);
 
+		uri.name_suffix = "-FirstAsset";
 		uri.seller_fee_basis_points = assetArgs.seller_fee_basis_points_first;
 		assetFirst.initAssetShell(address(host), address(0), IAssetShell.SaleType.kFirst, uri, assetArgs.enable_lock);
 
