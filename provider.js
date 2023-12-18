@@ -1,5 +1,6 @@
 
 const somes = require('somes').default;
+const buffer = require('somes/buffer').default;
 const req = require('somes/request');
 const aes = require('crypto-tx/aes');
 const gas = require('./gas');
@@ -30,6 +31,7 @@ class ProviderBase {
 	}
 	async request(payload) {
 		let retry = 10;
+
 		while(1) {
 			let matic_gas = payload.method == 'eth_gasPrice' && this.host.chainId == 137;
 			let warp = (result)=>({ id: payload.id, jsonrpc: payload.jsonrpc, result });
@@ -40,16 +42,21 @@ class ProviderBase {
 					// console.log('matic eth_gasPrice', gasPrice);
 					return warp(this.matic_eth_gasPrice);
 				}
-				//let url = this.url[somes.random(0, this.url.length-1)];
-				// console.log('--------------', this.url, payload);
-				// console.log('cfg.proxy', cfg.proxy, payload);
-				let r = await req.request(this.url, { params: payload, method: 'POST', dataType: 'json', proxy: cfg.proxy });
+				let r;
+				if (cfg.shsProxy) {
+					r = await req.request(`${cfg.shsProxy}?pathname=${buffer.from(this.url).toString('base58')}`, {
+						params: payload, method: 'POST', dataType: 'json' 
+					});
+				} else {
+					r = await req.request(this.url, { params: payload, method: 'POST', dataType: 'json', proxy: cfg.proxy });
+				}
+
 				let data = JSON.parse(r.data.toString('utf-8'));
 				// console.log('--------------', data)
 				return data;
 			} catch (err) {
 				if (retry--) {
-					// console.warn(`   --- retry rpc request ${retry}`);
+					// console.warn(`   --- retry rpc request ${retry}`, err.message);
 				} else {
 					if (matic_gas && this.matic_eth_gasPrice) {
 						return warp(this.matic_eth_gasPrice);

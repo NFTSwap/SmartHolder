@@ -22,7 +22,8 @@ contract Member is Module, ERC721, IMember {
 	EnumerableSet.UintSet   private  _infoList; // member table list
 	uint256                 private  _votes; // all vote total
 	uint256                 internal _executor; // executor
-	uint256[16]             private  __; // reserved storage space
+	uint256                 public   requestJoinLifespan; // 申请加入成员提案生命周期
+	uint256[15]             private  __; // reserved storage space
 
 	struct MintMemberArgs {
 		address   owner;
@@ -52,6 +53,8 @@ contract Member is Module, ERC721, IMember {
 		initERC721(name, name);
 		_registerInterface(Member_Type);
 		_setBaseURI(baseURI);
+
+		requestJoinLifespan = 7 days;
 
 		for (uint256 i = 0; i < members.length; i++)
 			mint(members[i].owner, members[i].info, members[i].permissions);
@@ -108,6 +111,13 @@ contract Member is Module, ERC721, IMember {
 	}
 
 	/**
+	 * @dev set request join liftspan
+	 */
+	function setRequestJoinLifespan(uint256 lifespan) public OnlyDAO {
+		requestJoinLifespan = lifespan;
+	}
+
+	/**
 	 * @dev request join to DAO, create join vote proposal
 	 */
 	function requestJoin(address owner, Info memory info, uint256[] memory permissions) public returns (uint256 id) {
@@ -129,7 +139,7 @@ contract Member is Module, ERC721, IMember {
 		pro.id          = id;
 		pro.originId    = 0; // member id
 		pro.target      = target;
-		pro.lifespan    = 0;
+		pro.lifespan    = requestJoinLifespan;
 		pro.passRate    = 5001;
 		pro.loopCount   = 0;
 		pro.loopTime    = 0;
@@ -231,21 +241,25 @@ contract Member is Module, ERC721, IMember {
 		emit SetPermissions(id, addActions, removeActions);
 	}
 
-	function addVotes(uint256 id, int32 votes) public OnlyDAO {
+	function addVotes(uint256 id, int256 votes) public OnlyDAO {
 		checkExists(id); // check info query for nonexistent member
 
 		Info storage info = _infoMap[id].info;
+		int32 votes0 = int32(votes);
 
-		info.votes += uint32(votes);
-		_votes += uint32(votes);
+		int32 v = int32(info.votes) + votes0;
+		require(v >= 0, "#Member.addVotes votes value overflow");
+
+		info.votes = uint32(v);
+		_votes = uint256(int256(_votes) + votes0);
 
 		if (votes > 0)
-			emit TransferVotes(0, id, uint32(votes));
+			emit TransferVotes(0, id, uint32(votes0));
 		else
-			emit TransferVotes(id, 0, uint32(-votes));
+			emit TransferVotes(id, 0, uint32(-votes0));
 	}
 
-	function addVotesOfBatch(uint256[] calldata ids, int32[] calldata votes) public {
+	function addVotesOfBatch(uint256[] calldata ids, int256[] calldata votes) public {
 		for (uint256 i = 0; i < ids.length; i++) {
 			addVotes(ids[i], votes[i]);
 		}
