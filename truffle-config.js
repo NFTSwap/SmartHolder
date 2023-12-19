@@ -62,7 +62,7 @@ const networks = {
 		// TODO maticvigil disable use, eth_getStorageAt call error
 		// provider: 'https://rpc-mainnet.maticvigil.com/v1/ef8f16191b474bb494f33283a81a38487e4dc245', // louistru@tom.com
 		production: true,
-		// gasPrice: process.env.GAS, // 400000000000
+		gasPrice: process.env.GAS, // 400000000000
 	},
 	arbitrum: {
 		network_id: 42161,

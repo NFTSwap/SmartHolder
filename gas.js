@@ -10,7 +10,7 @@ async function matic(scale,fast) {
 	let url = 'https://gpoly.blockscan.com/gasapi.ashx?apikey=key&method=gasoracle';
 	// let url = 'https://dao.smartholder.jp/service-api/utils/printJSON';
 	// if (cfg.shsProxy) {
-		// url = `${cfg.shsProxy}?pathname=${buffer.from(url).toString('base58')}`;
+	// 	url = `${cfg.shsProxy}?pathname=${buffer.from(url).toString('base58')}`;
 	// }
 	let {data} = await req.get(url);
 	// {
