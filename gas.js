@@ -8,12 +8,11 @@ try {
 
 async function matic(scale,fast) {
 	let url = 'https://gpoly.blockscan.com/gasapi.ashx?apikey=key&method=gasoracle';
-
-	if (cfg.shsProxy) {
-		var {data} = await req.get(`${cfg.shsProxy}?pathname=${buffer.from(url).toString('base58')}`);
-	} else {
-		var {data} = await req.get(url);
-	}
+	// let url = 'https://dao.smartholder.jp/service-api/utils/printJSON';
+	// if (cfg.shsProxy) {
+		// url = `${cfg.shsProxy}?pathname=${buffer.from(url).toString('base58')}`;
+	// }
+	let {data} = await req.get(url);
 	// {
 	// 	"LastBlock": "42009802",
 	// 	"SafeGasPrice": "503.4",

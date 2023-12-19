@@ -25,75 +25,69 @@ try {
 	var cfg = {};
 }
 
-const truffle_config = {
-	/**
-	 * Networks define how you connect to your ethereum client and let you set the
-	 * defaults web3 uses to send transactions. If you don't specify one truffle
-	 * will spin up a development blockchain for you on port 9545 when you
-	 * run `develop` or `test`. You can ask a truffle command to use a specific
-	 * network from the command line, e.g
-	 *
-	 * $ truffle test --network <network-name>
-	 */
+/**
+* Networks define how you connect to your ethereum client and let you set the
+* defaults web3 uses to send transactions. If you don't specify one truffle
+* will spin up a development blockchain for you on port 9545 when you
+* run `develop` or `test`. You can ask a truffle command to use a specific
+* network from the command line, e.g
+*
+* $ truffle test --network <network-name>
+*/
+const networks = {
+	// Useful for testing. The `development` name is special - truffle uses it by default
+	// if it's defined here and no other network is specified at the command line.
+	// You should run a client (like ganache-cli, geth or parity) in a separate terminal
+	// tab if you use this network and you must also set the `host`, `port` and `network_id`
+	// options below to some value.
+	goerli: {
+		network_id: 5,
+		provider: 'https://goerli.infura.io/v3/6b4f3897597e41d1adc12b7447c84767', // louis.tru@gmail.com
+		//provider: 'https://eth-goerli.g.alchemy.com/v2/lwDFslNRvhCjzogUVLPtPzGIN4ZZDa8I',
+		production: true,
+	},
+	arbitrum_goerli: {
+		network_id: 421613,
+		provider: 'https://arbitrum-goerli.infura.io/v3/6b4f3897597e41d1adc12b7447c84767', // louis.tru@gmail.com
+		production: true,
+	},
+	avalanche_fuji: {
+		network_id: 43113,
+		provider: 'https://avalanche-fuji.infura.io/v3/7ad9cba561d24867a0d9c4c78e0a8941',
+		production: true,
+	},
+	matic: {
+		network_id: 137,
+		provider: 'https://polygon-mainnet.infura.io/v3/6b4f3897597e41d1adc12b7447c84767', // louis.tru@gmail.com
+		// TODO maticvigil disable use, eth_getStorageAt call error
+		// provider: 'https://rpc-mainnet.maticvigil.com/v1/ef8f16191b474bb494f33283a81a38487e4dc245', // louistru@tom.com
+		production: true,
+		// gasPrice: process.env.GAS, // 400000000000
+	},
+	arbitrum: {
+		network_id: 42161,
+		provider:'https://arbitrum-mainnet.infura.io/v3/6b4f3897597e41d1adc12b7447c84767', // louis.tru@gmail.com
+		production: true,
+	},
+	avalanche: {
+		network_id: 43114,
+		provider: 'https://avalanche-mainnet.infura.io/v3/7ad9cba561d24867a0d9c4c78e0a8941',
+		production: true,
+	},
+	development: {
+		host: "127.0.0.1",
+		port: "8545",
+		gas: 6721975,
+		network_id: 1337,
+	},
+	...cfg.networks,
+};
 
+const network = process.env.ENV || 'goerli';
+
+const truffle_config = {
 	networks: {
-		// Useful for testing. The `development` name is special - truffle uses it by default
-		// if it's defined here and no other network is specified at the command line.
-		// You should run a client (like ganache-cli, geth or parity) in a separate terminal
-		// tab if you use this network and you must also set the `host`, `port` and `network_id`
-		// options below to some value.
-		goerli: {
-			network_id: 5,
-			provider: new Provider(
-				// 'https://goerli.infura.io/v3/6b4f3897597e41d1adc12b7447c84767',
-				'https://eth-goerli.g.alchemy.com/v2/lwDFslNRvhCjzogUVLPtPzGIN4ZZDa8I',
-			),
-			production: true,
-		},
-		arbitrum_goerli: {
-			network_id: 421613,
-			provider: new Provider(
-				'https://arbitrum-goerli.infura.io/v3/6b4f3897597e41d1adc12b7447c84767',
-			),
-			production: true,
-		},
-		avalanche_fuji: {
-			network_id: 43113,
-			provider: new Provider(
-				'https://avalanche-fuji.infura.io/v3/7ad9cba561d24867a0d9c4c78e0a8941',
-			),
-			production: true,
-		},
-		matic: {
-			network_id: 137,
-			provider: new Provider(
-				'https://polygon-mainnet.infura.io/v3/6b4f3897597e41d1adc12b7447c84767',
-				// 'https://rpc-mainnet.maticvigil.com/v1/ef8f16191b474bb494f33283a81a38487e4dc245'
-			),
-			production: true,
-			gasPrice: process.env.GAS, // 400000000000
-		},
-		arbitrum: {
-			network_id: 42161,
-			provider: new Provider(
-				'https://arbitrum-mainnet.infura.io/v3/6b4f3897597e41d1adc12b7447c84767',
-			),
-			production: true,
-		},
-		avalanche: {
-			network_id: 43114,
-			provider: new Provider(
-				'https://avalanche-mainnet.infura.io/v3/7ad9cba561d24867a0d9c4c78e0a8941',
-			),
-			production: true,
-		},
-		development: {
-			host: "127.0.0.1",
-			port: "8545",
-			gas: 6721975,
-			network_id: 1337,
-		},
-		...cfg.networks,
+		[network]: ((o)=>({...o,provider:new Provider(o.provider)}))(networks[network]),
 	},
 
 	// Set default mocha options here, use special reporters etc.
@@ -119,6 +113,5 @@ const truffle_config = {
 	},
 	// plugins: ["solidity-coverage"]
 };
-
 
 module.exports = truffle_config;

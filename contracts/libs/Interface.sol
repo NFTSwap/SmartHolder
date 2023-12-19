@@ -41,8 +41,6 @@ interface IERC1155_1 is IERC1155, IERC1155MetadataURI {
 
 interface IOpenseaContractURI {
 	function contractURI() external view returns (string memory);
-	function baseContractURI() external view returns (string memory);
-	function externalLink() external view returns (string memory);
 }
 
 // DAO interfaces
@@ -76,7 +74,13 @@ interface IAssetShell is IModule, IERC1155_1, IERC1155Receiver {
 	function withdrawBalance(IERC20 erc20) external;
 }
 
-interface IAsset is IModule, IERC1155_1, IOpenseaContractURI {}
+interface IAsset is IModule, IERC1155_1, IOpenseaContractURI {
+	function getContractURI(
+		string memory name,
+		string memory description,
+		uint32 seller_fee_basis_points, address fee_recipient
+	) external view returns (string memory);
+}
 interface IShare is IERC20_1 {}
 
 interface ILedger is IModule {

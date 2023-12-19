@@ -19,7 +19,7 @@ contract ProxyStore is Upgrade {
 	// The size allocated by Layout Store should be specified by dynamic compilation, 
 	// and the storage size needs to be read from the original contract
 
-	constructor(address impl_) public {
+	constructor(address impl_) {
 		_impl = impl_;
 	}
 

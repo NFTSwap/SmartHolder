@@ -57,9 +57,13 @@ contract AssetModule is Module, IOpenseaContractURI {
 		base_contract_uri = uri.base_contract_uri;
 	}
 
-	function contractURI() view public override returns (string memory uri) {
-		bytes memory a = abi.encodePacked("?name=0xs",                 bytes(name_).toHexString());
-		bytes memory b = abi.encodePacked("&description=0xs",          bytes(_description).toHexString());
+	function _contractURI(
+		string memory name,
+		string memory description,
+		uint32 seller_fee_basis_points, address fee_recipient
+	) view internal returns (string memory uri) {
+		bytes memory a = abi.encodePacked("?name=0xs",                 bytes(name).toHexString());
+		bytes memory b = abi.encodePacked("&description=0xs",          bytes(description).toHexString());
 		bytes memory c = abi.encodePacked("&image=0xs",                bytes(image).toHexString());
 		bytes memory d = abi.encodePacked("&external_link=0xs",        bytes(external_link).toHexString());
 		bytes memory e = abi.encodePacked("&seller_fee_basis_points=", uint256(seller_fee_basis_points).toString());
@@ -67,12 +71,8 @@ contract AssetModule is Module, IOpenseaContractURI {
 		uri = string(abi.encodePacked(base_contract_uri, a, b, c, d, e, f));
 	}
 
-	function baseContractURI() public view override returns (string memory uri) {
-		uri = base_contract_uri;
-	}
-
-	function externalLink() public view override returns (string memory uri) {
-		uri = external_link;
+	function contractURI() view public override returns (string memory uri) {
+		uri = _contractURI(name_, _description, seller_fee_basis_points, fee_recipient);
 	}
 
 	function set_seller_fee_basis_points(uint32 value) external Check(Action_Asset_set_seller_fee_basis_points) {
@@ -87,6 +87,14 @@ contract AssetModule is Module, IOpenseaContractURI {
 }
 
 contract Asset is AssetModule, ERC1155, IAsset {
+
+	function getContractURI(
+		string memory name,
+		string memory description,
+		uint32 seller_fee_basis_points, address fee_recipient
+	) public view override returns (string memory uri) {
+		uri = _contractURI(name,description,seller_fee_basis_points,fee_recipient);
+	}
 
 	function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165,IERC165) returns (bool) {
 		return ERC1155.supportsInterface1155(interfaceId) || ERC165.supportsInterface(interfaceId);

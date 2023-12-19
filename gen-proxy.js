@@ -121,7 +121,7 @@ function genProxyPlaceholder() {
 
 	for (let it of Modules) {
 		fs.writeFileSync(`${__dirname}/contracts/gen/${it}Proxy.sol`,
-			`contract ${it}Proxy {address _impl; constructor(address impl_) public {_impl=impl_;}}`
+			`contract ${it}Proxy {address _impl; constructor(address impl_) {_impl=impl_;}}`
 		);
 	}
 }

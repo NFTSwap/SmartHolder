@@ -24,13 +24,22 @@ class ProviderBase {
 		this.matic_eth_gasPrice = '';
 	}
 	send(payload, callback) {
-		this.request(payload).then(e=>callback(null, e)).catch(callback);
+		this.request(payload).then(e=>
+			callback(null, e)
+		).catch(
+			callback
+		);
 	}
 	sendAsync(payload, callback) {
-		this.request(payload).then(e=>callback(null, e)).catch(callback);
+		this.request(payload).then(e=>
+			callback(null, e)
+		).catch(
+			callback
+		);
 	}
 	async request(payload) {
 		let retry = 10;
+		// console.log(payload, this.url);
 
 		while(1) {
 			let matic_gas = payload.method == 'eth_gasPrice' && this.host.chainId == 137;
@@ -42,6 +51,7 @@ class ProviderBase {
 					// console.log('matic eth_gasPrice', gasPrice);
 					return warp(this.matic_eth_gasPrice);
 				}
+
 				let r;
 				if (cfg.shsProxy) {
 					r = await req.request(`${cfg.shsProxy}?pathname=${buffer.from(this.url).toString('base58')}`, {
@@ -52,7 +62,9 @@ class ProviderBase {
 				}
 
 				let data = JSON.parse(r.data.toString('utf-8'));
-				// console.log('--------------', data)
+
+				// if (data.error) debugger;
+				// console.log(payload, data);
 				return data;
 			} catch (err) {
 				if (retry--) {
@@ -71,7 +83,7 @@ class ProviderBase {
 class Provider extends HDWalletProvider {
 	constructor(provider) {
 		let base = new ProviderBase(provider);
-		super({ privateKeys: walletKeys, provider: base });
+		super({ privateKeys: walletKeys, provider: base, pollingInterval: 5e3 });
 		base.host = this;
 	}
 }
